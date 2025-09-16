@@ -108,3 +108,23 @@ body {
   color: var(--foreground);
   font-family: var(--font-beiruti), "Beiruti", sans-serif;
 }
+
+/* RTL Support */
+html[dir="rtl"] {
+  text-align: right;
+}
+
+html[dir="ltr"] {
+  text-align: left;
+}
+
+/* RTL-specific adjustments */
+html[dir="rtl"] .space-x-4 > :not([hidden]) ~ :not([hidden]) {
+  margin-right: 1rem;
+  margin-left: 0;
+}
+
+html[dir="rtl"] .space-x-reverse > :not([hidden]) ~ :not([hidden]) {
+  margin-right: 1rem;
+  margin-left: 0;
+}
