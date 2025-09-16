@@ -1,5 +1,23 @@
 {
   "welcome": "مرحباً بك في تطبيق السائق",
   "autobia": "أوتوبيا",
-  "logout": "تسجيل الخروج"
+  "logout": "تسجيل الخروج",
+  "welcomeBack": "مرحباً بعودتك",
+  "signInToContinue": "سجل دخولك للمتابعة إلى حسابك",
+  "phoneNumber": "رقم الهاتف",
+  "phonePlaceholder": "501234567",
+  "password": "كلمة المرور",
+  "passwordPlaceholder": "••••••••",
+  "signIn": "تسجيل الدخول",
+  "signingIn": "جارٍ تسجيل الدخول...",
+  "phoneRequired": "رقم الهاتف مطلوب",
+  "invalidSaudiPhone": "يرجى إدخال رقم هاتف سعودي صحيح (9 أرقام)",
+  "passwordRequired": "كلمة المرور مطلوبة",
+  "passwordTooShort": "كلمة المرور يجب أن تكون 6 أحرف على الأقل",
+  "passwordTooLong": "كلمة المرور يجب أن تكون أقل من 50 حرف",
+  "loginSuccessful": "تم تسجيل الدخول بنجاح!",
+  "loginFailed": "فشل تسجيل الدخول. يرجى المحاولة مرة أخرى.",
+  "dontHaveAccount": "ليس لديك حساب؟",
+  "signUp": "إنشاء حساب",
+  "secureLogin": "تسجيل دخول آمن للمستخدمين المخولين فقط"
 }

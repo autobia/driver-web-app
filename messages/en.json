@@ -1,5 +1,23 @@
 {
   "welcome": "Welcome to Driver Web App",
   "autobia": "Autobia",
-  "logout": "Logout"
+  "logout": "Logout",
+  "welcomeBack": "Welcome Back",
+  "signInToContinue": "Sign in to continue to your account",
+  "phoneNumber": "Phone Number",
+  "phonePlaceholder": "501234567",
+  "password": "Password",
+  "passwordPlaceholder": "••••••••",
+  "signIn": "Sign In",
+  "signingIn": "Signing In...",
+  "phoneRequired": "Phone number is required",
+  "invalidSaudiPhone": "Please enter a valid Saudi phone number (9 digits)",
+  "passwordRequired": "Password is required",
+  "passwordTooShort": "Password must be at least 6 characters",
+  "passwordTooLong": "Password must be less than 50 characters",
+  "loginSuccessful": "Login successful!",
+  "loginFailed": "Login failed. Please try again.",
+  "dontHaveAccount": "Don't have an account?",
+  "signUp": "Sign up",
+  "secureLogin": "Secure login for authorized users only"
 }
