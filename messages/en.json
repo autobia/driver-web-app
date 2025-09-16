@@ -25,5 +25,12 @@
   "goHome": "Go Home",
   "goToLogin": "Go to Login",
   "userId": "User ID",
-  "role": "Role"
+  "role": "Role",
+  "trips": "Trips",
+  "qualityCheckTickets": "Quality Check Tickets",
+  "purchaseInvoices": "Purchase Invoices",
+  "selectSection": "Select Section",
+  "noTripsMessage": "No trips available",
+  "noTicketsMessage": "No quality check tickets available",
+  "noInvoicesMessage": "No purchase invoices available"
 }

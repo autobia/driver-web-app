@@ -25,5 +25,12 @@
   "goHome": "الذهاب للرئيسية",
   "goToLogin": "الذهاب لتسجيل الدخول",
   "userId": "معرف المستخدم",
-  "role": "الدور"
+  "role": "الدور",
+  "trips": "الرحلات",
+  "qualityCheckTickets": "تذاكر فحص الجودة",
+  "purchaseInvoices": "فواتير الشراء",
+  "selectSection": "اختر القسم",
+  "noTripsMessage": "لا توجد رحلات متاحة",
+  "noTicketsMessage": "لا توجد تذاكر فحص جودة متاحة",
+  "noInvoicesMessage": "لا توجد فواتير شراء متاحة"
 }

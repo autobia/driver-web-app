@@ -2,15 +2,12 @@
 
 import { useState } from "react";
 import { useSelector } from "react-redux";
-import { RootState } from "../store/store";
-import {
-  UserInfo,
-  NavigationTabs,
-  DashboardContent,
-  NavigationTab,
-} from "../components/dashboard";
+import { RootState } from "../../store/store";
+import UserInfo from "./UserInfo";
+import NavigationTabs, { NavigationTab } from "./NavigationTabs";
+import DashboardContent from "./DashboardContent";
 
-export default function Home() {
+export default function Dashboard() {
   const { user } = useSelector((state: RootState) => state.auth);
 
   // Check if user is a driver to show trips by default
@@ -25,7 +22,7 @@ export default function Home() {
   }
 
   return (
-    <div className="min-h-screen bg-neutral-50">
+    <>
       <UserInfo user={user} />
       <NavigationTabs
         activeTab={activeTab}
@@ -33,6 +30,6 @@ export default function Home() {
         isDriver={isDriver}
       />
       <DashboardContent activeTab={activeTab} />
-    </div>
+    </>
   );
 }
