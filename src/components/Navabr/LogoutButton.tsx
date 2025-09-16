@@ -1,13 +1,19 @@
 "use client";
 
 import { useTranslations } from "next-intl";
+import { useDispatch } from "react-redux";
+import { useRouter } from "next/navigation";
 import { ArrowLeftStartOnRectangleIcon } from "@heroicons/react/24/outline";
+import { logout } from "../../store/slices/authSlice";
 
 export default function LogoutButton() {
   const t = useTranslations();
+  const dispatch = useDispatch();
+  const router = useRouter();
+
   const handleLogout = () => {
-    // Add logout logic here
-    console.log("Logout clicked");
+    dispatch(logout());
+    router.push("/login");
   };
 
   return (

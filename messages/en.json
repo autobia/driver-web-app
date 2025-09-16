@@ -19,5 +19,11 @@
   "loginFailed": "Login failed. Please try again.",
   "dontHaveAccount": "Don't have an account?",
   "signUp": "Sign up",
-  "secureLogin": "Secure login for authorized users only"
+  "secureLogin": "Secure login for authorized users only",
+  "pageNotFound": "Page Not Found",
+  "pageNotFoundDescription": "The page you are looking for does not exist.",
+  "goHome": "Go Home",
+  "goToLogin": "Go to Login",
+  "userId": "User ID",
+  "role": "Role"
 }

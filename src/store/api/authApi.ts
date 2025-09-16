@@ -22,30 +22,15 @@ export interface LoginResponse {
 export interface DecodedUser {
   user_id: number;
   user: {
-    id: number;
     username: string;
-    email: string;
-    phone: string;
     first_name: string;
     last_name: string;
-    status: string;
-    is_admin: boolean;
-    is_staff: boolean;
-    is_active: boolean;
-    is_superuser: boolean;
     role: {
-      id: number;
-      name_en: string;
-      name_ar: string;
-      is_staff: boolean;
-    };
-    language: {
       id: number;
       name_en: string;
       name_ar: string;
     };
   };
-  group: string[];
 }
 
 // Create the auth API slice
@@ -70,7 +55,19 @@ export const authApi = createApi({
           // Decode the access token to get user information
           try {
             const decodedToken = jwtDecode<DecodedUser>(response.tokens.access);
-            localStorage.setItem("user", JSON.stringify(decodedToken.user));
+            // Extract user_id, username, names, and role
+            const userData = {
+              user_id: decodedToken.user_id,
+              username: decodedToken.user.username,
+              first_name: decodedToken.user.first_name,
+              last_name: decodedToken.user.last_name,
+              role: {
+                id: decodedToken.user.role.id,
+                name_en: decodedToken.user.role.name_en,
+                name_ar: decodedToken.user.role.name_ar,
+              },
+            };
+            localStorage.setItem("user", JSON.stringify(userData));
           } catch (error) {
             console.error("Error decoding JWT token:", error);
           }

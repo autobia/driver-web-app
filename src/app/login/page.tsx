@@ -2,8 +2,10 @@
 
 import { useState } from "react";
 import { useTranslations } from "next-intl";
+import { useRouter } from "next/navigation";
 import { Formik, Form, Field, ErrorMessage } from "formik";
 import * as Yup from "yup";
+import { useDispatch } from "react-redux";
 import {
   EyeIcon,
   EyeSlashIcon,
@@ -12,6 +14,8 @@ import {
   CheckCircleIcon,
   XCircleIcon,
 } from "@heroicons/react/24/outline";
+import { useLoginMutation } from "../../store/api/authApi";
+import { setUser } from "../../store/slices/authSlice";
 
 interface LoginFormValues {
   phone: string;
@@ -20,6 +24,9 @@ interface LoginFormValues {
 
 export default function LoginPage() {
   const t = useTranslations();
+  const router = useRouter();
+  const dispatch = useDispatch();
+  const [login] = useLoginMutation();
   const [showPassword, setShowPassword] = useState(false);
   const [submitStatus, setSubmitStatus] = useState<{
     type: "success" | "error" | null;
@@ -61,41 +68,46 @@ export default function LoginPage() {
 
   const handleSubmit = async (
     values: LoginFormValues,
-    { setSubmitting }: any
+    { setSubmitting }: { setSubmitting: (isSubmitting: boolean) => void }
   ) => {
     setSubmitStatus({ type: null, message: "" });
 
-    try {
-      // Simulate API call
-      await new Promise((resolve) => setTimeout(resolve, 2000));
+    // Make actual API call
+    await login({
+      phone: `+966${values.phone}`,
+      password: values.password,
+      grant_type: "password",
+      is_staff: true,
+      lang: "ar",
+    }).unwrap();
 
-      // Handle successful login here
-      console.log("Login successful:", {
-        phone: `+966${values.phone}`,
-        password: values.password,
-      });
+    // Handle successful login - get user from localStorage (decoded from JWT)
+    const storedUser = localStorage.getItem("user");
+    const storedToken = localStorage.getItem("authToken");
+    const storedRefreshToken = localStorage.getItem("refreshToken");
 
-      setSubmitStatus({
-        type: "success",
-        message: t("loginSuccessful") || "Login successful! Redirecting...",
-      });
-
-      // Simulate redirect after success
-      setTimeout(() => {
-        // Replace with actual navigation
-        window.location.href = "/";
-      }, 1500);
-    } catch (error) {
-      console.error("Login error:", error);
-      setSubmitStatus({
-        type: "error",
-        message:
-          t("loginFailed") ||
-          "Login failed. Please check your credentials and try again.",
-      });
-    } finally {
-      setSubmitting(false);
+    if (storedUser && storedToken) {
+      const user = JSON.parse(storedUser);
+      dispatch(
+        setUser({
+          user,
+          token: storedToken,
+          refreshToken: storedRefreshToken || undefined,
+        })
+      );
     }
+
+    setSubmitStatus({
+      type: "success",
+      message: t("loginSuccessful") || "Login successful! Redirecting...",
+    });
+
+    // Redirect after success
+    setTimeout(() => {
+      router.push("/");
+    }, 1500);
+
+    setSubmitting(false);
   };
 
   return (

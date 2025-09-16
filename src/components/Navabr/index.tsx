@@ -1,4 +1,8 @@
+"use client";
+
 import { useTranslations, useLocale } from "next-intl";
+import { useSelector } from "react-redux";
+import { RootState } from "../../store/store";
 import LogoutButton from "./LogoutButton";
 import LanguageSwitcher from "./LanguageSwitcher";
 
@@ -6,9 +10,10 @@ export default function Navbar() {
   const t = useTranslations();
   const locale = useLocale();
   const isRTL = locale === "ar";
+  const { isAuthenticated } = useSelector((state: RootState) => state.auth);
 
   return (
-    <nav className="bg-white shadow-primary-100 border-b-2 border-l-2 border-r-2 border-primary-200/30 backdrop-blur-sm sticky top-0 z-50 rounded-bl-[15px] rounded-br-[15px]">
+    <nav className="bg-white shadow-primary-100  border-primary-200/30 backdrop-blur-sm sticky top-0 z-50 rounded-bl-[15px] rounded-br-[15px]">
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
         <div className="flex justify-between items-center h-16">
           {/* Brand - Start side (left in LTR, right in RTL) */}
@@ -25,7 +30,7 @@ export default function Navbar() {
             }`}
           >
             <LanguageSwitcher />
-            <LogoutButton />
+            {isAuthenticated && <LogoutButton />}
           </div>
         </div>
       </div>
