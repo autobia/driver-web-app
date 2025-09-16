@@ -1,5 +1,6 @@
 import { Beiruti } from "next/font/google";
 import "./globals.css";
+import { NextIntlClientProvider } from "next-intl";
 
 const beiruti = Beiruti({
   variable: "--font-beiruti",
@@ -13,7 +14,9 @@ export default function RootLayout({
 }>) {
   return (
     <html lang="en">
-      <body className={`${beiruti.variable} antialiased`}>{children}</body>
+      <body className={`${beiruti.variable} antialiased`}>
+        <NextIntlClientProvider>{children}</NextIntlClientProvider>
+      </body>
     </html>
   );
 }
