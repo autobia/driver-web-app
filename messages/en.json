@@ -32,5 +32,13 @@
   "selectSection": "Select Section",
   "noTripsMessage": "No trips available",
   "noTicketsMessage": "No quality check tickets available",
-  "noInvoicesMessage": "No purchase invoices available"
+  "noInvoicesMessage": "No purchase invoices available",
+  "startPreparing": "Start Preparing",
+  "companyName": "Company",
+  "orderId": "Order ID",
+  "quantity": "Quantity",
+  "status": "Status",
+  "pending": "Pending",
+  "inProgress": "In Progress",
+  "completed": "Completed"
 }

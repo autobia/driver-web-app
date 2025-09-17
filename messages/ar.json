@@ -32,5 +32,13 @@
   "selectSection": "اختر القسم",
   "noTripsMessage": "لا توجد رحلات متاحة",
   "noTicketsMessage": "لا توجد تذاكر فحص جودة متاحة",
-  "noInvoicesMessage": "لا توجد فواتير شراء متاحة"
+  "noInvoicesMessage": "لا توجد فواتير شراء متاحة",
+  "startPreparing": "بدء التحضير",
+  "companyName": "الشركة",
+  "orderId": "رقم الطلب",
+  "quantity": "الكمية",
+  "status": "الحالة",
+  "pending": "قيد الانتظار",
+  "inProgress": "قيد التنفيذ",
+  "completed": "مكتمل"
 }
