@@ -2,6 +2,7 @@
 
 import { useTranslations } from "next-intl";
 import { useSelector } from "react-redux";
+import { useRouter } from "next/navigation";
 import { RootState } from "../../store/store";
 import {
   useGetQualityChecksQuery,
@@ -14,6 +15,7 @@ import { Button } from "../ui/button";
 export default function QualityCheckTicketsComponent() {
   const t = useTranslations();
   const locale = useLocale();
+  const router = useRouter();
   const { user } = useSelector((state: RootState) => state.auth);
 
   const {
@@ -68,8 +70,8 @@ export default function QualityCheckTicketsComponent() {
   };
 
   const handleStartPreparing = (qualityCheckId: number) => {
-    // TODO: Implement start preparing functionality
-    console.log("Starting preparation for QC:", qualityCheckId);
+    // Navigate to QC detail page
+    router.push(`/qc/${qualityCheckId}`);
   };
 
   if (isLoading) {
@@ -145,7 +147,10 @@ export default function QualityCheckTicketsComponent() {
                 <div className="flex items-center space-x-3 rtl:space-x-reverse">
                   <div className="w-2 h-2 bg-secondary-400 rounded-full flex-shrink-0 mr-2 rtl:mr-0 rtl:ml-2"></div>
                   <p className="text-sm text-gray-700">
-                    {t("orderId")}: {qualityCheck.object_id}
+                    {t("orderId")}:{" "}
+                    {typeof qualityCheck.object_id === "object"
+                      ? qualityCheck.object_id.id
+                      : qualityCheck.object_id}
                   </p>
                 </div>
 

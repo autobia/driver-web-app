@@ -34,7 +34,7 @@ export default function TripsComponent() {
     );
   }
 
-  const trips = tripsData?.results || [];
+  const trips = tripsData?.trips || [];
 
   return (
     <div className="space-y-4">

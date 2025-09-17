@@ -108,6 +108,13 @@ interface CompanyEmployee {
   };
 }
 
+// Define trip object interface for when object_id is a trip
+interface TripObject {
+  id: number;
+  status: string;
+  trip_direction: string;
+}
+
 // Define the main quality check types - complete structure
 export interface QualityCheck {
   id: number;
@@ -116,7 +123,7 @@ export interface QualityCheck {
     app_label: string;
     model: string;
   };
-  object_id: number;
+  object_id: number | TripObject; // Can be either a number (purchase order) or trip object
   status: string;
   quality_checker: {
     id: number;
@@ -314,6 +321,35 @@ export interface QualityChecksParams {
   status?: string;
 }
 
+// Quality Check Submission Types
+export interface ReplacementItem {
+  replacement_item_sku: string;
+  brand_id: number;
+  manufacturer_id: number;
+  quantity: number;
+}
+
+export interface SubmissionItem {
+  part_number: string;
+  brand: number;
+  manufacturer: number;
+  received_quantity: number;
+  replacement_quantity: number;
+  replacement_list: ReplacementItem[];
+  delayed_quantity: number;
+  market_quantity: number;
+}
+
+export interface QualityCheckSubmissionRequest {
+  items: SubmissionItem[];
+}
+
+export interface QualityCheckSubmissionResponse {
+  id: number;
+  status: string;
+  message: string;
+}
+
 // Create the quality checks API slice
 export const qualityChecksApi = createApi({
   reducerPath: "qualityChecksApi",
@@ -329,11 +365,23 @@ export const qualityChecksApi = createApi({
         providesTags: ["QualityChecks"],
       }
     ),
+    submitQualityCheck: builder.mutation<
+      QualityCheckSubmissionResponse,
+      { id: number; data: QualityCheckSubmissionRequest }
+    >({
+      query: ({ id, data }) => ({
+        url: `/quality-checks/${id}/count-bulk/`,
+        method: "POST",
+        data,
+      }),
+      invalidatesTags: ["QualityChecks"],
+    }),
   }),
 });
 
 // Export hooks for usage in functional components
-export const { useGetQualityChecksQuery } = qualityChecksApi;
+export const { useGetQualityChecksQuery, useSubmitQualityCheckMutation } =
+  qualityChecksApi;
 
 // Export the reducer
 export default qualityChecksApi.reducer;
