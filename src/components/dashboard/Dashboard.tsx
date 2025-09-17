@@ -29,7 +29,9 @@ export default function Dashboard() {
         onTabChange={setActiveTab}
         isDriver={isDriver}
       />
-      <DashboardContent activeTab={activeTab} />
+      <div className="pb-20 sm:pb-0">
+        <DashboardContent activeTab={activeTab} />
+      </div>
     </>
   );
 }

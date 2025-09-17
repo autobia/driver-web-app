@@ -6,6 +6,7 @@ import Navbar from "@/components/Navabr";
 import StoreProvider from "@/store/ReduxProvider";
 import AuthInitializer from "@/components/AuthInitializer";
 import AuthGuard from "@/components/AuthGuard";
+import UserDataProvider from "@/components/UserDataProvider";
 
 const beiruti = Beiruti({
   variable: "--font-beiruti",
@@ -27,10 +28,12 @@ export default async function RootLayout({
           <NextIntlClientProvider>
             <AuthInitializer>
               <AuthGuard>
-                <div className="h-full flex flex-col">
-                  <Navbar />
-                  <main className="flex-1">{children}</main>
-                </div>
+                <UserDataProvider>
+                  <div className="h-full flex flex-col">
+                    <Navbar />
+                    <main className="flex-1">{children}</main>
+                  </div>
+                </UserDataProvider>
               </AuthGuard>
             </AuthInitializer>
           </NextIntlClientProvider>
