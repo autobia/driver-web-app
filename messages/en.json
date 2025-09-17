@@ -110,5 +110,14 @@
   "submit": "Submit",
   "submitting": "Submitting...",
   "submitQualityCheck": "Submit Quality Check",
-  "submitQualityCheckDescription": "Review the summary and submit the quality check. Items marked for market will be sent for procurement."
+  "submitQualityCheckDescription": "Review the summary and submit the quality check. Items marked for market will be sent for procurement.",
+  "assignmentSettings": "Assignment Settings",
+  "selectDriver": "Select Driver",
+  "selectDriverPlaceholder": "Choose a driver",
+  "driverRequired": "Driver selection is required",
+  "selectDelayedPreparer": "Select Delayed Preparer",
+  "selectPreparerPlaceholder": "Choose a preparer",
+  "noPreparerSelected": "No preparer selected",
+  "delayedPreparerDescription": "Optional: Select a preparer to handle delayed items",
+  "optional": "optional"
 }

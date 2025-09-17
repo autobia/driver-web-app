@@ -1,6 +1,10 @@
 import { createApi } from "@reduxjs/toolkit/query/react";
 import { axiosBaseQuery } from "./axiosBaseQuery";
 
+// Content Type Constants
+export const QC_CONTENT_TYPE_ID = 14;
+export const COMPANY_BRANCH_CONTENT_TYPE_ID = 32;
+
 // Define the quality check item types - complete structure
 export interface QualityCheckItem {
   id: number;
@@ -350,6 +354,33 @@ export interface QualityCheckSubmissionResponse {
   message: string;
 }
 
+// Quality Check Close Types
+export interface QualityCheckCloseRequest {
+  close: boolean;
+  assigned_type?: number; // Integer ID
+  assigned_to?: number; // Integer ID
+  trip?: boolean;
+  delayed_driver_id?: number; // For non-driver flow
+}
+
+export interface QualityCheckCloseResponse {
+  id: number;
+  status: string;
+  message: string;
+}
+
+// Delayed Items Flow Types
+export interface CreateDelayedItemsFlowRequest {
+  qc_id: string;
+  delayed_user_id: string;
+}
+
+export interface CreateDelayedItemsFlowResponse {
+  id: number;
+  status: string;
+  message: string;
+}
+
 // Create the quality checks API slice
 export const qualityChecksApi = createApi({
   reducerPath: "qualityChecksApi",
@@ -376,12 +407,38 @@ export const qualityChecksApi = createApi({
       }),
       invalidatesTags: ["QualityChecks"],
     }),
+    closeQualityCheck: builder.mutation<
+      QualityCheckCloseResponse,
+      { id: number; data: QualityCheckCloseRequest }
+    >({
+      query: ({ id, data }) => ({
+        url: `/quality-checks/${id}/close/`,
+        method: "POST",
+        data,
+      }),
+      invalidatesTags: ["QualityChecks"],
+    }),
+    createDelayedItemsFlow: builder.mutation<
+      CreateDelayedItemsFlowResponse,
+      CreateDelayedItemsFlowRequest
+    >({
+      query: (data) => ({
+        url: `/create-delayed-items-flow/`,
+        method: "POST",
+        data,
+      }),
+      invalidatesTags: ["QualityChecks"],
+    }),
   }),
 });
 
 // Export hooks for usage in functional components
-export const { useGetQualityChecksQuery, useSubmitQualityCheckMutation } =
-  qualityChecksApi;
+export const {
+  useGetQualityChecksQuery,
+  useSubmitQualityCheckMutation,
+  useCloseQualityCheckMutation,
+  useCreateDelayedItemsFlowMutation,
+} = qualityChecksApi;
 
 // Export the reducer
 export default qualityChecksApi.reducer;

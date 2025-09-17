@@ -87,7 +87,13 @@ export default function QualityCheckDetail() {
     return (
       <div className="flex flex-col items-center justify-center min-h-screen space-y-4">
         <p className="text-red-500">Error loading quality check details</p>
-        <Button onClick={() => router.back()} variant="outline">
+        <Button
+          onClick={() => {
+            dispatch(resetCurrentQC());
+            router.back();
+          }}
+          variant="outline"
+        >
           <ArrowLeft className="w-4 h-4 mr-2" />
           Go Back
         </Button>

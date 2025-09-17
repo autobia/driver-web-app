@@ -1,19 +1,38 @@
 "use client";
 
 import { useState } from "react";
-import { useSelector } from "react-redux";
-import { useTranslations } from "next-intl";
-import { useRouter } from "next/navigation";
-import { RootState } from "../../store/store";
-import { calculateCounterTotals } from "../../store/slices/qcSlice";
-import { useSubmitQualityCheckMutation } from "../../store/api/qualityChecksApi";
+import {
+  useSubmitQualityCheckMutation,
+  useCloseQualityCheckMutation,
+  useCreateDelayedItemsFlowMutation,
+} from "../../store/api/qualityChecksApi";
 import type {
   QualityCheckSubmissionRequest,
   SubmissionItem,
+  QualityCheckCloseRequest,
+  CreateDelayedItemsFlowRequest,
 } from "../../store/api/qualityChecksApi";
+import { useCreateTripMutation } from "../../store/api/tripsApi";
+import type { CreateTripRequest } from "../../store/api/tripsApi";
+import { useDrivers, usePreparers } from "../../hooks/useUserData";
+import { useSelector, useDispatch } from "react-redux";
+import { useTranslations } from "next-intl";
+import { useRouter } from "next/navigation";
+import { RootState } from "../../store/store";
+import {
+  calculateCounterTotals,
+  resetCurrentQC,
+} from "../../store/slices/qcSlice";
 import { Button } from "../ui/button";
 import { Checkbox } from "../ui/checkbox";
 import { Label } from "../ui/label";
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from "../ui/select";
 import {
   Dialog,
   DialogContent,
@@ -28,6 +47,8 @@ import {
   Package,
   Timer,
   ShoppingCart,
+  User,
+  Users,
 } from "lucide-react";
 
 interface CompletionModalProps {
@@ -41,13 +62,25 @@ export default function CompletionModal({
 }: CompletionModalProps) {
   const t = useTranslations();
   const router = useRouter();
+  const dispatch = useDispatch();
   const { currentQC, itemCounters } = useSelector(
     (state: RootState) => state.qc
   );
+  const { user } = useSelector((state: RootState) => state.auth);
 
   const [acknowledgeIncomplete, setAcknowledgeIncomplete] = useState(false);
+  const [selectedDriverId, setSelectedDriverId] = useState<string>("0");
+  const [selectedPreparerId, setSelectedPreparerId] = useState<string>("0");
+
   const [submitQualityCheck, { isLoading: isSubmitting }] =
     useSubmitQualityCheckMutation();
+  const [closeQualityCheck] = useCloseQualityCheckMutation();
+  const [createDelayedItemsFlow] = useCreateDelayedItemsFlowMutation();
+  const [createTrip] = useCreateTripMutation();
+
+  // Fetch drivers and preparers data
+  const { data: drivers, isLoading: driversLoading } = useDrivers();
+  const { data: preparers, isLoading: preparersLoading } = usePreparers();
 
   if (!currentQC) return null;
 
@@ -140,19 +173,149 @@ export default function CompletionModal({
         submissionData: submissionData,
       });
 
-      // // Submit the quality check
-      // const result = await submitQualityCheck({
-      //   id: currentQC.id,
-      //   data: submissionData,
-      // }).unwrap();
+      // Submit the quality check
+      const result = await submitQualityCheck({
+        id: currentQC.id,
+        data: submissionData,
+      }).unwrap();
 
-      // console.log("Quality Check submitted successfully:", result);
+      console.log("Quality Check submitted successfully:", result);
 
-      // // Navigate to success page or dashboard
-      // router.push("/");
-      // onClose();
+      // Determine user role
+      const isDriver = user?.role?.name_en?.toLowerCase() === "driver";
+
+      if (isDriver) {
+        // Driver flow (existing logic)
+        console.log("Processing as driver role");
+
+        // Determine if all items are sent to market
+        const allItemsToMarket = submissionData.items.every(
+          (item) =>
+            item.market_quantity > 0 &&
+            item.received_quantity === 0 &&
+            item.replacement_quantity === 0 &&
+            item.delayed_quantity === 0
+        );
+
+        const assignedTo = user?.user_id ? user.user_id.toString() : "";
+
+        // Prepare close request data
+        const closeData: QualityCheckCloseRequest = {
+          close: true,
+          assigned_type: 17,
+          assigned_to: Number(assignedTo),
+          trip: !allItemsToMarket,
+        };
+
+        // Close the quality check
+        const closeResult = await closeQualityCheck({
+          id: currentQC.id,
+          data: closeData,
+        }).unwrap();
+
+        console.log("Quality Check closed successfully:", closeResult);
+
+        // Check if there are any delayed items and create delayed items flow if needed
+        const hasDelayedItems = submissionData.items.some(
+          (item) => item.delayed_quantity > 0
+        );
+
+        if (hasDelayedItems) {
+          const delayedItemsData: CreateDelayedItemsFlowRequest = {
+            qc_id: currentQC.id.toString(),
+            delayed_user_id: assignedTo,
+          };
+
+          console.log("Creating delayed items flow:", delayedItemsData);
+
+          const delayedResult = await createDelayedItemsFlow(
+            delayedItemsData
+          ).unwrap();
+          console.log(
+            "Delayed items flow created successfully:",
+            delayedResult
+          );
+        }
+      } else {
+        // Non-driver flow (new logic)
+        console.log("Processing as non-driver role");
+
+        // Validate driver selection
+        if (selectedDriverId === "0") {
+          throw new Error("Driver selection is required");
+        }
+
+        // Step 1: Submit QC Data
+        console.log("Submitting quality check:", submissionData);
+        const submitResult = await submitQualityCheck({
+          id: currentQC.id,
+          data: submissionData,
+        }).unwrap();
+        console.log("Quality Check submitted successfully:", submitResult);
+
+        // Step 2: Create Trip
+        const tripData: CreateTripRequest = {
+          content_type: 14,
+          object_id: currentQC.id.toString(),
+          destination_point:
+            currentQC.main_source_id.company_branch.id.toString(),
+          destination_point_type: 32,
+          trip_direction: "bring",
+          assign_to: selectedDriverId,
+          user_type: "user",
+        };
+
+        console.log("Creating trip:", tripData);
+
+        const tripResult = await createTrip(tripData).unwrap();
+        console.log("Trip created successfully:", tripResult);
+
+        // Step 3: Close QC Ticket
+        const closeData: QualityCheckCloseRequest = {
+          delayed_driver_id:
+            selectedPreparerId !== "0" ? parseInt(selectedPreparerId) : 0,
+          close: true,
+        };
+
+        console.log("Closing QC with data:", closeData);
+
+        const closeResult = await closeQualityCheck({
+          id: currentQC.id,
+          data: closeData,
+        }).unwrap();
+
+        console.log("Quality Check closed successfully:", closeResult);
+
+        // Step 4: Check if there are any delayed items and create delayed items flow if needed
+        const hasDelayedItems = submissionData.items.some(
+          (item) => item.delayed_quantity > 0
+        );
+
+        if (hasDelayedItems) {
+          const delayedItemsData: CreateDelayedItemsFlowRequest = {
+            qc_id: currentQC.id.toString(),
+            delayed_user_id:
+              selectedPreparerId !== "0" ? selectedPreparerId : "0",
+          };
+
+          console.log("Creating delayed items flow:", delayedItemsData);
+
+          const delayedResult = await createDelayedItemsFlow(
+            delayedItemsData
+          ).unwrap();
+          console.log(
+            "Delayed items flow created successfully:",
+            delayedResult
+          );
+        }
+      }
+
+      // Navigate to success page or dashboard
+      dispatch(resetCurrentQC());
+      router.push("/");
+      onClose();
     } catch (error) {
-      console.error("Failed to submit quality check:", error);
+      console.error("Failed to submit or close quality check:", error);
       // TODO: Show error message to user
     }
   };
@@ -332,6 +495,108 @@ export default function CompletionModal({
               </p>
             </div>
           )}
+
+          {/* Driver and Preparer Selectors for Non-Driver Roles */}
+          {!user?.role?.name_en?.toLowerCase().includes("driver") && (
+            <div className="space-y-4">
+              <div className="border-t pt-4">
+                <h3 className="text-sm font-medium text-gray-900 mb-3 flex items-center">
+                  <User className="w-4 h-4 mr-2" />
+                  {t("assignmentSettings")}
+                </h3>
+
+                {/* Driver Selector */}
+                <div className="space-y-2 mb-4">
+                  <Label
+                    htmlFor="driver-select"
+                    className="text-sm font-medium text-gray-700"
+                  >
+                    {t("selectDriver")} <span className="text-red-500">*</span>
+                  </Label>
+                  <Select
+                    value={selectedDriverId}
+                    onValueChange={setSelectedDriverId}
+                  >
+                    <SelectTrigger id="driver-select" className="w-full">
+                      <SelectValue
+                        placeholder={
+                          driversLoading
+                            ? t("loading")
+                            : t("selectDriverPlaceholder")
+                        }
+                      />
+                    </SelectTrigger>
+                    <SelectContent>
+                      <SelectItem value="0" disabled>
+                        {t("selectDriverPlaceholder")}
+                      </SelectItem>
+                      {drivers?.map((driver) => (
+                        <SelectItem
+                          key={driver.id}
+                          value={driver.id.toString()}
+                        >
+                          {driver.first_name} {driver.last_name} (
+                          {driver.username})
+                        </SelectItem>
+                      ))}
+                    </SelectContent>
+                  </Select>
+                  {selectedDriverId === "0" && (
+                    <p className="text-xs text-red-600">
+                      {t("driverRequired")}
+                    </p>
+                  )}
+                </div>
+
+                {/* Delayed Preparer Selector - only show if there are delayed items */}
+                {totalDelayed > 0 && (
+                  <div className="space-y-2">
+                    <Label
+                      htmlFor="preparer-select"
+                      className="text-sm font-medium text-gray-700 flex items-center"
+                    >
+                      <Users className="w-4 h-4 mr-1" />
+                      {t("selectDelayedPreparer")}{" "}
+                      <span className="text-gray-500 text-xs ml-1">
+                        ({t("optional")})
+                      </span>
+                    </Label>
+                    <Select
+                      value={selectedPreparerId}
+                      onValueChange={setSelectedPreparerId}
+                    >
+                      <SelectTrigger id="preparer-select" className="w-full">
+                        <SelectValue
+                          placeholder={
+                            preparersLoading
+                              ? t("loading")
+                              : t("selectPreparerPlaceholder")
+                          }
+                        />
+                      </SelectTrigger>
+                      <SelectContent>
+                        <SelectItem value="0">
+                          {t("noPreparerSelected")}
+                        </SelectItem>
+                        {preparers?.map((preparer) => (
+                          <SelectItem
+                            key={preparer.id}
+                            value={preparer.id.toString()}
+                          >
+                            {preparer.first_name} {preparer.last_name} (
+                            {preparer.username})
+                          </SelectItem>
+                        ))}
+                      </SelectContent>
+                    </Select>
+                    <p className="text-xs text-gray-500">
+                      {t("delayedPreparerDescription")}
+                    </p>
+                  </div>
+                )}
+              </div>
+            </div>
+          )}
         </div>
 
         <DialogFooter className="flex-shrink-0 px-6 pb-6 pt-2 flex flex-col space-y-2 sm:flex-row sm:space-y-0 sm:space-x-2">
@@ -347,7 +612,11 @@ export default function CompletionModal({
           {incompleteItems === 0 ? (
             <Button
               onClick={handleComplete}
-              disabled={isSubmitting}
+              disabled={
+                isSubmitting ||
+                (!user?.role?.name_en?.toLowerCase().includes("driver") &&
+                  selectedDriverId === "0")
+              }
               className="w-full sm:w-auto bg-green-600 hover:bg-green-700 disabled:bg-gray-400"
             >
               <CheckCircle className="w-4 h-4 mr-2" />
@@ -367,7 +636,12 @@ export default function CompletionModal({
               {/* Single Submit button - requires acknowledgment for incomplete items */}
               <Button
                 onClick={handleComplete}
-                disabled={!acknowledgeIncomplete || isSubmitting}
+                disabled={
+                  !acknowledgeIncomplete ||
+                  isSubmitting ||
+                  (!user?.role?.name_en?.toLowerCase().includes("driver") &&
+                    selectedDriverId === "0")
+                }
                 className="w-full sm:w-auto bg-green-600 hover:bg-green-700 disabled:bg-gray-400"
               >
                 <CheckCircle className="w-4 h-4 mr-2" />

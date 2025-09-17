@@ -110,5 +110,14 @@
   "submit": "إرسال",
   "submitting": "جارٍ الإرسال...",
   "submitQualityCheck": "إرسال فحص الجودة",
-  "submitQualityCheckDescription": "راجع الملخص وأرسل فحص الجودة. العناصر المحددة للسوق سيتم إرسالها للشراء."
+  "submitQualityCheckDescription": "راجع الملخص وأرسل فحص الجودة. العناصر المحددة للسوق سيتم إرسالها للشراء.",
+  "assignmentSettings": "إعدادات التكليف",
+  "selectDriver": "اختيار السائق",
+  "selectDriverPlaceholder": "اختر سائق",
+  "driverRequired": "اختيار السائق مطلوب",
+  "selectDelayedPreparer": "اختيار محضر المؤجل",
+  "selectPreparerPlaceholder": "اختر محضر",
+  "noPreparerSelected": "لم يتم اختيار محضر",
+  "delayedPreparerDescription": "اختياري: اختر محضر للتعامل مع العناصر المؤجلة",
+  "optional": "اختياري"
 }

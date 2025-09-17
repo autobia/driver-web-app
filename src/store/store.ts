@@ -6,6 +6,7 @@ import { authApi } from "./api/authApi";
 import { tripsApi } from "./api/tripsApi";
 import { qualityChecksApi } from "./api/qualityChecksApi";
 import { inventoryApi } from "./api/inventoryApi";
+import { coreApi } from "./api/coreApi";
 
 export const makeStore = () => {
   return configureStore({
@@ -16,6 +17,7 @@ export const makeStore = () => {
       [tripsApi.reducerPath]: tripsApi.reducer,
       [qualityChecksApi.reducerPath]: qualityChecksApi.reducer,
       [inventoryApi.reducerPath]: inventoryApi.reducer,
+      [coreApi.reducerPath]: coreApi.reducer,
     },
     middleware: (getDefaultMiddleware) =>
       getDefaultMiddleware()
@@ -23,7 +25,8 @@ export const makeStore = () => {
         .concat(authApi.middleware)
         .concat(tripsApi.middleware)
         .concat(qualityChecksApi.middleware)
-        .concat(inventoryApi.middleware),
+        .concat(inventoryApi.middleware)
+        .concat(coreApi.middleware),
   });
 };
 
