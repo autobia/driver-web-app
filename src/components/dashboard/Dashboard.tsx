@@ -1,6 +1,5 @@
 "use client";
 
-import { useState } from "react";
 import { useSelector } from "react-redux";
 import { RootState } from "../../store/store";
 import UserInfo from "./UserInfo";
@@ -13,9 +12,7 @@ export default function Dashboard() {
   // Check if user is a driver to show trips by default
   const isDriver =
     user?.role?.name_en?.toLowerCase().includes("driver") || false;
-  const defaultTab: NavigationTab = isDriver ? "trips" : "qualityCheckTickets";
-
-  const [activeTab, setActiveTab] = useState<NavigationTab>(defaultTab);
+  const activeTab: NavigationTab = isDriver ? "trips" : "qualityCheckTickets";
 
   if (!user) {
     return null;
@@ -24,11 +21,7 @@ export default function Dashboard() {
   return (
     <>
       <UserInfo user={user} />
-      <NavigationTabs
-        activeTab={activeTab}
-        onTabChange={setActiveTab}
-        isDriver={isDriver}
-      />
+      <NavigationTabs activeTab={activeTab} isDriver={isDriver} />
       <div className="pb-20 sm:pb-0">
         <DashboardContent activeTab={activeTab} />
       </div>

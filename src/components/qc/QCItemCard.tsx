@@ -372,12 +372,12 @@ export default function QCItemCard({ item }: QCItemCardProps) {
       <div className="mt-4 pt-3 border-t border-gray-200">
         <div className="grid grid-cols-2 gap-2 text-xs text-gray-500">
           <div>
-            <span className="font-medium">Manufacturer:</span>
+            <span className="font-medium">{t("manufacturer")}:</span>
             <br />
             {item.brand_item?.item?.manufacturer?.name_en || "N/A"}
           </div>
           <div>
-            <span className="font-medium">Brand:</span>
+            <span className="font-medium">{t("brand")}:</span>
             <br />
             {item.brand_item?.brand?.name_en || "N/A"}
           </div>

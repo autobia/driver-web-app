@@ -14,7 +14,7 @@ export default function TripsComponent() {
         <div className="bg-white rounded-lg border border-neutral-200 p-6">
           <div className="text-center text-gray-500">
             <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-primary-600 mx-auto"></div>
-            <p className="mt-2">Loading trips...</p>
+            <p className="mt-2">{t("loadingTrips")}</p>
           </div>
         </div>
       </div>
@@ -27,7 +27,7 @@ export default function TripsComponent() {
         <h2 className="text-xl font-semibold text-gray-900">{t("trips")}</h2>
         <div className="bg-white rounded-lg border border-neutral-200 p-6">
           <div className="text-center text-red-500">
-            <p>Error loading trips. Please try again.</p>
+            <p>{t("errorLoadingTrips")}</p>
           </div>
         </div>
       </div>
@@ -73,16 +73,16 @@ export default function TripsComponent() {
                   </div>
                   <div className="text-sm text-gray-600 space-y-1">
                     <p>
-                      <strong>From:</strong> {trip.origin} →{" "}
-                      <strong>To:</strong> {trip.destination}
+                      <strong>{t("from")}:</strong> {trip.origin} →{" "}
+                      <strong>{t("to")}:</strong> {trip.destination}
                     </p>
                     <p>
-                      <strong>Departure:</strong>{" "}
+                      <strong>{t("departure")}:</strong>{" "}
                       {new Date(trip.departure_time).toLocaleString()}
                     </p>
                     {trip.arrival_time && (
                       <p>
-                        <strong>Arrival:</strong>{" "}
+                        <strong>{t("arrival")}:</strong>{" "}
                         {new Date(trip.arrival_time).toLocaleString()}
                       </p>
                     )}

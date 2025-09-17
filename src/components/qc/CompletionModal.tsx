@@ -312,7 +312,7 @@ export default function CompletionModal({
 
       // Navigate to success page or dashboard
       dispatch(resetCurrentQC());
-      router.push("/");
+      router.push("/quality-checks");
       onClose();
     } catch (error) {
       console.error("Failed to submit or close quality check:", error);

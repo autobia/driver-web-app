@@ -17,6 +17,7 @@ interface AuthState {
   user: User | null;
   token: string | null;
   refreshToken: string | null;
+  isInitialized: boolean;
 }
 
 const initialState: AuthState = {
@@ -24,6 +25,7 @@ const initialState: AuthState = {
   user: null,
   token: null,
   refreshToken: null,
+  isInitialized: false,
 };
 
 const authSlice = createSlice({
@@ -35,6 +37,7 @@ const authSlice = createSlice({
       state.user = null;
       state.token = null;
       state.refreshToken = null;
+      state.isInitialized = true;
 
       // Clear local storage
       if (typeof window !== "undefined") {
@@ -56,6 +59,7 @@ const authSlice = createSlice({
       state.token = action.payload.token;
       state.refreshToken = action.payload.refreshToken || null;
       state.isAuthenticated = true;
+      state.isInitialized = true;
     },
     initializeAuth: (state) => {
       if (typeof window !== "undefined") {
@@ -78,6 +82,8 @@ const authSlice = createSlice({
             localStorage.removeItem("user");
           }
         }
+        // Mark as initialized regardless of whether we found valid auth data
+        state.isInitialized = true;
       }
     },
   },

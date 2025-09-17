@@ -20,7 +20,7 @@ export const useAuth = () => {
   const dispatch = useDispatch();
   const router = useRouter();
   const pathname = usePathname();
-  const { isAuthenticated, token, user } = useSelector(
+  const { isAuthenticated, token, user, isInitialized } = useSelector(
     (state: RootState) => state.auth
   );
 
@@ -36,12 +36,15 @@ export const useAuth = () => {
 
   useEffect(() => {
     // Initialize auth state from localStorage on app start
-    if (!isAuthenticated) {
+    if (!isInitialized) {
       dispatch(initializeAuth());
     }
-  }, [dispatch, isAuthenticated]);
+  }, [dispatch, isInitialized]);
 
   useEffect(() => {
+    // Only perform route checks after auth has been initialized
+    if (!isInitialized) return;
+
     // Check authentication status when pathname changes
     const isPublicRoute = publicRoutes.includes(pathname);
 
@@ -68,12 +71,13 @@ export const useAuth = () => {
         router.push("/login");
       }
     }
-  }, [token, pathname, dispatch, router]);
+  }, [token, pathname, dispatch, router, isInitialized]);
 
   return {
     isAuthenticated: isAuthenticated && token && isTokenValid(token),
     user,
     token,
+    isInitialized,
   };
 };
 

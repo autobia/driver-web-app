@@ -10,7 +10,10 @@ import {
   resetAllCounters,
   setCurrentQC,
 } from "../../store/slices/qcSlice";
-import { useGetQualityChecksQuery } from "../../store/api/qualityChecksApi";
+import {
+  useGetQualityChecksQuery,
+  useGetQualityCheckByIdQuery,
+} from "../../store/api/qualityChecksApi";
 import { Button } from "../ui/button";
 import { ArrowLeft, ArrowRight, RotateCcw, CheckCircle } from "lucide-react";
 import QCTimeline from "./QCTimeline";
@@ -33,24 +36,41 @@ export default function QualityCheckDetail() {
   const [showResetModal, setShowResetModal] = useState(false);
   const [showCompletionModal, setShowCompletionModal] = useState(false);
 
-  // Fetch QC data if not in state
+  // Fetch specific QC data - either from list or directly by ID
+  const { data: qualityChecksData, isLoading: isQCListLoading } =
+    useGetQualityChecksQuery(
+      { userId: user?.user_id || 0 },
+      { skip: !user?.user_id }
+    );
+
   const {
-    data: qualityChecksData,
-    isLoading: isQCLoading,
-    error: qcError,
-  } = useGetQualityChecksQuery(
-    { userId: user?.user_id || 0 },
-    { skip: !user?.user_id }
-  );
+    data: specificQCData,
+    isLoading: isSpecificQCLoading,
+    error: specificQCError,
+  } = useGetQualityCheckByIdQuery(parseInt(qcId), {
+    skip: !qcId || isNaN(parseInt(qcId)),
+  });
 
   useEffect(() => {
-    if (qualityChecksData && qcId && !currentQC) {
-      const qc = qualityChecksData.find((q) => q.id.toString() === qcId);
-      if (qc) {
-        dispatch(setCurrentQC(qc));
+    if (!currentQC && qcId) {
+      // First try to find QC in the list data
+      if (qualityChecksData) {
+        const qc = qualityChecksData.find((q) => q.id.toString() === qcId);
+        if (qc) {
+          dispatch(setCurrentQC(qc));
+          return;
+        }
+      }
+
+      // If not found in list, use the specific QC data
+      if (specificQCData) {
+        dispatch(setCurrentQC(specificQCData));
       }
     }
-  }, [qualityChecksData, qcId, currentQC, dispatch]);
+  }, [qualityChecksData, specificQCData, qcId, currentQC, dispatch]);
+
+  const isQCLoading = isQCListLoading || isSpecificQCLoading;
+  const qcError = specificQCError;
 
   const handleBack = () => {
     setShowBackModal(true);
@@ -58,7 +78,7 @@ export default function QualityCheckDetail() {
 
   const confirmBack = () => {
     dispatch(resetCurrentQC());
-    router.back();
+    router.push("/quality-checks");
     setShowBackModal(false);
   };
 
@@ -86,16 +106,16 @@ export default function QualityCheckDetail() {
   if (qcError || !currentQC) {
     return (
       <div className="flex flex-col items-center justify-center min-h-screen space-y-4">
-        <p className="text-red-500">Error loading quality check details</p>
+        <p className="text-red-500">{t("errorLoadingQualityCheckDetails")}</p>
         <Button
           onClick={() => {
             dispatch(resetCurrentQC());
-            router.back();
+            router.push("/quality-checks");
           }}
           variant="outline"
         >
           <ArrowLeft className="w-4 h-4 mr-2" />
-          Go Back
+          {t("backToQualityChecks")}
         </Button>
       </div>
     );

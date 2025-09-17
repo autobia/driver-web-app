@@ -1,6 +1,6 @@
 "use client";
 
-import { ReactNode, useEffect, useState } from "react";
+import { ReactNode, useEffect } from "react";
 import { usePathname, useRouter } from "next/navigation";
 import { useAuth } from "../hooks/useAuth";
 
@@ -12,24 +12,14 @@ interface AuthGuardProps {
 const PUBLIC_ROUTES = ["/login"];
 
 export default function AuthGuard({ children }: AuthGuardProps) {
-  const { isAuthenticated } = useAuth();
+  const { isAuthenticated, isInitialized } = useAuth();
   const pathname = usePathname();
   const router = useRouter();
-  const [isLoading, setIsLoading] = useState(true);
 
   const isPublicRoute = PUBLIC_ROUTES.includes(pathname);
 
   useEffect(() => {
-    // Give time for auth state to initialize
-    const timer = setTimeout(() => {
-      setIsLoading(false);
-    }, 100);
-
-    return () => clearTimeout(timer);
-  }, []);
-
-  useEffect(() => {
-    if (!isLoading) {
+    if (isInitialized) {
       if (!isAuthenticated && !isPublicRoute) {
         // Redirect to login if not authenticated and not on a public route
         router.push("/login");
@@ -38,9 +28,9 @@ export default function AuthGuard({ children }: AuthGuardProps) {
         router.push("/");
       }
     }
-  }, [isAuthenticated, isPublicRoute, isLoading, router]);
+  }, [isAuthenticated, isPublicRoute, isInitialized, router]);
 
-  if (isLoading) {
+  if (!isInitialized) {
     return (
       <div className="min-h-screen flex items-center justify-center bg-neutral-50">
         <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-primary-600"></div>

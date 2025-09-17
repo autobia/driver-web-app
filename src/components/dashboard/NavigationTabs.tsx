@@ -1,6 +1,7 @@
 "use client";
 
 import { useTranslations } from "next-intl";
+import { useRouter } from "next/navigation";
 
 export type NavigationTab =
   | "trips"
@@ -9,16 +10,29 @@ export type NavigationTab =
 
 interface NavigationTabsProps {
   activeTab: NavigationTab;
-  onTabChange: (tab: NavigationTab) => void;
   isDriver: boolean;
 }
 
 export default function NavigationTabs({
   activeTab,
-  onTabChange,
   isDriver,
 }: NavigationTabsProps) {
   const t = useTranslations();
+  const router = useRouter();
+
+  const handleNavigation = (section: NavigationTab) => {
+    switch (section) {
+      case "trips":
+        router.push("/trips");
+        break;
+      case "qualityCheckTickets":
+        router.push("/quality-checks");
+        break;
+      case "purchaseInvoices":
+        router.push("/purchase-invoices");
+        break;
+    }
+  };
 
   return (
     <>
@@ -29,7 +43,7 @@ export default function NavigationTabs({
             {/* Trips Tile - Only show for drivers */}
             {isDriver && (
               <button
-                onClick={() => onTabChange("trips")}
+                onClick={() => handleNavigation("trips")}
                 className={`flex-1 min-w-0 p-4 rounded-xl border transition-all duration-200 ${
                   activeTab === "trips"
                     ? "bg-primary-50 border-primary-300 shadow-md shadow-primary-200/50"
@@ -52,7 +66,7 @@ export default function NavigationTabs({
 
             {/* Quality Check Tickets Tile */}
             <button
-              onClick={() => onTabChange("qualityCheckTickets")}
+              onClick={() => handleNavigation("qualityCheckTickets")}
               className={`flex-1 min-w-0 p-4 rounded-xl border transition-all duration-200 ${
                 activeTab === "qualityCheckTickets"
                   ? "bg-primary-50 border-primary-300 shadow-md shadow-primary-200/50"
@@ -74,7 +88,7 @@ export default function NavigationTabs({
 
             {/* Purchase Invoices Tile */}
             <button
-              onClick={() => onTabChange("purchaseInvoices")}
+              onClick={() => handleNavigation("purchaseInvoices")}
               className={`flex-1 min-w-0 p-4 rounded-xl border transition-all duration-200 ${
                 activeTab === "purchaseInvoices"
                   ? "bg-primary-50 border-primary-300 shadow-md shadow-primary-200/50"
@@ -103,7 +117,7 @@ export default function NavigationTabs({
           {/* Trips Tab - Only show for drivers */}
           {isDriver && (
             <button
-              onClick={() => onTabChange("trips")}
+              onClick={() => handleNavigation("trips")}
               className={`flex-1 flex flex-col items-center py-2 px-1 rounded-lg transition-all duration-200 ${
                 activeTab === "trips"
                   ? "bg-primary-50 text-primary-700"
@@ -121,7 +135,7 @@ export default function NavigationTabs({
 
           {/* Quality Check Tickets Tab */}
           <button
-            onClick={() => onTabChange("qualityCheckTickets")}
+            onClick={() => handleNavigation("qualityCheckTickets")}
             className={`flex-1 flex flex-col items-center py-2 px-1 rounded-lg transition-all duration-200 ${
               activeTab === "qualityCheckTickets"
                 ? "bg-primary-50 text-primary-700"
@@ -140,7 +154,7 @@ export default function NavigationTabs({
 
           {/* Purchase Invoices Tab */}
           <button
-            onClick={() => onTabChange("purchaseInvoices")}
+            onClick={() => handleNavigation("purchaseInvoices")}
             className={`flex-1 flex flex-col items-center py-2 px-1 rounded-lg transition-all duration-200 ${
               activeTab === "purchaseInvoices"
                 ? "bg-primary-50 text-primary-700"

@@ -396,6 +396,13 @@ export const qualityChecksApi = createApi({
         providesTags: ["QualityChecks"],
       }
     ),
+    getQualityCheckById: builder.query<QualityCheck, number>({
+      query: (id) => ({
+        url: `/quality-checks/${id}/`,
+        method: "GET",
+      }),
+      providesTags: (result, error, id) => [{ type: "QualityChecks", id }],
+    }),
     submitQualityCheck: builder.mutation<
       QualityCheckSubmissionResponse,
       { id: number; data: QualityCheckSubmissionRequest }
@@ -435,6 +442,7 @@ export const qualityChecksApi = createApi({
 // Export hooks for usage in functional components
 export const {
   useGetQualityChecksQuery,
+  useGetQualityCheckByIdQuery,
   useSubmitQualityCheckMutation,
   useCloseQualityCheckMutation,
   useCreateDelayedItemsFlowMutation,

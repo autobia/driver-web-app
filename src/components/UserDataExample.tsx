@@ -1,6 +1,7 @@
 "use client";
 
 import React from "react";
+import { useTranslations } from "next-intl";
 import {
   useDrivers,
   usePreparers,
@@ -12,6 +13,8 @@ import {
  * This component can be used anywhere in the app to display or work with user data
  */
 export default function UserDataExample() {
+  const t = useTranslations();
+
   // Get drivers data
   const {
     data: drivers,
@@ -34,22 +37,22 @@ export default function UserDataExample() {
   } = useAllUsersLoadingState();
 
   if (allUsersLoading) {
-    return <div className="p-4">Loading user data...</div>;
+    return <div className="p-4">{t("loadingUserData")}</div>;
   }
 
   if (hasErrors) {
     return (
       <div className="p-4 text-red-600">
-        <h3>Error loading user data:</h3>
-        {!!errors.drivers && <p>• Drivers: Error occurred</p>}
-        {!!errors.preparers && <p>• Preparers: Error occurred</p>}
+        <h3>{t("errorLoadingUserData")}</h3>
+        {!!errors.drivers && <p>• {t("errorLoadingDrivers")}</p>}
+        {!!errors.preparers && <p>• {t("errorLoadingPreparers")}</p>}
       </div>
     );
   }
 
   return (
     <div className="p-4 space-y-4">
-      <h2 className="text-xl font-bold">User Data Example</h2>
+      <h2 className="text-xl font-bold">{t("userDataExample")}</h2>
 
       <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
         {/* Drivers Section */}
@@ -58,9 +61,9 @@ export default function UserDataExample() {
             Drivers ({drivers?.length || 0})
           </h3>
           {driversLoading ? (
-            <p>Loading drivers...</p>
+            <p>{t("loadingDrivers")}</p>
           ) : driversError ? (
-            <p className="text-red-500">Error loading drivers</p>
+            <p className="text-red-500">{t("errorLoadingDrivers")}</p>
           ) : (
             <ul className="space-y-1">
               {drivers?.slice(0, 5).map((driver) => (
@@ -83,9 +86,9 @@ export default function UserDataExample() {
             Preparers ({preparers?.length || 0})
           </h3>
           {preparersLoading ? (
-            <p>Loading preparers...</p>
+            <p>{t("loadingPreparers")}</p>
           ) : preparersError ? (
-            <p className="text-red-500">Error loading preparers</p>
+            <p className="text-red-500">{t("errorLoadingPreparers")}</p>
           ) : (
             <ul className="space-y-1">
               {preparers?.slice(0, 5).map((preparer) => (

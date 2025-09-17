@@ -71,7 +71,7 @@ export default function QualityCheckTicketsComponent() {
 
   const handleStartPreparing = (qualityCheckId: number) => {
     // Navigate to QC detail page
-    router.push(`/qc/${qualityCheckId}`);
+    router.push(`/quality-checks/${qualityCheckId}`);
   };
 
   if (isLoading) {
@@ -83,7 +83,7 @@ export default function QualityCheckTicketsComponent() {
         <div className="bg-white rounded-lg border border-neutral-200 p-6">
           <div className="text-center text-gray-500">
             <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-primary-600 mx-auto"></div>
-            <p className="mt-2">Loading quality check tickets...</p>
+            <p className="mt-2">{t("loadingQualityCheckTickets")}</p>
           </div>
         </div>
       </div>
@@ -98,7 +98,7 @@ export default function QualityCheckTicketsComponent() {
         </h2>
         <div className="bg-white rounded-lg border border-neutral-200 p-6">
           <div className="text-center text-red-500">
-            <p>Error loading quality check tickets. Please try again.</p>
+            <p>{t("errorLoadingQualityCheckTickets")}</p>
           </div>
         </div>
       </div>
