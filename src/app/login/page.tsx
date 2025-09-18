@@ -16,6 +16,7 @@ import {
 } from "@heroicons/react/24/outline";
 import { useLoginMutation } from "../../store/api/authApi";
 import { setUser } from "../../store/slices/authSlice";
+import { Button } from "../../components/ui/button";
 
 interface LoginFormValues {
   phone: string;
@@ -232,17 +233,19 @@ export default function LoginPage() {
                             : "border-neutral-300 focus:border-primary-500 focus:ring-primary-200"
                         }`}
                       />
-                      <button
+                      <Button
                         type="button"
                         onClick={() => setShowPassword(!showPassword)}
-                        className="absolute inset-y-0 right-0 flex items-center pr-3 text-neutral-400 hover:text-neutral-600 transition-colors duration-200"
+                        variant="ghost"
+                        size="icon"
+                        className="absolute inset-y-0 right-0 h-full px-3 text-neutral-400 hover:text-neutral-600"
                       >
                         {showPassword ? (
                           <EyeSlashIcon className="h-5 w-5" />
                         ) : (
                           <EyeIcon className="h-5 w-5" />
                         )}
-                      </button>
+                      </Button>
                     </div>
                     <ErrorMessage
                       name="password"
@@ -252,14 +255,12 @@ export default function LoginPage() {
                   </div>
 
                   {/* Submit Button */}
-                  <button
+                  <Button
                     type="submit"
                     disabled={isSubmitting}
-                    className={`w-full py-3 px-4 rounded-lg font-medium text-white transition-all duration-200 ${
-                      isSubmitting
-                        ? "bg-neutral-400 cursor-not-allowed"
-                        : "bg-primary-600 hover:bg-primary-700 focus:outline-none focus:ring-2 focus:ring-primary-200 transform hover:scale-[1.02] active:scale-[0.98]"
-                    }`}
+                    variant="default"
+                    size="lg"
+                    className="w-full"
                   >
                     {isSubmitting ? (
                       <div className="flex items-center justify-center">
@@ -269,7 +270,7 @@ export default function LoginPage() {
                     ) : (
                       t("signIn") || "Sign In"
                     )}
-                  </button>
+                  </Button>
                 </Form>
               )}
             </Formik>

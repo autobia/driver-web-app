@@ -48,6 +48,12 @@
   "confirmBackMessage": "Are you sure you want to go back? Your current progress will be reset.",
   "goBack": "Go Back",
   "cancel": "Cancel",
+  "warehouse": "Warehouse",
+  "companyBranch": "Company Branch",
+  "destination": "Destination",
+  "direction": "Direction",
+  "bring": "Bring",
+  "deliver": "Deliver",
   "confirmReset": "Reset Counters?",
   "confirmResetMessage": "Are you sure you want to reset all counters? This action cannot be undone.",
   "reset": "Reset",
@@ -154,5 +160,11 @@
   "going": "Going",
   "getting_location": "Getting Location...",
   "tripCompleted": "Trip Completed",
-  "tripCancelled": "Trip Cancelled"
+  "tripCancelled": "Trip Cancelled",
+  "saved": "Saved successfully",
+  "savingFailed": "Failed to save",
+  "deleted": "Deleted successfully",
+  "deletingFailed": "Failed to delete",
+  "updated": "Updated successfully",
+  "updatingFailed": "Failed to update"
 }

@@ -60,6 +60,52 @@ interface Assignment {
 }
 
 // Define the trip types (new structure with assignments)
+// Warehouse destination interface
+export interface WarehouseDestination {
+  id: number;
+  name_ar: string;
+  name_en: string;
+  telephone?: string;
+  city_name?: string;
+  is_active: boolean;
+  latitude?: number;
+  longitude?: number;
+  warehouse_id?: {
+    id: number;
+    name_en: string;
+    name_ar: string;
+    is_active: boolean;
+    latitude?: number;
+    longitude?: number;
+  };
+}
+
+// Company Branch destination interface
+export interface CompanyBranchDestination {
+  id: number;
+  name_ar: string;
+  name_en: string;
+  company_id: {
+    id: number;
+    name_en: string;
+    name_ar: string;
+    company_type: {
+      id: number;
+      name_en: string;
+      name_ar: string;
+      description_en: string;
+      description_ar: string;
+    };
+    phone?: string;
+    email?: string;
+    is_active: boolean;
+  };
+  type: string;
+  is_active: boolean;
+  latitude?: number;
+  longitude?: number;
+}
+
 export interface Trip {
   id: number;
   content_type: number;
@@ -68,12 +114,8 @@ export interface Trip {
   assignment: Assignment;
   trip_direction?: "bring" | "deliver";
   has_delayed_item?: boolean;
-  destination_point?: {
-    company_id?: number | null;
-    warehouse?: {
-      id: number;
-    };
-  };
+  destination_point_type?: "warehouse" | "companybranch";
+  destination_point?: WarehouseDestination | CompanyBranchDestination;
   main_source?: {
     warehouse?: {
       id: number;

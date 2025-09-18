@@ -11,9 +11,11 @@ import {
 } from "../../store/api/qualityChecksApi";
 import { useLocale } from "next-intl";
 import { Button } from "../ui/button";
+import { useToast } from "../../hooks/useToast";
 
 export default function QualityCheckTicketsComponent() {
   const t = useTranslations();
+  const toast = useToast();
   const locale = useLocale();
   const router = useRouter();
   const { user } = useSelector((state: RootState) => state.auth);
@@ -71,6 +73,10 @@ export default function QualityCheckTicketsComponent() {
 
   const handleStartPreparing = (qualityCheckId: number) => {
     // Navigate to QC detail page
+    toast.info(
+      "Starting quality check preparation",
+      "Loading quality check details..."
+    );
     router.push(`/quality-checks/${qualityCheckId}`);
   };
 
@@ -190,7 +196,8 @@ export default function QualityCheckTicketsComponent() {
                 <Button
                   onClick={() => handleStartPreparing(qualityCheck.id)}
                   className="w-full"
-                  size="lg"
+                  variant="default"
+                  size="sm"
                 >
                   <svg
                     className="w-4 h-4"

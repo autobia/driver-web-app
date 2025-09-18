@@ -5,6 +5,7 @@ import { useDispatch } from "react-redux";
 import { useRouter } from "next/navigation";
 import { ArrowLeftStartOnRectangleIcon } from "@heroicons/react/24/outline";
 import { logout } from "../../store/slices/authSlice";
+import { Button } from "../ui/button";
 
 export default function LogoutButton() {
   const t = useTranslations();
@@ -17,13 +18,14 @@ export default function LogoutButton() {
   };
 
   return (
-    <button
+    <Button
       onClick={handleLogout}
-      className="p-2 text-primary-600 hover:text-primary-700 hover:bg-primary-50 rounded-lg transition-all duration-200 focus:outline-none focus:ring-2 focus:ring-primary-200"
+      variant="ghost"
+      size="icon"
       title={t("logout") || "Logout"}
       aria-label={t("logout") || "Logout"}
     >
       <ArrowLeftStartOnRectangleIcon className="h-6 w-6" />
-    </button>
+    </Button>
   );
 }

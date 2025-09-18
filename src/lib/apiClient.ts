@@ -1,4 +1,5 @@
 import axios, { AxiosRequestConfig } from "axios";
+import { showToast } from "./toast";
 
 // Create Axios instance with base configuration
 const apiClient = axios.create({
@@ -65,30 +66,92 @@ apiClient.interceptors.response.use(
         data,
       });
 
-      // Handle specific status codes
+      // Show toast notification for API errors (except for auth-related routes)
+      const url = error.config?.url || "";
+      const isAuthRoute = url.includes("/login") || url.includes("/register");
+
+      if (!isAuthRoute && typeof window !== "undefined") {
+        // Handle the specific response format: { status, scope, context, timestamp, error }
+        if (data && typeof data === "object") {
+          let errorMessage = "An error occurred";
+          let errorTitle = "Error";
+
+          // Check for error object with message
+          if (
+            data.error &&
+            typeof data.error === "object" &&
+            data.error.message
+          ) {
+            errorMessage = data.error.message;
+          }
+          // Fallback to context or direct message
+          else if (data.context) {
+            errorMessage = data.context;
+          } else if (data.message) {
+            errorMessage = data.message;
+          } else if (typeof data.error === "string") {
+            errorMessage = data.error;
+          }
+
+          // Use scope as title if available
+          if (data.scope) {
+            errorTitle = data.scope;
+          }
+
+          showToast.error(errorTitle, errorMessage);
+        } else {
+          showToast.apiError(data, `Request failed (${status})`);
+        }
+      }
+
+      // Handle specific status codes - ONLY navigate on 404
       switch (status) {
         case 401:
-          // Unauthorized - clear token and redirect to login
+          // Unauthorized - clear token but don't navigate, just show toast
           localStorage.removeItem("authToken");
-          if (typeof window !== "undefined") {
-            window.location.href = "/login";
+          if (!isAuthRoute && typeof window !== "undefined") {
+            showToast.error("Session expired", "Please login again");
           }
           break;
         case 403:
           console.error("Access forbidden");
+          // Just show toast, no navigation
+          break;
+        case 404:
+          // ONLY navigate on 404 errors
+          console.error("Resource not found");
+          if (!isAuthRoute && typeof window !== "undefined") {
+            showToast.error(
+              "Not found",
+              "The requested resource was not found"
+            );
+            // Navigate to 404 page for not found resources
+            window.location.href = "/404";
+          }
           break;
         case 500:
           console.error("Server error");
+          // Just show toast, no navigation
           break;
         default:
+          // For all other errors, just show toast and handle response
           break;
       }
     } else if (error.request) {
       // Network error
       console.error("❌ Network Error:", error.message);
+      if (typeof window !== "undefined") {
+        showToast.error(
+          "Network error",
+          "Please check your internet connection"
+        );
+      }
     } else {
       // Other error
       console.error("❌ Error:", error.message);
+      if (typeof window !== "undefined") {
+        showToast.error("Error", error.message || "Something went wrong");
+      }
     }
 
     return Promise.reject(error);

@@ -5,6 +5,9 @@ import {
   useGetDriverTripsQuery,
   useUpdateTripLocationMutation,
   useCreateAdvancedTripMutation,
+  type Trip,
+  type WarehouseDestination,
+  type CompanyBranchDestination,
 } from "../../store/api/tripsApi";
 import { useCreateQualityCheckMutation } from "../../store/api/qualityChecksApi";
 import {
@@ -14,9 +17,12 @@ import {
 import { useState } from "react";
 import { useSelector } from "react-redux";
 import { RootState } from "../../store/store";
+import { Button } from "../ui/button";
+import { useToast } from "../../hooks/useToast";
 
 export default function TripsComponent() {
   const t = useTranslations();
+  const toast = useToast();
   const { data: tripsData, isLoading, error } = useGetDriverTripsQuery();
   const [updateTripLocation] = useUpdateTripLocationMutation();
   const [createAdvancedTrip] = useCreateAdvancedTripMutation();
@@ -82,10 +88,38 @@ export default function TripsComponent() {
     }
   };
 
+  // Helper function to get destination type translation
+  const getDestinationTypeTranslation = (type: string) => {
+    switch (type) {
+      case "warehouse":
+        return t("warehouse");
+      case "companybranch":
+        return t("companyBranch");
+      default:
+        return type;
+    }
+  };
+
+  // Helper function to get destination name
+  const getDestinationName = (trip: Trip) => {
+    if (!trip.destination_point) return "";
+
+    if (trip.destination_point_type === "warehouse") {
+      const warehouse = trip.destination_point as WarehouseDestination;
+      return warehouse.name_ar || warehouse.name_en || "";
+    } else if (trip.destination_point_type === "companybranch") {
+      const company = trip.destination_point as CompanyBranchDestination;
+      return company.company_id?.name_ar || company.company_id?.name_en || "";
+    }
+
+    return "";
+  };
+
   // Function to handle "going" button click - directly call createTrip
   const handleGoingClick = async (tripId: number) => {
     if (!user) {
       console.error("User not logged in");
+      toast.error("Authentication required", "Please login to continue");
       return;
     }
 
@@ -130,7 +164,7 @@ export default function TripsComponent() {
       );
     } catch (error) {
       console.error("Error in going flow:", error);
-      // You could add toast notification here for error feedback
+      toast.operationError("Going to location", error);
     } finally {
       setLocationLoadingTripId(null);
     }
@@ -205,7 +239,12 @@ export default function TripsComponent() {
             console.log("Quality Check created");
 
             // Check if destination point has company_id (equivalent to Flutter check)
-            if (trip.destination_point?.company_id != null) {
+            const hasCompanyDestination =
+              trip.destination_point_type === "companybranch" &&
+              (trip.destination_point as CompanyBranchDestination)
+                ?.company_id != null;
+
+            if (hasCompanyDestination) {
               console.log(
                 "Trip has company destination - would navigate to QC screen in Flutter"
               );
@@ -233,6 +272,10 @@ export default function TripsComponent() {
               }).unwrap();
 
               console.log("Trip updated with delayed QC flag");
+              toast.success(
+                "Trip updated successfully",
+                "Location updated and marked as on the way"
+              );
             } else {
               console.log(
                 "The specified trip indicates that there is a delayed items upon it, so we create a quality check for it"
@@ -263,6 +306,10 @@ export default function TripsComponent() {
                   console.log(
                     "New delivery trip created and original trip updated"
                   );
+                  toast.success(
+                    "Delivery trip created",
+                    "New delivery trip has been created and you're now on the way"
+                  );
                 }
               }
             }
@@ -278,6 +325,10 @@ export default function TripsComponent() {
               }).unwrap();
 
               console.log("Delivery trip location updated");
+              toast.success(
+                "Arrived at destination",
+                "Trip has been marked as arrived"
+              );
             } catch (deliverError) {
               // Handle API errors like in Flutter
               const apiError = deliverError as { data?: { context?: string } };
@@ -487,16 +538,50 @@ export default function TripsComponent() {
                     {getStatusTranslation(trip.status)}
                   </span>
                 </div>
+
+                {/* Destination Information */}
+                {trip.destination_point_type && trip.destination_point && (
+                  <div className="flex items-center space-x-3 rtl:space-x-reverse">
+                    <div className="w-2 h-2 bg-blue-500 rounded-full flex-shrink-0 mr-2 rtl:mr-0 rtl:ml-2"></div>
+                    <div className="flex-1 min-w-0">
+                      <p className="text-xs text-gray-500 uppercase tracking-wide">
+                        {getDestinationTypeTranslation(
+                          trip.destination_point_type
+                        )}
+                      </p>
+                      <p className="text-sm font-medium text-gray-900 truncate">
+                        {getDestinationName(trip)}
+                      </p>
+                    </div>
+                  </div>
+                )}
+
+                {/* Trip Direction */}
+                {trip.trip_direction && (
+                  <div className="flex items-center space-x-3 rtl:space-x-reverse">
+                    <div className="w-2 h-2 bg-green-500 rounded-full flex-shrink-0 mr-2 rtl:mr-0 rtl:ml-2"></div>
+                    <p className="text-sm text-gray-700">
+                      <span className="text-xs text-gray-500 uppercase tracking-wide mr-2">
+                        {t("direction")}:
+                      </span>
+                      {trip.trip_direction === "bring"
+                        ? t("bring")
+                        : t("deliver")}
+                    </p>
+                  </div>
+                )}
               </div>
 
               {/* Card Footer */}
               <div className="px-4 pb-4">
                 {trip.status === "pending" && (
                   <div className="flex gap-2">
-                    <button
+                    <Button
                       onClick={() => handleGoingClick(trip.id)}
                       disabled={locationLoadingTripId === trip.id}
-                      className="flex-1 bg-blue-600 hover:bg-blue-700 disabled:bg-blue-400 disabled:cursor-not-allowed text-white font-medium py-2 px-3 rounded-lg transition-colors duration-200 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2 text-sm flex items-center justify-center"
+                      variant="default"
+                      size="sm"
+                      className="flex-1"
                     >
                       {locationLoadingTripId === trip.id ? (
                         <>
@@ -506,22 +591,26 @@ export default function TripsComponent() {
                       ) : (
                         t("going")
                       )}
-                    </button>
-                    <button
+                    </Button>
+                    <Button
                       onClick={() => handleAssignPreparerClick(trip.id)}
-                      className="flex-1 bg-orange-600 hover:bg-orange-700 text-white font-medium py-2 px-3 rounded-lg transition-colors duration-200 focus:outline-none focus:ring-2 focus:ring-orange-500 focus:ring-offset-2 text-sm"
+                      variant="secondary"
+                      size="sm"
+                      className="flex-1"
                     >
                       {t("assignPreparer")}
-                    </button>
+                    </Button>
                   </div>
                 )}
 
                 {trip.status === "on_the_way" && (
                   <div className="flex gap-2">
-                    <button
+                    <Button
                       onClick={() => handleArrivedClick(trip.id)}
                       disabled={locationLoadingTripId === trip.id}
-                      className="w-full bg-green-600 hover:bg-green-700 disabled:bg-green-400 disabled:cursor-not-allowed text-white font-medium py-2 px-3 rounded-lg transition-colors duration-200 focus:outline-none focus:ring-2 focus:ring-green-500 focus:ring-offset-2 text-sm flex items-center justify-center"
+                      variant="default"
+                      size="sm"
+                      className="w-full bg-green-600 hover:bg-green-700 disabled:bg-green-400"
                     >
                       {locationLoadingTripId === trip.id ? (
                         <>
@@ -531,7 +620,7 @@ export default function TripsComponent() {
                       ) : (
                         t("arrived")
                       )}
-                    </button>
+                    </Button>
                   </div>
                 )}
 
@@ -588,17 +677,19 @@ export default function TripsComponent() {
             </div>
 
             <div className="flex gap-3 justify-end">
-              <button
+              <Button
                 onClick={handleCloseAssignModal}
                 disabled={isAssigning}
-                className="px-4 py-2 text-gray-600 border border-gray-300 rounded-md hover:bg-gray-50 disabled:opacity-50 disabled:cursor-not-allowed"
+                variant="outline"
+                size="default"
               >
                 {t("cancel")}
-              </button>
-              <button
+              </Button>
+              <Button
                 onClick={handleAssignPreparerSubmit}
                 disabled={!selectedPreparer || isAssigning}
-                className="px-4 py-2 bg-orange-600 text-white rounded-md hover:bg-orange-700 disabled:opacity-50 disabled:cursor-not-allowed flex items-center"
+                variant="secondary"
+                size="default"
               >
                 {isAssigning ? (
                   <>
@@ -608,7 +699,7 @@ export default function TripsComponent() {
                 ) : (
                   t("assignPreparer")
                 )}
-              </button>
+              </Button>
             </div>
           </div>
         </div>
