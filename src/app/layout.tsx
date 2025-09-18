@@ -7,6 +7,7 @@ import StoreProvider from "@/store/ReduxProvider";
 import AuthInitializer from "@/components/AuthInitializer";
 import AuthGuard from "@/components/AuthGuard";
 import UserDataProvider from "@/components/UserDataProvider";
+import TranslationInitializer from "@/components/TranslationInitializer";
 import { Toaster } from "@/components/ui/sonner";
 
 const beiruti = Beiruti({
@@ -27,17 +28,19 @@ export default async function RootLayout({
       <body className={`${beiruti.variable} antialiased h-full`}>
         <StoreProvider>
           <NextIntlClientProvider>
-            <AuthInitializer>
-              <AuthGuard>
-                <UserDataProvider>
-                  <div className="h-full flex flex-col">
-                    <Navbar />
-                    <main className="flex-1">{children}</main>
-                  </div>
-                  <Toaster />
-                </UserDataProvider>
-              </AuthGuard>
-            </AuthInitializer>
+            <TranslationInitializer>
+              <AuthInitializer>
+                <AuthGuard>
+                  <UserDataProvider>
+                    <div className="h-full flex flex-col">
+                      <Navbar />
+                      <main className="flex-1">{children}</main>
+                    </div>
+                    <Toaster />
+                  </UserDataProvider>
+                </AuthGuard>
+              </AuthInitializer>
+            </TranslationInitializer>
           </NextIntlClientProvider>
         </StoreProvider>
       </body>

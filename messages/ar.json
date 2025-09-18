@@ -194,5 +194,22 @@
   "currency": "ريال",
   "itemId": "رقم الصنف",
   "pricePerItem": "السعر للقطعة",
-  "totalPrice": "السعر الإجمالي"
+  "totalPrice": "السعر الإجمالي",
+  "anErrorOccurred": "حدث خطأ",
+  "error": "خطأ",
+  "sessionExpired": "انتهت الجلسة",
+  "pleaseLoginAgain": "يرجى تسجيل الدخول مرة أخرى",
+  "notFound": "غير موجود",
+  "requestedResourceNotFound": "المورد المطلوب غير موجود",
+  "serverError": "خطأ في الخادم",
+  "networkError": "خطأ في الشبكة",
+  "checkInternetConnection": "يرجى التحقق من اتصال الإنترنت",
+  "somethingWentWrong": "حدث خطأ ما",
+  "pageNotFoundFallback": "الصفحة التي تبحث عنها غير موجودة.",
+  "accessForbidden": "الوصول محظور",
+  "resourceNotFound": "المورد غير موجود",
+  "requestFailed": "فشل الطلب",
+  "startingQualityCheckPreparation": "بدء تحضير فحص الجودة",
+  "loadingQualityCheckDetails": "جارٍ تحميل تفاصيل فحص الجودة...",
+  "qcPrefix": "فج#"
 }

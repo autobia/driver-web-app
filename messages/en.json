@@ -194,5 +194,22 @@
   "currency": "SAR",
   "itemId": "Item ID",
   "pricePerItem": "Price Per Item",
-  "totalPrice": "Total Price"
+  "totalPrice": "Total Price",
+  "anErrorOccurred": "An error occurred",
+  "error": "Error",
+  "sessionExpired": "Session expired",
+  "pleaseLoginAgain": "Please login again",
+  "notFound": "Not found",
+  "requestedResourceNotFound": "The requested resource was not found",
+  "serverError": "Server error",
+  "networkError": "Network error",
+  "checkInternetConnection": "Please check your internet connection",
+  "somethingWentWrong": "Something went wrong",
+  "pageNotFoundFallback": "The page you are looking for does not exist.",
+  "accessForbidden": "Access forbidden",
+  "resourceNotFound": "Resource not found",
+  "requestFailed": "Request failed",
+  "startingQualityCheckPreparation": "Starting quality check preparation",
+  "loadingQualityCheckDetails": "Loading quality check details...",
+  "qcPrefix": "QC#"
 }

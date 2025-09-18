@@ -10,11 +10,10 @@ export default function NotFound() {
         <div>
           <h1 className="text-9xl font-bold text-primary-200">404</h1>
           <h2 className="mt-6 text-3xl font-bold text-primary-800">
-            {t("pageNotFound") || "Page Not Found"}
+            {t("pageNotFound")}
           </h2>
           <p className="mt-2 text-sm text-primary-600">
-            {t("pageNotFoundDescription") ||
-              "The page you are looking for does not exist."}
+            {t("pageNotFoundDescription")}
           </p>
         </div>
         <div className="space-y-4">
@@ -22,13 +21,13 @@ export default function NotFound() {
             href="/"
             className="group relative w-full flex justify-center py-2 px-4 border border-transparent text-sm font-medium rounded-md text-white bg-primary-600 hover:bg-primary-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-primary-500 transition-colors"
           >
-            {t("goHome") || "Go Home"}
+            {t("goHome")}
           </Link>
           <Link
             href="/login"
             className="group relative w-full flex justify-center py-2 px-4 border border-primary-300 text-sm font-medium rounded-md text-primary-700 bg-white hover:bg-primary-50 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-primary-500 transition-colors"
           >
-            {t("goToLogin") || "Go to Login"}
+            {t("goToLogin")}
           </Link>
         </div>
       </div>

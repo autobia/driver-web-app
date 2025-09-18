@@ -1,4 +1,5 @@
 import { toast } from "sonner";
+import { translateUtil } from "./translationUtils";
 
 interface ApiError {
   status: boolean;
@@ -53,7 +54,7 @@ export const showToast = {
   // Specific handler for API errors
   apiError: (
     error: ApiError | AxiosError | string | unknown,
-    fallbackMessage = "An error occurred"
+    fallbackMessage = translateUtil("anErrorOccurred")
   ) => {
     let message = fallbackMessage;
     let description = "";

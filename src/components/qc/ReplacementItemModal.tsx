@@ -142,7 +142,7 @@ export default function ReplacementItemModal({
               value={selectedManufacturerId}
               onValueChange={setSelectedManufacturerId}
             >
-              <SelectTrigger>
+              <SelectTrigger className="w-full">
                 <SelectValue placeholder={t("selectManufacturer")} />
               </SelectTrigger>
               <SelectContent>
@@ -175,7 +175,7 @@ export default function ReplacementItemModal({
               onValueChange={setSelectedBrandId}
               disabled={!selectedManufacturerId}
             >
-              <SelectTrigger>
+              <SelectTrigger className="w-full">
                 <SelectValue placeholder={t("selectBrand")} />
               </SelectTrigger>
               <SelectContent>
@@ -206,6 +206,7 @@ export default function ReplacementItemModal({
               onChange={(e: React.ChangeEvent<HTMLInputElement>) =>
                 setSku(e.target.value)
               }
+              className="w-full"
             />
           </div>
 
@@ -222,6 +223,7 @@ export default function ReplacementItemModal({
               onChange={(e: React.ChangeEvent<HTMLInputElement>) =>
                 setQuantity(e.target.value)
               }
+              className="w-full"
             />
             <p className="text-xs text-gray-500">
               {t("maxQuantity")}: {maxQuantity}

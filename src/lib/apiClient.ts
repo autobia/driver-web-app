@@ -1,5 +1,6 @@
 import axios, { AxiosRequestConfig } from "axios";
 import { showToast } from "./toast";
+import { translateUtil } from "./translationUtils";
 
 // Create Axios instance with base configuration
 const apiClient = axios.create({
@@ -73,8 +74,8 @@ apiClient.interceptors.response.use(
       if (!isAuthRoute && typeof window !== "undefined") {
         // Handle the specific response format: { status, scope, context, timestamp, error }
         if (data && typeof data === "object") {
-          let errorMessage = "An error occurred";
-          let errorTitle = "Error";
+          let errorMessage = translateUtil("anErrorOccurred");
+          let errorTitle = translateUtil("error");
 
           // Check for error object with message
           if (
@@ -100,7 +101,10 @@ apiClient.interceptors.response.use(
 
           showToast.error(errorTitle, errorMessage);
         } else {
-          showToast.apiError(data, `Request failed (${status})`);
+          showToast.apiError(
+            data,
+            `${translateUtil("requestFailed")} (${status})`
+          );
         }
       }
 
@@ -110,27 +114,30 @@ apiClient.interceptors.response.use(
           // Unauthorized - clear token but don't navigate, just show toast
           localStorage.removeItem("authToken");
           if (!isAuthRoute && typeof window !== "undefined") {
-            showToast.error("Session expired", "Please login again");
+            showToast.error(
+              translateUtil("sessionExpired"),
+              translateUtil("pleaseLoginAgain")
+            );
           }
           break;
         case 403:
-          console.error("Access forbidden");
+          console.error(translateUtil("accessForbidden"));
           // Just show toast, no navigation
           break;
         case 404:
           // ONLY navigate on 404 errors
-          console.error("Resource not found");
+          console.error(translateUtil("resourceNotFound"));
           if (!isAuthRoute && typeof window !== "undefined") {
             showToast.error(
-              "Not found",
-              "The requested resource was not found"
+              translateUtil("notFound"),
+              translateUtil("requestedResourceNotFound")
             );
             // Navigate to 404 page for not found resources
             window.location.href = "/404";
           }
           break;
         case 500:
-          console.error("Server error");
+          console.error(translateUtil("serverError"));
           // Just show toast, no navigation
           break;
         default:
@@ -142,15 +149,18 @@ apiClient.interceptors.response.use(
       console.error("❌ Network Error:", error.message);
       if (typeof window !== "undefined") {
         showToast.error(
-          "Network error",
-          "Please check your internet connection"
+          translateUtil("networkError"),
+          translateUtil("checkInternetConnection")
         );
       }
     } else {
       // Other error
       console.error("❌ Error:", error.message);
       if (typeof window !== "undefined") {
-        showToast.error("Error", error.message || "Something went wrong");
+        showToast.error(
+          translateUtil("error"),
+          error.message || translateUtil("somethingWentWrong")
+        );
       }
     }
 

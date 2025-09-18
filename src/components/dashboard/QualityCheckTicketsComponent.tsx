@@ -74,8 +74,8 @@ export default function QualityCheckTicketsComponent() {
   const handleStartPreparing = (qualityCheckId: number) => {
     // Navigate to QC detail page
     toast.info(
-      "Starting quality check preparation",
-      "Loading quality check details..."
+      t("startingQualityCheckPreparation"),
+      t("loadingQualityCheckDetails")
     );
     router.push(`/quality-checks/${qualityCheckId}`);
   };
@@ -135,7 +135,8 @@ export default function QualityCheckTicketsComponent() {
               {/* Card Header */}
               <div className="bg-gradient-to-r from-primary-400 to-primary-500 px-4 py-3">
                 <h3 className="text-base font-bold text-white tracking-wide">
-                  QC#{qualityCheck.id}
+                  {t("qcPrefix")}
+                  {qualityCheck.id}
                 </h3>
               </div>
 
