@@ -528,7 +528,7 @@ export default function TripsComponent() {
                 <div className="flex items-center space-x-3 rtl:space-x-reverse">
                   <div className="w-2 h-2 bg-secondary-500 rounded-full flex-shrink-0 mr-2 rtl:mr-0 rtl:ml-2"></div>
                   <p className="text-sm font-medium text-gray-900 truncate">
-                    {t("purchaseInvoice")} #{trip.object_id}
+                    {t("purchaseInvoice")} #{trip.main_source_id}
                   </p>
                 </div>
 

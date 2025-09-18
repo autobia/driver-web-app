@@ -116,6 +116,7 @@ export interface Trip {
   has_delayed_item?: boolean;
   destination_point_type?: "warehouse" | "companybranch";
   destination_point?: WarehouseDestination | CompanyBranchDestination;
+  main_source_id?: number;
   main_source?: {
     warehouse?: {
       id: number;
