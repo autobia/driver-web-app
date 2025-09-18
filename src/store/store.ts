@@ -1,23 +1,27 @@
 import { configureStore } from "@reduxjs/toolkit";
 import authReducer from "./slices/authSlice";
 import qcReducer from "./slices/qcSlice";
+import purchaseOrderReducer from "./slices/purchaseOrderSlice";
 import { middlewares } from "./middleware";
 import { authApi } from "./api/authApi";
 import { tripsApi } from "./api/tripsApi";
 import { qualityChecksApi } from "./api/qualityChecksApi";
 import { inventoryApi } from "./api/inventoryApi";
 import { coreApi } from "./api/coreApi";
+import { purchaseOrderApi } from "./api/purchaseOrderApi";
 
 export const makeStore = () => {
   return configureStore({
     reducer: {
       auth: authReducer,
       qc: qcReducer,
+      purchaseOrder: purchaseOrderReducer,
       [authApi.reducerPath]: authApi.reducer,
       [tripsApi.reducerPath]: tripsApi.reducer,
       [qualityChecksApi.reducerPath]: qualityChecksApi.reducer,
       [inventoryApi.reducerPath]: inventoryApi.reducer,
       [coreApi.reducerPath]: coreApi.reducer,
+      [purchaseOrderApi.reducerPath]: purchaseOrderApi.reducer,
     },
     middleware: (getDefaultMiddleware) =>
       getDefaultMiddleware()
@@ -26,7 +30,8 @@ export const makeStore = () => {
         .concat(tripsApi.middleware)
         .concat(qualityChecksApi.middleware)
         .concat(inventoryApi.middleware)
-        .concat(coreApi.middleware),
+        .concat(coreApi.middleware)
+        .concat(purchaseOrderApi.middleware),
   });
 };
 
