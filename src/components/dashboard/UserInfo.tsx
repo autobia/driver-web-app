@@ -1,6 +1,8 @@
 "use client";
 
 import { useTranslations, useLocale } from "next-intl";
+import { motion } from "framer-motion";
+import { Sparkles } from "lucide-react";
 import { User } from "../../store/slices/authSlice";
 
 interface UserInfoProps {
@@ -12,47 +14,143 @@ export default function UserInfo({ user }: UserInfoProps) {
   const locale = useLocale();
 
   return (
-    <div className="p-3">
+    <motion.div
+      className="p-3"
+      initial={{ opacity: 0, y: -20 }}
+      animate={{ opacity: 1, y: 0 }}
+      transition={{ duration: 0.6, ease: "easeOut" }}
+    >
       <div className="max-w-7xl mx-auto">
-        <div className="bg-white rounded-xl border border-neutral-200 p-3">
+        <motion.div
+          className="bg-gradient-to-br from-white via-primary-50/30 to-primary-100/20 rounded-lg border border-neutral-200 p-3 shadow-sm backdrop-blur-sm"
+          whileHover={{
+            boxShadow:
+              "0 6px 20px -5px rgba(0, 0, 0, 0.1), 0 3px 8px -6px rgba(0, 0, 0, 0.1)",
+            borderColor: "rgba(139, 69, 19, 0.4)",
+            transition: { duration: 0.3 },
+          }}
+        >
           <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3">
             {/* Welcome Message */}
-            <div className="flex items-center gap-2">
-              <h1 className="text-lg font-semibold text-gray-900">
-                {t("welcome")}, {user.first_name} {user.last_name}!
-              </h1>
-              <span className="text-lg">👋</span>
-            </div>
+            <motion.div
+              className="flex items-center gap-2"
+              initial={{ opacity: 0, x: -20 }}
+              animate={{ opacity: 1, x: 0 }}
+              transition={{ duration: 0.5, delay: 0.1 }}
+            >
+              <motion.div
+                className="flex items-center justify-center w-8 h-8 rounded-full bg-gradient-to-br from-primary-500 to-primary-600 shadow-md"
+                animate={{
+                  scale: [1, 1.1, 1],
+                  rotate: [0, 5, -5, 0],
+                }}
+                transition={{
+                  duration: 2,
+                  ease: "easeInOut",
+                  repeat: Infinity,
+                  repeatDelay: 3,
+                }}
+                whileHover={{ scale: 1.15 }}
+              >
+                <Sparkles className="w-4 h-4 text-white" />
+              </motion.div>
+              <div className="flex flex-col">
+                <motion.h1
+                  className="text-lg font-bold text-gray-900"
+                  initial={{ opacity: 0, y: 10 }}
+                  animate={{ opacity: 1, y: 0 }}
+                  transition={{ duration: 0.8, delay: 0.2 }}
+                >
+                  {t("welcome")}, {user.first_name} {user.last_name}!
+                </motion.h1>
+                <motion.div
+                  className="h-0.5 bg-gradient-to-r from-primary-500 to-primary-600 rounded-full"
+                  initial={{ width: 0 }}
+                  animate={{ width: "100%" }}
+                  transition={{ duration: 0.8, delay: 0.5 }}
+                />
+              </div>
+            </motion.div>
 
             {/* User Details - ID and Role Only */}
-            <div className="flex gap-2 flex-shrink-0">
+            <motion.div
+              className="flex gap-2 flex-shrink-0"
+              initial={{ opacity: 0, x: 20 }}
+              animate={{ opacity: 1, x: 0 }}
+              transition={{ duration: 0.5, delay: 0.2 }}
+            >
               {/* User ID Badge */}
-              <div className="bg-blue-50 border border-blue-200 rounded-lg px-2 py-1 min-w-0">
-                <div className="flex items-center gap-1 whitespace-nowrap">
-                  <span className="text-sm font-medium text-blue-700">
+              <motion.div
+                className="bg-gradient-to-br from-emerald-50 to-emerald-100 border border-emerald-200 rounded-lg px-2 py-1.5 min-w-0 shadow-sm"
+                initial={{ opacity: 0, scale: 0.8 }}
+                animate={{ opacity: 1, scale: 1 }}
+                transition={{ duration: 0.4, delay: 0.3 }}
+                whileHover={{
+                  scale: 1.05,
+                  borderColor: "rgba(139, 69, 19, 0.4)",
+                }}
+                whileTap={{ scale: 0.95 }}
+              >
+                <div className="flex items-center gap-2 whitespace-nowrap">
+                  <motion.div
+                    className="w-2 h-2 bg-emerald-500 rounded-full"
+                    animate={{
+                      scale: [1, 1.2, 1],
+                      opacity: [0.7, 1, 0.7],
+                    }}
+                    transition={{
+                      duration: 2,
+                      repeat: Infinity,
+                      ease: "easeInOut",
+                    }}
+                  />
+                  <span className="text-sm font-medium text-emerald-700">
                     {t("userId")}:
                   </span>
-                  <span className="text-sm font-bold text-blue-900">
+                  <span className="text-sm font-bold text-emerald-900">
                     {user.user_id}
                   </span>
                 </div>
-              </div>
+              </motion.div>
 
               {/* Role Badge */}
-              <div className="bg-emerald-50 border border-emerald-200 rounded-lg px-2 py-1 min-w-0">
-                <div className="flex items-center gap-1 whitespace-nowrap">
-                  <span className="text-sm font-medium text-emerald-700">
+              <motion.div
+                className="bg-gradient-to-br from-blue-50 to-blue-100 border border-blue-200 rounded-lg px-2 py-1.5 min-w-0 shadow-sm"
+                initial={{ opacity: 0, scale: 0.8 }}
+                animate={{ opacity: 1, scale: 1 }}
+                transition={{ duration: 0.4, delay: 0.4 }}
+                whileHover={{
+                  scale: 1.05,
+                  borderColor: "rgba(139, 69, 19, 0.4)",
+                }}
+                whileTap={{ scale: 0.95 }}
+              >
+                <div className="flex items-center gap-2 whitespace-nowrap">
+                  <motion.div
+                    className="w-2 h-2 bg-blue-500 rounded-full"
+                    animate={{
+                      scale: [1, 1.2, 1],
+                      opacity: [0.7, 1, 0.7],
+                    }}
+                    transition={{
+                      duration: 2,
+                      repeat: Infinity,
+                      ease: "easeInOut",
+                      delay: 0.5,
+                    }}
+                  />
+                  <span className="text-sm font-medium text-blue-700">
                     {t("role")}:
                   </span>
-                  <span className="text-sm font-bold text-emerald-900">
+                  <span className="text-sm font-bold text-blue-900">
                     {locale === "ar" ? user.role.name_ar : user.role.name_en}
                   </span>
                 </div>
-              </div>
-            </div>
+              </motion.div>
+            </motion.div>
           </div>
-        </div>
+        </motion.div>
       </div>
-    </div>
+    </motion.div>
   );
 }
