@@ -426,28 +426,23 @@ export default function TripsComponent() {
 
         if (isContentTypeAllowed) {
           // Create quality check with selected preparer
-          const qualityCheckResult = await createQualityCheck({
+          await createQualityCheck({
             content_type: trip.content_type as number,
             object_id: trip.object_id,
             quality_checker: selectedPreparer,
           }).unwrap();
 
-          if (qualityCheckResult.id) {
-            // Update trip with destination coordinates as per Flutter
-            await updateTripLocation({
-              tripId: selectedTripForAssign,
-              data: {
-                confirm_destination_point_lat: 12.12345678,
-                confirm_destination_point_long: 21.12345678,
-              },
-            }).unwrap();
+          // Update trip with destination coordinates as per Flutter
+          await updateTripLocation({
+            tripId: selectedTripForAssign,
+            data: {
+              confirm_destination_point_lat: 12.12345678,
+              confirm_destination_point_long: 21.12345678,
+            },
+          }).unwrap();
 
-            console.log("Preparer assigned successfully");
-            // You could add toast notification here for success feedback
-
-            // Close modal and reset state
-            handleCloseAssignModal();
-          }
+          // Close modal and reset state
+          handleCloseAssignModal();
         } else {
           console.log("Content type not allowed - Already Prepared");
           // You could add toast notification here: "Already Prepared"
