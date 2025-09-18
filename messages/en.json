@@ -116,7 +116,9 @@
   "selectDriverPlaceholder": "Choose a driver",
   "driverRequired": "Driver selection is required",
   "selectDelayedPreparer": "Select Delayed Preparer",
+  "selectPreparer": "Select Preparer",
   "selectPreparerPlaceholder": "Choose a preparer",
+  "assigning": "Assigning...",
   "noPreparerSelected": "No preparer selected",
   "delayedPreparerDescription": "Optional: Select a preparer to handle delayed items",
   "optional": "optional",
@@ -148,5 +150,9 @@
   "arrived": "Arrived",
   "assignPreparer": "Assign Preparer",
   "onTheWay": "On The Way",
-  "cancelled": "Cancelled"
+  "cancelled": "Cancelled",
+  "going": "Going",
+  "getting_location": "Getting Location...",
+  "tripCompleted": "Trip Completed",
+  "tripCancelled": "Trip Cancelled"
 }

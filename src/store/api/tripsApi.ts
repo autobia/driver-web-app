@@ -66,6 +66,19 @@ export interface Trip {
   object_id: number;
   status: string;
   assignment: Assignment;
+  trip_direction?: "bring" | "deliver";
+  has_delayed_item?: boolean;
+  destination_point?: {
+    company_id?: number | null;
+    warehouse?: {
+      id: number;
+    };
+  };
+  main_source?: {
+    warehouse?: {
+      id: number;
+    };
+  };
 }
 
 export interface TripsResponse {
@@ -74,11 +87,17 @@ export interface TripsResponse {
 
 // Trip creation request interface
 export interface CreateTripRequest {
-  content_type: 14; // Always QC content type ID
-  object_id: string;
+  confirm_destination_point_lat: number;
+  confirm_destination_point_long: number;
+}
+
+// Advanced trip creation request interface (based on Flutter code)
+export interface CreateAdvancedTripRequest {
+  content_type: number;
+  object_id: number;
   destination_point: string;
-  destination_point_type: 32; // Always company branch content type ID
-  trip_direction: "bring";
+  destination_point_type: number;
+  trip_direction: "bring" | "deliver";
   assign_to: string;
   user_type: "user";
 }
@@ -89,6 +108,24 @@ export interface CreateTripResponse {
   trip_number: string;
   status: string;
   created_at: string;
+}
+
+// Trip update location request interface
+export interface UpdateTripLocationRequest {
+  confirm_start_point_lat?: number;
+  confirm_start_point_long?: number;
+  confirm_destination_point_lat?: number;
+  confirm_destination_point_long?: number;
+  create_delayed_qc?: boolean;
+}
+
+// Trip update location response interface
+export interface UpdateTripLocationResponse {
+  id: number;
+  status: string;
+  confirm_start_point_lat: number;
+  confirm_start_point_long: number;
+  updated_at: string;
 }
 
 // Create the trips API slice
@@ -113,11 +150,40 @@ export const tripsApi = createApi({
       }),
       invalidatesTags: ["Trips"],
     }),
+
+    createAdvancedTrip: builder.mutation<
+      CreateTripResponse,
+      CreateAdvancedTripRequest
+    >({
+      query: (data) => ({
+        url: "/trips/",
+        method: "POST",
+        data,
+      }),
+      invalidatesTags: ["Trips"],
+    }),
+
+    updateTripLocation: builder.mutation<
+      UpdateTripLocationResponse,
+      { tripId: number; data: UpdateTripLocationRequest }
+    >({
+      query: ({ tripId, data }) => ({
+        url: `/trips/${tripId}/`,
+        method: "PUT",
+        data,
+      }),
+      invalidatesTags: ["Trips"],
+    }),
   }),
 });
 
 // Export hooks for usage in functional components
-export const { useGetDriverTripsQuery, useCreateTripMutation } = tripsApi;
+export const {
+  useGetDriverTripsQuery,
+  useCreateTripMutation,
+  useCreateAdvancedTripMutation,
+  useUpdateTripLocationMutation,
+} = tripsApi;
 
 // Export the reducer
 export default tripsApi.reducer;

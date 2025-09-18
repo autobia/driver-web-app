@@ -381,6 +381,22 @@ export interface CreateDelayedItemsFlowResponse {
   message: string;
 }
 
+// Create Quality Check Types
+export interface CreateQualityCheckRequest {
+  content_type: number;
+  object_id: number;
+  quality_checker: number;
+}
+
+export interface CreateQualityCheckResponse {
+  id: number;
+  content_type: number;
+  object_id: number;
+  status: string;
+  quality_checker: number;
+  created_at: string;
+}
+
 // Create the quality checks API slice
 export const qualityChecksApi = createApi({
   reducerPath: "qualityChecksApi",
@@ -436,6 +452,18 @@ export const qualityChecksApi = createApi({
       }),
       invalidatesTags: ["QualityChecks"],
     }),
+
+    createQualityCheck: builder.mutation<
+      CreateQualityCheckResponse,
+      CreateQualityCheckRequest
+    >({
+      query: (data) => ({
+        url: `/quality-checks/`,
+        method: "POST",
+        data,
+      }),
+      invalidatesTags: ["QualityChecks"],
+    }),
   }),
 });
 
@@ -446,6 +474,7 @@ export const {
   useSubmitQualityCheckMutation,
   useCloseQualityCheckMutation,
   useCreateDelayedItemsFlowMutation,
+  useCreateQualityCheckMutation,
 } = qualityChecksApi;
 
 // Export the reducer

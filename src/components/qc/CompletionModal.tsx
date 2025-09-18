@@ -12,8 +12,8 @@ import type {
   QualityCheckCloseRequest,
   CreateDelayedItemsFlowRequest,
 } from "../../store/api/qualityChecksApi";
-import { useCreateTripMutation } from "../../store/api/tripsApi";
-import type { CreateTripRequest } from "../../store/api/tripsApi";
+import { useCreateAdvancedTripMutation } from "../../store/api/tripsApi";
+import type { CreateAdvancedTripRequest } from "../../store/api/tripsApi";
 import { useDrivers, usePreparers } from "../../hooks/useUserData";
 import { useSelector, useDispatch } from "react-redux";
 import { useTranslations } from "next-intl";
@@ -76,7 +76,7 @@ export default function CompletionModal({
     useSubmitQualityCheckMutation();
   const [closeQualityCheck] = useCloseQualityCheckMutation();
   const [createDelayedItemsFlow] = useCreateDelayedItemsFlowMutation();
-  const [createTrip] = useCreateTripMutation();
+  const [createTrip] = useCreateAdvancedTripMutation();
 
   // Fetch drivers and preparers data
   const { data: drivers, isLoading: driversLoading } = useDrivers();
@@ -254,14 +254,14 @@ export default function CompletionModal({
         console.log("Quality Check submitted successfully:", submitResult);
 
         // Step 2: Create Trip
-        const tripData: CreateTripRequest = {
+        const tripData: CreateAdvancedTripRequest = {
           content_type: 14,
-          object_id: currentQC.id.toString(),
+          object_id: currentQC.id,
           destination_point:
             currentQC.main_source_id.company_branch.id.toString(),
           destination_point_type: 32,
           trip_direction: "bring",
-          assign_to: selectedDriverId,
+          assign_to: selectedDriverId.toString(),
           user_type: "user",
         };
 

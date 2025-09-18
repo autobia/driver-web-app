@@ -116,7 +116,9 @@
   "selectDriverPlaceholder": "اختر سائق",
   "driverRequired": "اختيار السائق مطلوب",
   "selectDelayedPreparer": "اختيار محضر المؤجل",
+  "selectPreparer": "اختيار المحضر",
   "selectPreparerPlaceholder": "اختر محضر",
+  "assigning": "جارٍ التعيين...",
   "noPreparerSelected": "لم يتم اختيار محضر",
   "delayedPreparerDescription": "اختياري: اختر محضر للتعامل مع العناصر المؤجلة",
   "optional": "اختياري",
@@ -145,8 +147,12 @@
   "contentType": "نوع المحتوى",
   "objectId": "معرف الكائن",
   "purchaseInvoice": "فاتورة الشراء",
-  "arrived": "ذاهب",
+  "arrived": "وصل",
   "assignPreparer": "تعيين محضر",
   "onTheWay": "في الطريق",
-  "cancelled": "ملغي"
+  "cancelled": "ملغي",
+  "going": "ذاهب",
+  "getting_location": "جاري الحصول على الموقع...",
+  "tripCompleted": "اكتملت الرحلة",
+  "tripCancelled": "تم إلغاء الرحلة"
 }

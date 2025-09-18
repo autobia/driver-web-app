@@ -1,6 +1,9 @@
 "use client";
 
-import { useFetchUsersQuery } from "@/store/api/coreApi";
+import {
+  useFetchUsersQuery,
+  useFetchContentTypesQuery,
+} from "@/store/api/coreApi";
 
 // Custom hooks to access cached user data
 export const useDrivers = () => {
@@ -29,4 +32,9 @@ export const useAllUsersLoadingState = () => {
       preparers: preparers.error,
     },
   };
+};
+
+// Custom hook to fetch all content types
+export const useContentTypes = () => {
+  return useFetchContentTypesQuery();
 };

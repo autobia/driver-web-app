@@ -3,7 +3,10 @@
 import { ReactNode, useEffect } from "react";
 import { useSelector } from "react-redux";
 import { RootState } from "@/store/store";
-import { useFetchUsersQuery } from "@/store/api/coreApi";
+import {
+  useFetchUsersQuery,
+  useFetchContentTypesQuery,
+} from "@/store/api/coreApi";
 
 interface UserDataProviderProps {
   children: ReactNode;
@@ -30,6 +33,12 @@ export default function UserDataProvider({ children }: UserDataProviderProps) {
     }
   );
 
+  // Fetch all content types when authenticated
+  const { data: contentTypesData, error: contentTypesError } =
+    useFetchContentTypesQuery(undefined, {
+      skip: !isAuthenticated, // Skip the query if not authenticated
+    });
+
   useEffect(() => {
     if (isAuthenticated) {
       console.log(
@@ -44,15 +53,24 @@ export default function UserDataProvider({ children }: UserDataProviderProps) {
       if (preparersData) {
         console.log("Preparers loaded:", preparersData.length, "users");
       }
+      if (contentTypesData) {
+        console.log(
+          "Content types loaded:",
+          contentTypesData.content_types?.length || 0,
+          "types"
+        );
+      }
     }
-  }, [isAuthenticated, user, driversData, preparersData]);
+  }, [isAuthenticated, user, driversData, preparersData, contentTypesData]);
 
   // Log any errors
   useEffect(() => {
     if (driversError) console.error("Error fetching drivers:", driversError);
     if (preparersError)
       console.error("Error fetching preparers:", preparersError);
-  }, [driversError, preparersError]);
+    if (contentTypesError)
+      console.error("Error fetching content types:", contentTypesError);
+  }, [driversError, preparersError, contentTypesError]);
 
   // Make user data available via global state or context
   // For now, we're just fetching and caching in RTK Query cache
