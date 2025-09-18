@@ -22,7 +22,7 @@ export default function UserInfo({ user }: UserInfoProps) {
     >
       <div className="max-w-7xl mx-auto">
         <motion.div
-          className="bg-gradient-to-br from-white via-primary-50/30 to-primary-100/20 rounded-lg border border-neutral-200 p-3 shadow-sm backdrop-blur-sm"
+          className="bg-gradient-to-br  rounded-lg border border-primary-50 p-3 shadow-sm backdrop-blur-sm"
           whileHover={{
             boxShadow:
               "0 6px 20px -5px rgba(0, 0, 0, 0.1), 0 3px 8px -6px rgba(0, 0, 0, 0.1)",
