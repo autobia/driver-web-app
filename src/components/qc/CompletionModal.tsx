@@ -222,8 +222,8 @@ export default function CompletionModal({
 
         if (hasDelayedItems) {
           const delayedItemsData: CreateDelayedItemsFlowRequest = {
-            qc_id: currentQC.id.toString(),
-            delayed_user_id: assignedTo,
+            qc_id: currentQC.id,
+            delayed_user_id: Number(assignedTo),
           };
 
           console.log("Creating delayed items flow:", delayedItemsData);
@@ -293,9 +293,9 @@ export default function CompletionModal({
 
         if (hasDelayedItems) {
           const delayedItemsData: CreateDelayedItemsFlowRequest = {
-            qc_id: currentQC.id.toString(),
+            qc_id: currentQC.id,
             delayed_user_id:
-              selectedPreparerId !== "0" ? selectedPreparerId : "0",
+              selectedPreparerId !== "0" ? parseInt(selectedPreparerId) : 0,
           };
 
           console.log("Creating delayed items flow:", delayedItemsData);

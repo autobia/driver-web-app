@@ -371,8 +371,8 @@ export interface QualityCheckCloseResponse {
 
 // Delayed Items Flow Types
 export interface CreateDelayedItemsFlowRequest {
-  qc_id: string;
-  delayed_user_id: string;
+  qc_id: number;
+  delayed_user_id: number;
 }
 
 export interface CreateDelayedItemsFlowResponse {
