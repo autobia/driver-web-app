@@ -137,5 +137,16 @@
   "errorLoadingDrivers": "خطأ في تحميل السائقين",
   "loadingPreparers": "جارٍ تحميل المحضرين...",
   "errorLoadingPreparers": "خطأ في تحميل المحضرين",
-  "close": "إغلاق"
+  "close": "إغلاق",
+  "trip": "رحلة",
+  "assignedTo": "مُعيّن إلى",
+  "username": "اسم المستخدم",
+  "phone": "الهاتف",
+  "contentType": "نوع المحتوى",
+  "objectId": "معرف الكائن",
+  "purchaseInvoice": "فاتورة الشراء",
+  "arrived": "ذاهب",
+  "assignPreparer": "تعيين محضر",
+  "onTheWay": "في الطريق",
+  "cancelled": "ملغي"
 }

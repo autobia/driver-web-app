@@ -7,6 +7,38 @@ export default function TripsComponent() {
   const t = useTranslations();
   const { data: tripsData, isLoading, error } = useGetDriverTripsQuery();
 
+  // Helper function to get status translation
+  const getStatusTranslation = (status: string) => {
+    switch (status) {
+      case "pending":
+        return t("pending");
+      case "on_the_way":
+        return t("onTheWay");
+      case "arrived":
+        return t("arrived");
+      case "cancelled":
+        return t("cancelled");
+      default:
+        return status;
+    }
+  };
+
+  // Helper function to get status color
+  const getStatusColor = (status: string) => {
+    switch (status) {
+      case "pending":
+        return "bg-yellow-100 text-yellow-800 border-yellow-200";
+      case "on_the_way":
+        return "bg-blue-100 text-blue-800 border-blue-200";
+      case "arrived":
+        return "bg-green-100 text-green-800 border-green-200";
+      case "cancelled":
+        return "bg-red-100 text-red-800 border-red-200";
+      default:
+        return "bg-gray-100 text-gray-800 border-gray-200";
+    }
+  };
+
   if (isLoading) {
     return (
       <div className="space-y-4">
@@ -47,52 +79,56 @@ export default function TripsComponent() {
           </div>
         </div>
       ) : (
-        <div className="space-y-3">
+        <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-3">
           {trips.map((trip) => (
             <div
               key={trip.id}
-              className="bg-white rounded-lg border border-neutral-200 p-4 hover:shadow-md transition-shadow"
+              className="bg-white rounded-xl border border-neutral-200 shadow-sm hover:shadow-md transition-shadow duration-200 overflow-hidden"
             >
-              <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3">
-                <div className="flex-1">
-                  <div className="flex items-center gap-2 mb-2">
-                    <h3 className="font-semibold text-gray-900">
-                      Trip #{trip.trip_number}
-                    </h3>
-                    <span
-                      className={`px-2 py-1 text-xs font-medium rounded-full ${
-                        trip.status === "completed"
-                          ? "bg-green-100 text-green-800"
-                          : trip.status === "in_progress"
-                          ? "bg-blue-100 text-blue-800"
-                          : "bg-gray-100 text-gray-800"
-                      }`}
-                    >
-                      {trip.status}
+              {/* Card Header */}
+              <div className="bg-gradient-to-r from-primary-400 to-primary-500 px-4 py-3">
+                <h3 className="text-base font-bold text-white tracking-wide">
+                  {t("trip")}#{trip.id}
+                </h3>
+              </div>
+
+              {/* Card Body */}
+              <div className="p-4 space-y-2">
+                {/* Purchase Invoice ID */}
+                <div className="flex items-center space-x-3 rtl:space-x-reverse">
+                  <div className="w-2 h-2 bg-secondary-500 rounded-full flex-shrink-0 mr-2 rtl:mr-0 rtl:ml-2"></div>
+                  <p className="text-sm font-medium text-gray-900 truncate">
+                    {t("purchaseInvoice")} #{trip.object_id}
+                  </p>
+                </div>
+
+                {/* Trip Status */}
+                <div className="flex items-center justify-between">
+                  <div className="flex items-center space-x-3 rtl:space-x-reverse">
+                    <div className="w-2 h-2 bg-secondary-200 rounded-full flex-shrink-0 mr-2 rtl:mr-0 rtl:ml-2"></div>
+                    <span className="text-sm text-gray-700">
+                      {t("status")}:
                     </span>
                   </div>
-                  <div className="text-sm text-gray-600 space-y-1">
-                    <p>
-                      <strong>{t("from")}:</strong> {trip.origin} →{" "}
-                      <strong>{t("to")}:</strong> {trip.destination}
-                    </p>
-                    <p>
-                      <strong>{t("departure")}:</strong>{" "}
-                      {new Date(trip.departure_time).toLocaleString()}
-                    </p>
-                    {trip.arrival_time && (
-                      <p>
-                        <strong>{t("arrival")}:</strong>{" "}
-                        {new Date(trip.arrival_time).toLocaleString()}
-                      </p>
-                    )}
-                  </div>
+                  <span
+                    className={`text-xs font-medium px-2 py-1 rounded-full border ${getStatusColor(
+                      trip.status
+                    )}`}
+                  >
+                    {getStatusTranslation(trip.status)}
+                  </span>
                 </div>
-                <div className="text-right">
-                  <div className="text-lg font-bold text-primary-600">
-                    ${trip.fare}
-                  </div>
-                  <div className="text-sm text-gray-500">{trip.distance}km</div>
+              </div>
+
+              {/* Card Footer */}
+              <div className="px-4 pb-4">
+                <div className="flex gap-2">
+                  <button className="flex-1 bg-green-600 hover:bg-green-700 text-white font-medium py-2 px-3 rounded-lg transition-colors duration-200 focus:outline-none focus:ring-2 focus:ring-green-500 focus:ring-offset-2 text-sm">
+                    {t("arrived")}
+                  </button>
+                  <button className="flex-1 bg-orange-600 hover:bg-orange-700 text-white font-medium py-2 px-3 rounded-lg transition-colors duration-200 focus:outline-none focus:ring-2 focus:ring-orange-500 focus:ring-offset-2 text-sm">
+                    {t("assignPreparer")}
+                  </button>
                 </div>
               </div>
             </div>

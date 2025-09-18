@@ -137,5 +137,16 @@
   "errorLoadingDrivers": "Error loading drivers",
   "loadingPreparers": "Loading preparers...",
   "errorLoadingPreparers": "Error loading preparers",
-  "close": "Close"
+  "close": "Close",
+  "trip": "Trip",
+  "assignedTo": "Assigned To",
+  "username": "Username",
+  "phone": "Phone",
+  "contentType": "Content Type",
+  "objectId": "Object ID",
+  "purchaseInvoice": "Purchase Invoice",
+  "arrived": "Arrived",
+  "assignPreparer": "Assign Preparer",
+  "onTheWay": "On The Way",
+  "cancelled": "Cancelled"
 }
