@@ -6,11 +6,13 @@ import { useRouter } from "next/navigation";
 import { RootState } from "../../store/store";
 import { useGetDriverTripsQuery } from "../../store/api/tripsApi";
 import { useGetQualityChecksQuery } from "../../store/api/qualityChecksApi";
+import { useGetUnShippedOrdersQuery } from "../../store/api/saleOrderApi";
 
 export type NavigationTab =
   | "trips"
   | "qualityCheckTickets"
-  | "purchaseInvoices";
+  | "purchaseInvoices"
+  | "ordersDelivery";
 
 interface NavigationTabsProps {
   activeTab: NavigationTab;
@@ -42,10 +44,13 @@ export default function NavigationTabs({
     }
   );
 
+  const { data: salesOrdersData } = useGetUnShippedOrdersQuery();
+
   // Calculate counts for badges
   const tripsCount = tripsData?.trips?.length || 0;
   const qualityChecksCount = qualityChecksData?.length || 0;
   const purchaseInvoicesCount = 0; // TODO: Add API call when available
+  const ordersDeliveryCount = salesOrdersData?.length || 0;
 
   const handleNavigation = (section: NavigationTab) => {
     switch (section) {
@@ -57,6 +62,8 @@ export default function NavigationTabs({
         break;
       case "purchaseInvoices":
         router.push("/purchase-invoices");
+      case "ordersDelivery":
+        router.push("/orders-delivery");
         break;
     }
   };
@@ -135,6 +142,34 @@ export default function NavigationTabs({
             </div>
             <span className="text-xs font-medium">{t("purchaseInvoices")}</span>
           </button>
+
+          {/* Orders Delivery Tab */}
+          {isDriver && (
+            <button
+              onClick={() => handleNavigation("ordersDelivery")}
+              className={`flex-1 flex flex-col items-center py-2 px-1 rounded-lg transition-all duration-200 relative ${
+                activeTab === "purchaseInvoices"
+                  ? "bg-primary-50 text-primary-700"
+                  : "text-gray-500 hover:text-gray-700"
+              }`}
+            >
+              <div className="w-6 h-6 mb-1 relative">
+                <svg
+                  className="w-5 h-5"
+                  viewBox="0 0 24 24"
+                  fill="currentColor"
+                >
+                  <path d="M20 3H4c-1.1 0-2 .9-2 2v14c0 1.1.9 2 2 2h16c1.1 0 2-.9 2-2V5c0-1.1-.9-2-2-2zm0 16H4V5h16v14zM6 11h12v2H6zm0-4h12v2H6zm0 8h12v2H6z" />
+                </svg>
+                {ordersDeliveryCount > 0 && (
+                  <span className="absolute -top-1 -right-1 bg-red-500 text-white text-xs font-bold rounded-full w-5 h-5 flex items-center justify-center">
+                    {ordersDeliveryCount > 9 ? "9+" : ordersDeliveryCount}
+                  </span>
+                )}
+              </div>
+              <span className="text-xs font-medium">{t("ordersDelivery")}</span>
+            </button>
+          )}
         </div>
       </div>
     </>

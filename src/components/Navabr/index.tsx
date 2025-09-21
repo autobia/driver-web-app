@@ -8,6 +8,7 @@ import { useGetDriverTripsQuery } from "../../store/api/tripsApi";
 import { useGetQualityChecksQuery } from "../../store/api/qualityChecksApi";
 import LogoutButton from "./LogoutButton";
 import LanguageSwitcher from "./LanguageSwitcher";
+import { useGetUnShippedOrdersQuery } from "@/store/api/saleOrderApi";
 
 export default function Navbar() {
   const t = useTranslations();
@@ -37,12 +38,13 @@ export default function Navbar() {
       skip: !isAuthenticated || !user?.user_id,
     }
   );
+  const { data: salesOrdersData } = useGetUnShippedOrdersQuery();
 
   // Calculate counts for badges
   const tripsCount = tripsData?.trips?.length || 0;
   const qualityChecksCount = qualityChecksData?.length || 0;
   const purchaseInvoicesCount = 0; // TODO: Add API call when available
-
+  const ordersDeliveryCount = salesOrdersData?.length || 0;
   const handleNavigation = (path: string) => {
     router.push(path);
   };
@@ -52,6 +54,8 @@ export default function Navbar() {
     if (pathname.includes("/trips")) return "trips";
     if (pathname.includes("/quality-checks")) return "qualityCheckTickets";
     if (pathname.includes("/purchase-invoices")) return "purchaseInvoices";
+    if (pathname.includes("/orders-delivery")) return "orders-delivery";
+
     return "";
   };
 
@@ -95,6 +99,21 @@ export default function Navbar() {
         </svg>
       ),
     },
+    ...(isDriver
+      ? [
+          {
+            key: "ordersDelivery",
+            label: t("ordersDelivery"),
+            path: "/orders-delivery",
+            count: ordersDeliveryCount,
+            icon: (
+              <svg className="w-5 h-5" viewBox="0 0 24 24" fill="currentColor">
+                <path d="M20 3H4c-1.1 0-2 .9-2 2v14c0 1.1.9 2 2 2h16c1.1 0 2-.9 2-2V5c0-1.1-.9-2-2-2zm0 16H4V5h16v14zM6 11h12v2H6zm0-4h12v2H6zm0 8h12v2H6z" />
+              </svg>
+            ),
+          },
+        ]
+      : []),
   ];
 
   return (

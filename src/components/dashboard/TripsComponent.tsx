@@ -70,14 +70,6 @@ export default function TripsComponent() {
   // Check if ANY refetch is in progress (to disable all other actions)
   const isAnyRefetchInProgress = refetchingTripId !== null && isFetching;
 
-  if (isAnyRefetchInProgress) {
-    console.log(
-      `🚫 All actions disabled - refetching trip ${refetchingTripId}, isFetching: ${isFetching}`
-    );
-  }
-
-  console.warn("isLoading", isLoading);
-
   // Assign Preparer Modal State
   const [showAssignModal, setShowAssignModal] = useState(false);
   const [selectedTripForAssign, setSelectedTripForAssign] = useState<
@@ -109,9 +101,6 @@ export default function TripsComponent() {
   }> => {
     try {
       if (!navigator.geolocation) {
-        console.warn(
-          "Geolocation is not supported by this browser. Using fallback coordinates."
-        );
         return { latitude: FALLBACK_LATITUDE, longitude: FALLBACK_LONGITUDE };
       }
 
@@ -130,10 +119,6 @@ export default function TripsComponent() {
         longitude: position.coords.longitude,
       };
     } catch (error) {
-      console.warn(
-        "Failed to get current location. Using fallback coordinates:",
-        error
-      );
       return { latitude: FALLBACK_LATITUDE, longitude: FALLBACK_LONGITUDE };
     }
   };
@@ -301,7 +286,6 @@ export default function TripsComponent() {
           }).unwrap();
 
           console.log("Update trip latitude and longitude");
-          console.warn(qualityCheckResult, "results area");
 
           // Set refetching state and refetch trips to get updated data
           setRefetchingTripId(tripId);

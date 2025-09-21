@@ -23,12 +23,6 @@ export default function NotFound() {
           >
             {t("goHome")}
           </Link>
-          <Link
-            href="/login"
-            className="group relative w-full flex justify-center py-2 px-4 border border-primary-300 text-sm font-medium rounded-md text-primary-700 bg-white hover:bg-primary-50 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-primary-500 transition-colors"
-          >
-            {t("goToLogin")}
-          </Link>
         </div>
       </div>
     </div>

@@ -229,5 +229,15 @@
   "updatingTrip": "Updating Trip...",
   "processingArrival": "Processing Arrival...",
   "assigningPreparer": "Assigning preparer...",
-  "refreshingTripData": "Refreshing trip data..."
+  "refreshingTripData": "Refreshing trip data...",
+  "ordersDelivery": "Orders Delivery",
+  "salesOrders": "Sales Orders",
+  "failedToLoadSalesOrders": "Failed to load sales orders",
+  "ordersFound": "orders found",
+  "noSalesOrders": "No Sales Orders",
+  "noSalesOrdersDescription": "No unshipped sales orders found",
+  "createdAt": "Created At",
+  "totalQuantity": "Total Quantity",
+  "urgent": "Urgent",
+  "uploadDocuments": "Upload Documents"
 }

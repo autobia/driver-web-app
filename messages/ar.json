@@ -229,5 +229,15 @@
   "updatingTrip": "جاري تحديث الرحلة...",
   "processingArrival": "جاري معالجة الوصول...",
   "assigningPreparer": "جاري تعيين المحضر...",
-  "refreshingTripData": "جاري تحديث بيانات الرحلة..."
+  "refreshingTripData": "جاري تحديث بيانات الرحلة...",
+  "ordersDelivery": "تسليم الطلبات",
+  "salesOrders": "أوامر البيع",
+  "failedToLoadSalesOrders": "فشل في تحميل أوامر البيع",
+  "ordersFound": "طلبات موجودة",
+  "noSalesOrders": "لا توجد أوامر بيع",
+  "noSalesOrdersDescription": "لا توجد أوامر بيع غير مشحونة",
+  "createdAt": "تاريخ الإنشاء",
+  "totalQuantity": "الكمية الإجمالية",
+  "urgent": "عاجل",
+  "uploadDocuments": "رفع المستندات"
 }

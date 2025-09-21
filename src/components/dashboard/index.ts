@@ -5,4 +5,5 @@ export { default as DashboardContent } from "./DashboardContent";
 export { default as TripsComponent } from "./TripsComponent";
 export { default as QualityCheckTicketsComponent } from "./QualityCheckTicketsComponent";
 export { default as PurchaseInvoicesComponent } from "./PurchaseInvoicesComponent";
+export { default as SalesOrdersComponent } from "./SalesOrdersComponent";
 export type { NavigationTab } from "./NavigationTabs";
