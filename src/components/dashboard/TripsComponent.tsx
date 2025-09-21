@@ -66,6 +66,46 @@ export default function TripsComponent() {
   const QUALITY_CHECK_CONTENT_TYPE = 48;
   const WAREHOUSE_CONTENT_TYPE = 32;
 
+  // Fallback coordinates
+  const FALLBACK_LATITUDE = 17;
+  const FALLBACK_LONGITUDE = 17;
+
+  // Helper function to get current location with fallback
+  const getCurrentLocationWithFallback = async (): Promise<{
+    latitude: number;
+    longitude: number;
+  }> => {
+    try {
+      if (!navigator.geolocation) {
+        console.warn(
+          "Geolocation is not supported by this browser. Using fallback coordinates."
+        );
+        return { latitude: FALLBACK_LATITUDE, longitude: FALLBACK_LONGITUDE };
+      }
+
+      const position = await new Promise<GeolocationPosition>(
+        (resolve, reject) => {
+          navigator.geolocation.getCurrentPosition(resolve, reject, {
+            enableHighAccuracy: true,
+            timeout: 10000,
+            maximumAge: 60000,
+          });
+        }
+      );
+
+      return {
+        latitude: position.coords.latitude,
+        longitude: position.coords.longitude,
+      };
+    } catch (error) {
+      console.warn(
+        "Failed to get current location. Using fallback coordinates:",
+        error
+      );
+      return { latitude: FALLBACK_LATITUDE, longitude: FALLBACK_LONGITUDE };
+    }
+  };
+
   // Helper function to get status translation
   const getStatusTranslation = (status: string) => {
     switch (status) {
@@ -142,23 +182,8 @@ export default function TripsComponent() {
     setLocationLoadingTripId(tripId);
 
     try {
-      // Get current location using browser's geolocation API
-      const position = await new Promise<GeolocationPosition>(
-        (resolve, reject) => {
-          if (!navigator.geolocation) {
-            reject(new Error("Geolocation is not supported by this browser."));
-            return;
-          }
-
-          navigator.geolocation.getCurrentPosition(resolve, reject, {
-            enableHighAccuracy: true,
-            timeout: 10000,
-            maximumAge: 60000,
-          });
-        }
-      );
-
-      const { latitude, longitude } = position.coords;
+      // Get current location with fallback
+      const { latitude, longitude } = await getCurrentLocationWithFallback();
 
       // Update trip location with current coordinates
       await updateTripLocation({
@@ -196,23 +221,8 @@ export default function TripsComponent() {
     setLocationLoadingTripId(tripId);
 
     try {
-      // Get current location using browser's geolocation API
-      const position = await new Promise<GeolocationPosition>(
-        (resolve, reject) => {
-          if (!navigator.geolocation) {
-            reject(new Error("Geolocation is not supported by this browser."));
-            return;
-          }
-
-          navigator.geolocation.getCurrentPosition(resolve, reject, {
-            enableHighAccuracy: true,
-            timeout: 10000,
-            maximumAge: 60000,
-          });
-        }
-      );
-
-      const { latitude, longitude } = position.coords;
+      // Get current location with fallback
+      const { latitude, longitude } = await getCurrentLocationWithFallback();
 
       // Get allowed content types for driver app - same as Flutter logic
       const allowedContentTypes = driverAppContentTypes?.content_types || [];
