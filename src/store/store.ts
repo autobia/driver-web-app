@@ -9,6 +9,7 @@ import { qualityChecksApi } from "./api/qualityChecksApi";
 import { inventoryApi } from "./api/inventoryApi";
 import { coreApi } from "./api/coreApi";
 import { purchaseOrderApi } from "./api/purchaseOrderApi";
+import { filerApi } from "./api/filerApi";
 
 export const makeStore = () => {
   return configureStore({
@@ -22,6 +23,7 @@ export const makeStore = () => {
       [inventoryApi.reducerPath]: inventoryApi.reducer,
       [coreApi.reducerPath]: coreApi.reducer,
       [purchaseOrderApi.reducerPath]: purchaseOrderApi.reducer,
+      [filerApi.reducerPath]: filerApi.reducer,
     },
     middleware: (getDefaultMiddleware) =>
       getDefaultMiddleware()
@@ -31,7 +33,8 @@ export const makeStore = () => {
         .concat(qualityChecksApi.middleware)
         .concat(inventoryApi.middleware)
         .concat(coreApi.middleware)
-        .concat(purchaseOrderApi.middleware),
+        .concat(purchaseOrderApi.middleware)
+        .concat(filerApi.middleware),
   });
 };
 

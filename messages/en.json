@@ -211,5 +211,13 @@
   "requestFailed": "Request failed",
   "startingQualityCheckPreparation": "Starting quality check preparation",
   "loadingQualityCheckDetails": "Loading quality check details...",
-  "qcPrefix": "QC#"
+  "qcPrefix": "QC#",
+  "attachImages": "Attach Images",
+  "addImages": "Add Images",
+  "imagePreview": "Image Preview",
+  "uploadSuccess": "Upload Successful",
+  "uploading": "Uploading...",
+  "uploadFailed": "Upload Failed",
+  "retry": "Retry",
+  "imageUploadDescription": "Click \"Add Images\" to upload images - they will be uploaded automatically"
 }

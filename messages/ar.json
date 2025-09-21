@@ -211,5 +211,13 @@
   "requestFailed": "فشل الطلب",
   "startingQualityCheckPreparation": "بدء تحضير فحص الجودة",
   "loadingQualityCheckDetails": "جارٍ تحميل تفاصيل فحص الجودة...",
-  "qcPrefix": "فج#"
+  "qcPrefix": "فج#",
+  "attachImages": "ارفاق صور",
+  "addImages": "إضافة صور",
+  "imagePreview": "معاينة الصورة",
+  "uploadSuccess": "تم الرفع بنجاح",
+  "uploading": "جاري الرفع...",
+  "uploadFailed": "فشل الرفع",
+  "retry": "إعادة المحاولة",
+  "imageUploadDescription": "اضغط \"إضافة صور\" لرفع الصور - سيتم رفعها تلقائياً"
 }

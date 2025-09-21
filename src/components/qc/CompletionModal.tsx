@@ -1,11 +1,12 @@
 "use client";
 
-import { useState } from "react";
+import { useState, useRef } from "react";
 import {
   useSubmitQualityCheckMutation,
   useCloseQualityCheckMutation,
   useCreateDelayedItemsFlowMutation,
 } from "../../store/api/qualityChecksApi";
+import { useUploadFileMutation } from "../../store/api/filerApi";
 import type {
   QualityCheckSubmissionRequest,
   SubmissionItem,
@@ -72,17 +73,163 @@ export default function CompletionModal({
   const [selectedDriverId, setSelectedDriverId] = useState<string>("0");
   const [selectedPreparerId, setSelectedPreparerId] = useState<string>("0");
 
+  // Image upload state
+  const [images, setImages] = useState<
+    {
+      file: File;
+      preview: string;
+      uploading: boolean;
+      uploaded: boolean;
+      error?: string;
+      id: number;
+    }[]
+  >([]);
+  const fileInputRef = useRef<HTMLInputElement | null>(null);
+
   const [submitQualityCheck, { isLoading: isSubmitting }] =
     useSubmitQualityCheckMutation();
   const [closeQualityCheck] = useCloseQualityCheckMutation();
   const [createDelayedItemsFlow] = useCreateDelayedItemsFlowMutation();
   const [createTrip] = useCreateAdvancedTripMutation();
+  const [uploadFile] = useUploadFileMutation();
 
   // Fetch drivers and preparers data
   const { data: drivers, isLoading: driversLoading } = useDrivers();
   const { data: preparers, isLoading: preparersLoading } = usePreparers();
 
   if (!currentQC) return null;
+
+  // Helper to convert file to base64
+  const fileToBase64 = (file: File): Promise<string> => {
+    return new Promise((resolve, reject) => {
+      const reader = new FileReader();
+      reader.onload = () => resolve(reader.result as string);
+      reader.onerror = reject;
+      reader.readAsDataURL(file);
+    });
+  };
+
+  // Helper to get MIME type from file extension
+  const getMimeType = (filename: string): string => {
+    const extension = filename.split(".").pop()?.toLowerCase();
+    switch (extension) {
+      case "jpg":
+      case "jpeg":
+        return "image/jpeg";
+      case "png":
+        return "image/png";
+      case "gif":
+        return "image/gif";
+      case "webp":
+        return "image/webp";
+      case "svg":
+        return "image/svg+xml";
+      case "bmp":
+        return "image/bmp";
+      default:
+        return "image/jpeg"; // Default fallback
+    }
+  };
+
+  // Helper to create complete base64 data URL
+  const createBase64DataUrl = (file: File, base64Data: string): string => {
+    const mimeType = getMimeType(file.name);
+    return `data:${mimeType};base64,${base64Data}`;
+  };
+
+  // Handle file selection and auto-upload
+  const handleSelectImages = async (e: React.ChangeEvent<HTMLInputElement>) => {
+    if (!e.target.files) return;
+    const files = Array.from(e.target.files);
+
+    // Process each file
+    for (const file of files) {
+      const preview = await fileToBase64(file);
+      const imageId = Date.now() + Math.random(); // Unique ID for tracking
+
+      const newImage = {
+        file,
+        preview,
+        uploading: true,
+        uploaded: false,
+        id: imageId,
+      };
+
+      // Add image to state with uploading status
+      setImages((prev) => [...prev, newImage]);
+
+      // Start upload immediately
+      try {
+        const base64Data = preview.split(",")[1];
+        const finalBase64Image = createBase64DataUrl(file, base64Data);
+        await uploadFile({
+          content_type: 48, // QC content type
+          object_id: currentQC.id,
+          type: 1, // Image type
+          base64_file: finalBase64Image,
+        }).unwrap();
+
+        // Update to uploaded state using the unique ID
+        setImages((prev) =>
+          prev.map((img) =>
+            img.id === imageId
+              ? { ...img, uploading: false, uploaded: true }
+              : img
+          )
+        );
+      } catch {
+        // Update to error state using the unique ID
+        setImages((prev) =>
+          prev.map((img) =>
+            img.id === imageId
+              ? { ...img, uploading: false, error: t("uploadFailed") }
+              : img
+          )
+        );
+      }
+    }
+
+    e.target.value = "";
+  };
+
+  // Remove image
+  const handleRemoveImage = (idx: number) => {
+    setImages((prev) => prev.filter((_, i) => i !== idx));
+  };
+
+  // Upload a single image
+  const handleUploadImage = async (idx: number) => {
+    setImages((prev) =>
+      prev.map((img, i) =>
+        i === idx ? { ...img, uploading: true, error: undefined } : img
+      )
+    );
+    const img = images[idx];
+    try {
+      // Create complete base64 data URL with proper MIME type
+      const base64Data = img.preview.split(",")[1];
+      const finalBase64Image = createBase64DataUrl(img.file, base64Data);
+      await uploadFile({
+        content_type: 48, // QC content type - adjust as needed
+        object_id: currentQC.id,
+        type: 1, // Image type - adjust as needed
+        base64_file: finalBase64Image,
+      }).unwrap();
+      setImages((prev) =>
+        prev.map((img, i) =>
+          i === idx ? { ...img, uploading: false, uploaded: true } : img
+        )
+      );
+    } catch {
+      setImages((prev) =>
+        prev.map((img, i) =>
+          i === idx
+            ? { ...img, uploading: false, error: t("uploadFailed") }
+            : img
+        )
+      );
+    }
+  };
 
   // Calculate completion statistics
   const totalItems = currentQC.items.reduce(
@@ -411,6 +558,115 @@ export default function CompletionModal({
                 </div>
               )}
             </div>
+          </div>
+
+          {/* Image Upload Section */}
+          <div className="p-3 sm:p-4 bg-blue-50 border border-blue-200 rounded-lg">
+            <div className="flex items-center justify-between mb-3">
+              <h3 className="font-medium text-blue-800 text-sm sm:text-base flex items-center">
+                📎 {t("attachImages")}
+              </h3>
+              <Button
+                type="button"
+                size="sm"
+                onClick={() => fileInputRef.current?.click()}
+                className="text-xs sm:text-sm"
+              >
+                {t("addImages")}
+              </Button>
+              <input
+                ref={fileInputRef}
+                type="file"
+                accept="image/*"
+                multiple
+                className="hidden"
+                onChange={handleSelectImages}
+              />
+            </div>
+
+            {images.length > 0 && (
+              <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-3">
+                {images.map((img, idx) => (
+                  <div
+                    key={idx}
+                    className="relative bg-white border rounded-lg overflow-hidden shadow-sm"
+                  >
+                    <div className="aspect-square relative">
+                      <img
+                        src={img.preview}
+                        alt={t("imagePreview")}
+                        className={`w-full h-full object-cover transition-opacity ${
+                          img.uploading ? "opacity-75" : "opacity-100"
+                        }`}
+                      />
+                      {/* Uploading overlay */}
+                      {img.uploading && (
+                        <div className="absolute inset-0 bg-blue-500 bg-opacity-20 flex items-center justify-center">
+                          <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-blue-600"></div>
+                        </div>
+                      )}
+                      {/* Success overlay */}
+                      {img.uploaded && (
+                        <div className="absolute top-1 left-1 bg-green-500 text-white rounded-full w-6 h-6 flex items-center justify-center text-xs">
+                          ✓
+                        </div>
+                      )}
+                    </div>
+
+                    {/* Remove button */}
+                    <button
+                      type="button"
+                      className="absolute top-1 right-1 bg-red-500 text-white rounded-full w-6 h-6 flex items-center justify-center text-xs hover:bg-red-600 transition-colors"
+                      onClick={() => handleRemoveImage(idx)}
+                      disabled={img.uploading}
+                    >
+                      ×
+                    </button>
+
+                    {/* Upload status */}
+                    <div className="absolute bottom-0 left-0 right-0 bg-black bg-opacity-60 text-white p-1.5">
+                      {img.uploaded ? (
+                        <div className="text-center">
+                          <span className="text-xs block text-green-300 font-medium">
+                            ✓ {t("uploadSuccess")}
+                          </span>
+                        </div>
+                      ) : img.uploading ? (
+                        <div className="text-center">
+                          <div className="flex items-center justify-center mb-1">
+                            <div className="animate-spin rounded-full h-3 w-3 border-b-2 border-white"></div>
+                          </div>
+                          <span className="text-xs block text-yellow-300">
+                            {t("uploading")}
+                          </span>
+                        </div>
+                      ) : img.error ? (
+                        <div className="text-center">
+                          <span className="text-xs block text-red-300 mb-1">
+                            {t("uploadFailed")}
+                          </span>
+                          <Button
+                            type="button"
+                            size="sm"
+                            variant="destructive"
+                            className="text-xs h-6 px-2"
+                            onClick={() => handleUploadImage(idx)}
+                          >
+                            {t("retry")}
+                          </Button>
+                        </div>
+                      ) : null}
+                    </div>
+                  </div>
+                ))}
+              </div>
+            )}
+
+            {images.length === 0 && (
+              <p className="text-sm text-blue-600 text-center py-3">
+                {t("imageUploadDescription")}
+              </p>
+            )}
           </div>
 
           {/* Incomplete Items Details */}
