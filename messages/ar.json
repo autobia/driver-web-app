@@ -219,5 +219,15 @@
   "uploading": "جاري الرفع...",
   "uploadFailed": "فشل الرفع",
   "retry": "إعادة المحاولة",
-  "imageUploadDescription": "اضغط \"إضافة صور\" لرفع الصور - سيتم رفعها تلقائياً"
+  "imageUploadDescription": "اضغط \"إضافة صور\" لرفع الصور - سيتم رفعها تلقائياً",
+  "startingTrip": "بدء الرحلة",
+  "loadingTripDetails": "جار التحميل...",
+  "tripStartedSuccessfully": "تم بدء الرحلة بنجاح",
+  "tripLocationUpdated": "تم تحديث موقعك وبدء الرحلة",
+  "tripArrivedSuccessfully": "تم الوصول بنجاح",
+  "tripMarkedAsArrived": "تم وضع علامة على الرحلة كوصلت إلى الوجهة",
+  "updatingTrip": "جاري تحديث الرحلة...",
+  "processingArrival": "جاري معالجة الوصول...",
+  "assigningPreparer": "جاري تعيين المحضر...",
+  "refreshingTripData": "جاري تحديث بيانات الرحلة..."
 }

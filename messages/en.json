@@ -219,5 +219,15 @@
   "uploading": "Uploading...",
   "uploadFailed": "Upload Failed",
   "retry": "Retry",
-  "imageUploadDescription": "Click \"Add Images\" to upload images - they will be uploaded automatically"
+  "imageUploadDescription": "Click \"Add Images\" to upload images - they will be uploaded automatically",
+  "startingTrip": "Starting Trip",
+  "loadingTripDetails": "Loading trip details...",
+  "tripStartedSuccessfully": "Trip Started Successfully",
+  "tripLocationUpdated": "Your location has been updated and the trip has started",
+  "tripArrivedSuccessfully": "Arrived Successfully",
+  "tripMarkedAsArrived": "Trip has been marked as arrived at destination",
+  "updatingTrip": "Updating Trip...",
+  "processingArrival": "Processing Arrival...",
+  "assigningPreparer": "Assigning preparer...",
+  "refreshingTripData": "Refreshing trip data..."
 }

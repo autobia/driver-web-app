@@ -37,7 +37,13 @@ import { useToast } from "../../hooks/useToast";
 export default function TripsComponent() {
   const t = useTranslations();
   const toast = useToast();
-  const { data: tripsData, isLoading, error } = useGetDriverTripsQuery();
+  const {
+    data: tripsData,
+    isLoading,
+    isFetching,
+    error,
+    refetch,
+  } = useGetDriverTripsQuery();
   const [updateTripLocation] = useUpdateTripLocationMutation();
   const [createAdvancedTrip] = useCreateAdvancedTripMutation();
   const [createQualityCheck] = useCreateQualityCheckMutation();
@@ -45,6 +51,32 @@ export default function TripsComponent() {
   const [locationLoadingTripId, setLocationLoadingTripId] = useState<
     number | null
   >(null);
+  const [operationType, setOperationType] = useState<
+    "going" | "arriving" | "assigning" | null
+  >(null);
+  const [refetchingTripId, setRefetchingTripId] = useState<number | null>(null);
+
+  // Track when we're fetching AND which trip triggered it
+  const isRefetchingSpecificTrip = (tripId: number) => {
+    const isRefetching = refetchingTripId === tripId && isFetching;
+    if (isRefetching) {
+      console.log(
+        `🔄 Refetching data for trip ${tripId} - isFetching: ${isFetching}, refetchingTripId: ${refetchingTripId}`
+      );
+    }
+    return isRefetching;
+  };
+
+  // Check if ANY refetch is in progress (to disable all other actions)
+  const isAnyRefetchInProgress = refetchingTripId !== null && isFetching;
+
+  if (isAnyRefetchInProgress) {
+    console.log(
+      `🚫 All actions disabled - refetching trip ${refetchingTripId}, isFetching: ${isFetching}`
+    );
+  }
+
+  console.warn("isLoading", isLoading);
 
   // Assign Preparer Modal State
   const [showAssignModal, setShowAssignModal] = useState(false);
@@ -180,6 +212,8 @@ export default function TripsComponent() {
     }
 
     setLocationLoadingTripId(tripId);
+    setOperationType("going");
+    toast.info(t("startingTrip"), t("loadingTripDetails"));
 
     try {
       // Get current location with fallback
@@ -197,11 +231,23 @@ export default function TripsComponent() {
       console.log(
         `Trip ${tripId} location updated successfully for going action`
       );
+
+      // Show success message
+      toast.success(t("tripStartedSuccessfully"), t("tripLocationUpdated"));
+
+      // Set refetching state and refetch trips to get updated data
+      console.log(`🚀 Starting refetch for trip ${tripId}`);
+      setRefetchingTripId(tripId);
+      setOperationType("going");
+      await refetch();
+      console.log(`✅ Refetch completed for trip ${tripId}`);
     } catch (error) {
       console.error("Error in going flow:", error);
       toast.operationError("Going to location", error);
     } finally {
       setLocationLoadingTripId(null);
+      setOperationType(null);
+      setRefetchingTripId(null);
     }
   };
 
@@ -219,7 +265,8 @@ export default function TripsComponent() {
     }
 
     setLocationLoadingTripId(tripId);
-
+    setOperationType("arriving");
+    toast.info(t("startingTrip"), t("loadingTripDetails"));
     try {
       // Get current location with fallback
       const { latitude, longitude } = await getCurrentLocationWithFallback();
@@ -254,27 +301,11 @@ export default function TripsComponent() {
           }).unwrap();
 
           console.log("Update trip latitude and longitude");
+          console.warn(qualityCheckResult, "results area");
 
-          if (qualityCheckResult.id) {
-            console.log("Quality Check created");
-
-            // Check if destination point has company_id (equivalent to Flutter check)
-            const hasCompanyDestination =
-              trip.destination_point_type === "companybranch" &&
-              (trip.destination_point as CompanyBranchDestination)
-                ?.company_id != null;
-
-            if (hasCompanyDestination) {
-              console.log(
-                "Trip has company destination - would navigate to QC screen in Flutter"
-              );
-              // In Flutter, this would fetch QC details and navigate to QualityCheck screen
-              // Here we can trigger a navigation or show success message
-            } else {
-              console.log("Purchase Order Updated");
-              // You could add toast notification here: "Purchase Order Updated"
-            }
-          }
+          // Set refetching state and refetch trips to get updated data
+          setRefetchingTripId(tripId);
+          await refetch();
         } else {
           console.log("Content Type is of type quality check");
 
@@ -292,10 +323,10 @@ export default function TripsComponent() {
               }).unwrap();
 
               console.log("Trip updated with delayed QC flag");
-              toast.success(
-                "Trip updated successfully",
-                "Location updated and marked as on the way"
-              );
+
+              // Set refetching state and refetch trips to get updated data
+              setRefetchingTripId(tripId);
+              await refetch();
             } else {
               console.log(
                 "The specified trip indicates that there is a delayed items upon it, so we create a quality check for it"
@@ -303,7 +334,7 @@ export default function TripsComponent() {
 
               // Create a new delivery trip
               if (trip.main_source?.warehouse?.id) {
-                const newTripResult = await createAdvancedTrip({
+                await createAdvancedTrip({
                   content_type: trip.content_type,
                   object_id: trip.object_id,
                   destination_point: trip.main_source.warehouse.id.toString(),
@@ -313,24 +344,20 @@ export default function TripsComponent() {
                   user_type: "user",
                 }).unwrap();
 
-                if (newTripResult.id) {
-                  // Update original trip location
-                  await updateTripLocation({
-                    tripId,
-                    data: {
-                      confirm_destination_point_lat: latitude,
-                      confirm_destination_point_long: longitude,
-                    },
-                  }).unwrap();
+                await updateTripLocation({
+                  tripId,
+                  data: {
+                    confirm_destination_point_lat: latitude,
+                    confirm_destination_point_long: longitude,
+                  },
+                }).unwrap();
+                console.log(
+                  "New delivery trip created and original trip updated"
+                );
 
-                  console.log(
-                    "New delivery trip created and original trip updated"
-                  );
-                  toast.success(
-                    "Delivery trip created",
-                    "New delivery trip has been created and you're now on the way"
-                  );
-                }
+                // Set refetching state and refetch trips to get updated data
+                setRefetchingTripId(tripId);
+                await refetch();
               }
             }
           } else if (trip.trip_direction === "deliver") {
@@ -345,10 +372,10 @@ export default function TripsComponent() {
               }).unwrap();
 
               console.log("Delivery trip location updated");
-              toast.success(
-                "Arrived at destination",
-                "Trip has been marked as arrived"
-              );
+
+              // Set refetching state and refetch trips to get updated data
+              setRefetchingTripId(tripId);
+              await refetch();
             } catch (deliverError) {
               // Handle API errors like in Flutter
               const apiError = deliverError as { data?: { context?: string } };
@@ -379,6 +406,8 @@ export default function TripsComponent() {
       // You could add toast notification here: "An error occur while validating PO status button"
     } finally {
       setLocationLoadingTripId(null);
+      setOperationType(null);
+      setRefetchingTripId(null);
     }
   };
 
@@ -410,6 +439,8 @@ export default function TripsComponent() {
     }
 
     setIsAssigning(true);
+    setLocationLoadingTripId(selectedTripForAssign);
+    setOperationType("assigning");
 
     try {
       // Step 1: If trip status is pending, update trip location first
@@ -453,6 +484,10 @@ export default function TripsComponent() {
 
           // Close modal and reset state
           handleCloseAssignModal();
+
+          // Set refetching state and refetch trips to get updated data
+          setRefetchingTripId(selectedTripForAssign);
+          await refetch();
         } else {
           console.log("Content type not allowed - Already Prepared");
           // You could add toast notification here: "Already Prepared"
@@ -471,6 +506,9 @@ export default function TripsComponent() {
       // You could add toast notification here: "Preparer cannot be assigned to this trip due to an error"
     } finally {
       setIsAssigning(false);
+      setLocationLoadingTripId(null);
+      setOperationType(null);
+      setRefetchingTripId(null);
     }
   };
 
@@ -518,8 +556,36 @@ export default function TripsComponent() {
           {trips.map((trip) => (
             <div
               key={trip.id}
-              className="bg-white rounded-xl border border-neutral-200 shadow-sm hover:shadow-md transition-shadow duration-200 overflow-hidden"
+              className={`bg-white rounded-xl border border-neutral-200 shadow-sm hover:shadow-md transition-all duration-200 overflow-hidden relative ${
+                locationLoadingTripId === trip.id ||
+                isRefetchingSpecificTrip(trip.id)
+                  ? "opacity-75 scale-[0.98] shadow-lg border-primary-200"
+                  : isAnyRefetchInProgress && refetchingTripId !== trip.id
+                  ? "opacity-70"
+                  : ""
+              }`}
             >
+              {/* Loading Overlay */}
+              {(locationLoadingTripId === trip.id ||
+                isRefetchingSpecificTrip(trip.id)) && (
+                <div className="absolute inset-0 bg-white bg-opacity-60 backdrop-blur-[1px] flex items-center justify-center z-10 rounded-xl animate-in fade-in duration-200">
+                  <div className="flex flex-col items-center space-y-2 animate-pulse">
+                    <div className="animate-spin rounded-full h-6 w-6 border-2 border-primary-200 border-t-primary-600"></div>
+                    <span className="text-sm text-gray-700 font-medium">
+                      {isRefetchingSpecificTrip(trip.id)
+                        ? t("refreshingTripData")
+                        : operationType === "going"
+                        ? t("updatingTrip")
+                        : operationType === "arriving"
+                        ? t("processingArrival")
+                        : operationType === "assigning"
+                        ? t("assigningPreparer")
+                        : t("getting_location")}
+                    </span>
+                  </div>
+                </div>
+              )}
+
               {/* Card Header */}
               <div className="bg-gradient-to-r from-primary-400 to-primary-500 px-4 py-3">
                 <h3 className="text-base font-bold text-white tracking-wide">
@@ -593,15 +659,27 @@ export default function TripsComponent() {
                   <div className="flex gap-2">
                     <Button
                       onClick={() => handleGoingClick(trip.id)}
-                      disabled={locationLoadingTripId === trip.id}
+                      disabled={
+                        locationLoadingTripId === trip.id ||
+                        isRefetchingSpecificTrip(trip.id) ||
+                        isAnyRefetchInProgress
+                      }
                       variant="default"
                       size="sm"
                       className="flex-1"
                     >
-                      {locationLoadingTripId === trip.id ? (
+                      {locationLoadingTripId === trip.id ||
+                      isRefetchingSpecificTrip(trip.id) ? (
                         <>
                           <div className="animate-spin rounded-full h-4 w-4 border-b-2 border-white mr-2"></div>
-                          {t("getting_location")}
+                          {isRefetchingSpecificTrip(trip.id)
+                            ? t("refreshingTripData")
+                            : t("getting_location")}
+                        </>
+                      ) : refetchingTripId === trip.id ? (
+                        <>
+                          <div className="h-4 w-4 border-2 border-gray-400 border-t-transparent rounded-full animate-spin mr-2"></div>
+                          {t("refreshingTripData")}
                         </>
                       ) : (
                         t("going")
@@ -609,6 +687,11 @@ export default function TripsComponent() {
                     </Button>
                     <Button
                       onClick={() => handleAssignPreparerClick(trip.id)}
+                      disabled={
+                        locationLoadingTripId === trip.id ||
+                        isRefetchingSpecificTrip(trip.id) ||
+                        isAnyRefetchInProgress
+                      }
                       variant="secondary"
                       size="sm"
                       className="flex-1"
@@ -622,15 +705,27 @@ export default function TripsComponent() {
                   <div className="flex gap-2">
                     <Button
                       onClick={() => handleArrivedClick(trip.id)}
-                      disabled={locationLoadingTripId === trip.id}
+                      disabled={
+                        locationLoadingTripId === trip.id ||
+                        isRefetchingSpecificTrip(trip.id) ||
+                        isAnyRefetchInProgress
+                      }
                       variant="default"
                       size="sm"
                       className="w-full bg-green-600 hover:bg-green-700 disabled:bg-green-400"
                     >
-                      {locationLoadingTripId === trip.id ? (
+                      {locationLoadingTripId === trip.id ||
+                      isRefetchingSpecificTrip(trip.id) ? (
                         <>
                           <div className="animate-spin rounded-full h-4 w-4 border-b-2 border-white mr-2"></div>
-                          {t("getting_location")}
+                          {isRefetchingSpecificTrip(trip.id)
+                            ? t("refreshingTripData")
+                            : t("getting_location")}
+                        </>
+                      ) : refetchingTripId === trip.id ? (
+                        <>
+                          <div className="h-4 w-4 border-2 border-gray-400 border-t-transparent rounded-full animate-spin mr-2"></div>
+                          {t("refreshingTripData")}
                         </>
                       ) : (
                         t("arrived")
