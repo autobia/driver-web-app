@@ -1,20 +1,29 @@
 "use client";
 
 import { useTranslations } from "next-intl";
+import { useState } from "react";
 import { Button } from "@/components/ui/button";
 import { Upload, FileText } from "lucide-react";
 import { useGetUnShippedOrdersQuery } from "@/store/api/saleOrderApi";
-import { useToast } from "@/hooks/useToast";
+import UploadDocumentsModal from "./UploadDocumentsModal";
 
 export default function SalesOrdersComponent() {
   const t = useTranslations();
-  const toast = useToast();
 
   const { data: orders, isLoading, error } = useGetUnShippedOrdersQuery();
 
+  // Modal state
+  const [showUploadModal, setShowUploadModal] = useState(false);
+  const [selectedOrderId, setSelectedOrderId] = useState<number | null>(null);
+
   const handleUploadDocuments = (orderId: number) => {
-    // TODO: Implement document upload functionality
-    toast.info(t("uploadDocuments"), `Upload documents for order #${orderId}`);
+    setSelectedOrderId(orderId);
+    setShowUploadModal(true);
+  };
+
+  const handleCloseModal = () => {
+    setShowUploadModal(false);
+    setSelectedOrderId(null);
   };
 
   const formatDate = (dateString: string) => {
@@ -156,6 +165,13 @@ export default function SalesOrdersComponent() {
           ))}
         </div>
       )}
+
+      {/* Upload Documents Modal */}
+      <UploadDocumentsModal
+        isOpen={showUploadModal}
+        onClose={handleCloseModal}
+        orderId={selectedOrderId}
+      />
     </div>
   );
 }

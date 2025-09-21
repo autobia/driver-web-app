@@ -613,16 +613,6 @@ export default function CompletionModal({
                       )}
                     </div>
 
-                    {/* Remove button */}
-                    <button
-                      type="button"
-                      className="absolute top-1 right-1 bg-red-500 text-white rounded-full w-6 h-6 flex items-center justify-center text-xs hover:bg-red-600 transition-colors"
-                      onClick={() => handleRemoveImage(idx)}
-                      disabled={img.uploading}
-                    >
-                      ×
-                    </button>
-
                     {/* Upload status */}
                     <div className="absolute bottom-0 left-0 right-0 bg-black bg-opacity-60 text-white p-1.5">
                       {img.uploaded ? (
@@ -856,15 +846,6 @@ export default function CompletionModal({
         </div>
 
         <DialogFooter className="flex-shrink-0 px-6 pb-6 pt-2 flex flex-col space-y-2 sm:flex-row sm:space-y-0 sm:space-x-2">
-          <Button
-            onClick={onClose}
-            variant="outline"
-            className="w-full sm:w-auto"
-            disabled={isSubmitting}
-          >
-            {t("cancel")}
-          </Button>
-
           {incompleteItems === 0 ? (
             <Button
               onClick={handleComplete}

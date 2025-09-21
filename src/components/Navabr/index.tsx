@@ -54,7 +54,7 @@ export default function Navbar() {
     if (pathname.includes("/trips")) return "trips";
     if (pathname.includes("/quality-checks")) return "qualityCheckTickets";
     if (pathname.includes("/purchase-invoices")) return "purchaseInvoices";
-    if (pathname.includes("/orders-delivery")) return "orders-delivery";
+    if (pathname.includes("/orders-delivery")) return "ordersDelivery";
 
     return "";
   };
@@ -132,7 +132,7 @@ export default function Navbar() {
 
           {/* Desktop Navigation - Center */}
           {isAuthenticated && (
-            <div className="hidden md:flex items-center justify-center flex-1 max-w-2xl mx-8">
+            <div className="hidden lg:flex items-center justify-center flex-1 max-w-2xl mx-8">
               <nav
                 className={`flex ${
                   isRTL ? "space-x-reverse space-x-6" : "space-x-6"

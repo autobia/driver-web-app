@@ -114,20 +114,76 @@ export interface SaleOrder {
 
 export type UnshippedOrdersResponse = SaleOrder[];
 
+// File upload interfaces
+export interface FileUploadRequest {
+  content_type: number;
+  object_id: number;
+  type: number; // 1 for image
+  base64_file: string;
+}
+
+export interface FileUploadResponse {
+  file: string;
+  id: number;
+}
+
+// Shipping document submission interfaces
+export interface SubmitShippingDocumentRequest {
+  content_type: number;
+  object_id: number;
+  url: string;
+  type: string; // 'ShippingPolicy' or 'ShippingReceipt'
+  shipping_company_id: number;
+  shipping_price: number;
+  is_vat_included: boolean;
+  loading_fee: number;
+  custom_shipping_company_name?: string;
+}
+
+export interface SubmitShippingDocumentResponse {
+  success: boolean;
+  message?: string;
+}
+
 const saleOrderApi = createApi({
   reducerPath: "saleOrderApi",
   baseQuery: axiosBaseQuery(),
-  tagTypes: ["saleOrders"],
+  tagTypes: ["SaleOrders"],
   endpoints: (builder) => ({
     getUnShippedOrders: builder.query<UnshippedOrdersResponse, void>({
       query: () => ({
         url: "sales/un-shipped-orders/",
         method: "GET",
       }),
+      providesTags: ["SaleOrders"],
+    }),
+
+    uploadFile: builder.mutation<FileUploadResponse, FileUploadRequest>({
+      query: (fileData) => ({
+        url: "filer/",
+        method: "POST",
+        data: fileData,
+      }),
+    }),
+
+    submitShippingDocument: builder.mutation<
+      SubmitShippingDocumentResponse,
+      SubmitShippingDocumentRequest
+    >({
+      query: (documentData) => ({
+        url: "submit-shipping-url/",
+        method: "POST",
+        data: documentData,
+      }),
+      invalidatesTags: ["SaleOrders"],
     }),
   }),
 });
 
-export const { useGetUnShippedOrdersQuery } = saleOrderApi;
+export const {
+  useGetUnShippedOrdersQuery,
+  useUploadFileMutation,
+  useSubmitShippingDocumentMutation,
+} = saleOrderApi;
 
 export default saleOrderApi;

@@ -49,12 +49,21 @@ export interface FetchContentTypesParams {
   type_name?: string;
 }
 
+// Define shipping company interfaces
+export interface ShippingCompany {
+  id: number;
+  name_en: string;
+  name_ar: string;
+}
+
+export type ShippingCompaniesResponse = ShippingCompany[];
+
 // Create the core API slice
 // Current role mappings: driver = 4, preparer = 11
 export const coreApi = createApi({
   reducerPath: "coreApi",
   baseQuery: axiosBaseQuery(),
-  tagTypes: ["Users", "ContentTypes"],
+  tagTypes: ["Users", "ContentTypes", "ShippingCompanies"],
   endpoints: (builder) => ({
     fetchUsers: builder.query<UsersResponse, FetchUsersParams | void>({
       query: (params) => {
@@ -92,11 +101,23 @@ export const coreApi = createApi({
       },
       providesTags: ["ContentTypes"],
     }),
+
+    fetchShippingCompanies: builder.query<ShippingCompaniesResponse, void>({
+      query: () => ({
+        url: "/shipping-companies/",
+        method: "GET",
+      }),
+      providesTags: ["ShippingCompanies"],
+    }),
   }),
 });
 
 // Export hooks for usage in functional components
-export const { useFetchUsersQuery, useFetchContentTypesQuery } = coreApi;
+export const {
+  useFetchUsersQuery,
+  useFetchContentTypesQuery,
+  useFetchShippingCompaniesQuery,
+} = coreApi;
 
 // Export the reducer
 export default coreApi.reducer;
