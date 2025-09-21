@@ -685,19 +685,21 @@ export default function TripsComponent() {
                         t("going")
                       )}
                     </Button>
-                    <Button
-                      onClick={() => handleAssignPreparerClick(trip.id)}
-                      disabled={
-                        locationLoadingTripId === trip.id ||
-                        isRefetchingSpecificTrip(trip.id) ||
-                        isAnyRefetchInProgress
-                      }
-                      variant="secondary"
-                      size="sm"
-                      className="flex-1"
-                    >
-                      {t("assignPreparer")}
-                    </Button>
+                    {trip.trip_direction !== "deliver" && (
+                      <Button
+                        onClick={() => handleAssignPreparerClick(trip.id)}
+                        disabled={
+                          locationLoadingTripId === trip.id ||
+                          isRefetchingSpecificTrip(trip.id) ||
+                          isAnyRefetchInProgress
+                        }
+                        variant="secondary"
+                        size="sm"
+                        className="flex-1"
+                      >
+                        {t("assignPreparer")}
+                      </Button>
+                    )}
                   </div>
                 )}
 
