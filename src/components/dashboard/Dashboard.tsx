@@ -38,7 +38,7 @@ export default function Dashboard() {
     <>
       <UserInfo user={user} />
       <NavigationTabs activeTab={activeTab} isDriver={isDriver} />
-      <div className="pb-20 sm:pb-0">
+      <div className="pb-20 lg:pb-0">
         <DashboardContent activeTab={activeTab} />
       </div>
     </>

@@ -266,5 +266,17 @@
   "pleaseCompleteAllFields": "Please complete all required fields",
   "uploadErrorMessage": "An error occurred while uploading documents",
   "saleOrder#": "Sale Order#",
-  "purchaseInvoice#": "Purchase Invoice#"
+  "purchaseInvoice#": "Purchase Invoice#",
+  "submitPackagesByOrderId": "Submit Packages by Order ID",
+  "enterOrderId": "Enter Order ID",
+  "pleaseEnterOrderId": "Please enter an order ID",
+  "pleaseEnterValidOrderNumber": "Please enter a valid order number",
+  "submittingPackage": "Submitting Packages",
+  "processingPackageSubmission": "Processing package submission...",
+  "packageSubmitted": "Packages Submitted",
+  "packageSubmittedSuccessfully": "Packages submitted successfully for delivery",
+  "packageSubmissionFailed": "Package Submission Failed",
+  "packageSubmissionError": "An error occurred while submitting packages",
+  "submitPackagesByOrderIdDescription": "Enter an order ID to submit packages for delivery",
+  "unexpectedError": "An unexpected error occurred"
 }

@@ -145,6 +145,18 @@ export interface SubmitShippingDocumentResponse {
   message?: string;
 }
 
+// Package submission with sale order IDs interfaces
+export interface SubmitPackageRequest {
+  sale_order_ids: number[];
+}
+
+export interface SubmitPackageResponse {
+  status: boolean;
+  scope: string;
+  context: string;
+  data: null;
+}
+
 const saleOrderApi = createApi({
   reducerPath: "saleOrderApi",
   baseQuery: axiosBaseQuery(),
@@ -177,6 +189,18 @@ const saleOrderApi = createApi({
       }),
       invalidatesTags: ["SaleOrders"],
     }),
+
+    submitPackage: builder.mutation<
+      SubmitPackageResponse,
+      SubmitPackageRequest
+    >({
+      query: (packageData) => ({
+        url: "/package-qr-submit/",
+        method: "POST",
+        data: packageData,
+      }),
+      invalidatesTags: ["SaleOrders"],
+    }),
   }),
 });
 
@@ -184,6 +208,7 @@ export const {
   useGetUnShippedOrdersQuery,
   useUploadFileMutation,
   useSubmitShippingDocumentMutation,
+  useSubmitPackageMutation,
 } = saleOrderApi;
 
 export default saleOrderApi;

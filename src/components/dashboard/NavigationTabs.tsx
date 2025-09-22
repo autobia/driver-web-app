@@ -44,7 +44,9 @@ export default function NavigationTabs({
     }
   );
 
-  const { data: salesOrdersData } = useGetUnShippedOrdersQuery();
+  const { data: salesOrdersData } = useGetUnShippedOrdersQuery(undefined, {
+    skip: !isAuthenticated || !isDriver,
+  });
 
   // Calculate counts for badges
   const tripsCount = tripsData?.trips?.length || 0;

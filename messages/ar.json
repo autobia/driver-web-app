@@ -266,5 +266,17 @@
   "pleaseCompleteAllFields": "يرجى إكمال جميع الحقول المطلوبة",
   "uploadErrorMessage": "حدث خطأ أثناء رفع المستندات",
   "saleOrder#": "طلب بيع#",
-  "purchaseInvoice#": "فاتورة شراء#"
+  "purchaseInvoice#": "فاتورة شراء#",
+  "submitPackagesByOrderId": "إرسال الطرود برقم الطلب",
+  "enterOrderId": "أدخل رقم الطلب",
+  "pleaseEnterOrderId": "يرجى إدخال رقم الطلب",
+  "pleaseEnterValidOrderNumber": "يرجى إدخال رقم طلب صحيح",
+  "submittingPackage": "جاري إرسال الطرود",
+  "processingPackageSubmission": "جاري معالجة إرسال الطرود...",
+  "packageSubmitted": "تم إرسال الطرود",
+  "packageSubmittedSuccessfully": "تم إرسال الطرود بنجاح للتسليم",
+  "packageSubmissionFailed": "فشل في إرسال الطرود",
+  "packageSubmissionError": "حدث خطأ أثناء إرسال الطرود",
+  "submitPackagesByOrderIdDescription": "أدخل رقم الطلب لإرسال الطرود للتسليم",
+  "unexpectedError": "حدث خطأ غير متوقع"
 }

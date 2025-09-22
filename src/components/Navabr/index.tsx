@@ -38,7 +38,9 @@ export default function Navbar() {
       skip: !isAuthenticated || !user?.user_id,
     }
   );
-  const { data: salesOrdersData } = useGetUnShippedOrdersQuery();
+  const { data: salesOrdersData } = useGetUnShippedOrdersQuery(undefined, {
+    skip: !isAuthenticated || !isDriver,
+  });
 
   // Calculate counts for badges
   const tripsCount = tripsData?.trips?.length || 0;
