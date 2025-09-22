@@ -48,10 +48,14 @@ export default function NavigationTabs({
     skip: !isAuthenticated || !isDriver,
   });
 
+  const { searchResults } = useSelector(
+    (state: RootState) => state.purchaseOrder
+  );
+
   // Calculate counts for badges
   const tripsCount = tripsData?.trips?.length || 0;
   const qualityChecksCount = qualityChecksData?.length || 0;
-  const purchaseInvoicesCount = 0; // TODO: Add API call when available
+  const purchaseInvoicesCount = searchResults?.length || 0;
   const ordersDeliveryCount = salesOrdersData?.length || 0;
 
   const handleNavigation = (section: NavigationTab) => {
