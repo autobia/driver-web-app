@@ -9,11 +9,35 @@ import AuthGuard from "@/components/AuthGuard";
 import UserDataProvider from "@/components/UserDataProvider";
 import TranslationInitializer from "@/components/TranslationInitializer";
 import { Toaster } from "@/components/ui/sonner";
+import type { Metadata } from "next";
 
 const beiruti = Beiruti({
   variable: "--font-beiruti",
   subsets: ["arabic", "latin"],
 });
+
+export const metadata: Metadata = {
+  title: "Driver Web App",
+  description:
+    "Professional driver management and delivery tracking application",
+  metadataBase: new URL("https://driver.autobia.com"),
+  openGraph: {
+    title: "Driver Web App",
+    description:
+      "Professional driver management and delivery tracking application",
+    type: "website",
+    locale: "en_US",
+    alternateLocale: "ar_SA",
+  },
+  twitter: {
+    card: "summary_large_image",
+    title: "Driver Web App",
+    description:
+      "Professional driver management and delivery tracking application",
+  },
+  viewport: "width=device-width, initial-scale=1",
+  robots: "index, follow",
+};
 
 export default async function RootLayout({
   children,
