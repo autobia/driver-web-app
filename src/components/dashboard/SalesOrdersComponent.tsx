@@ -97,72 +97,74 @@ export default function SalesOrdersComponent() {
       ) : (
         /* Sales Order Cards */
         <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-3">
-          {orders.map((order) => (
-            <div
-              key={order.id}
-              className="bg-white rounded-xl border border-neutral-200 shadow-sm hover:shadow-md transition-shadow duration-200 overflow-hidden"
-            >
-              {/* Card Header */}
-              <div className="bg-gradient-to-r from-primary-400 to-primary-500 px-4 py-3">
-                <h3 className="text-base font-bold text-white tracking-wide">
-                  SO #{order.id}
-                </h3>
-                {order.public_order_id && (
-                  <p className="text-sm text-primary-100 mt-1">
-                    Public ID: {order.public_order_id}
-                  </p>
-                )}
-              </div>
-
-              {/* Card Body */}
-              <div className="p-4 space-y-3">
-                {/* Status */}
-                <div className="flex items-center space-x-3 rtl:space-x-reverse">
-                  <div
-                    className={`w-2 h-2 ${getStatusColor(
-                      order.status
-                    )} rounded-full flex-shrink-0 mr-2 rtl:mr-0 rtl:ml-2`}
-                  ></div>
-                  <div className="flex-1 min-w-0">
-                    <p className="text-xs text-gray-500 uppercase tracking-wide">
-                      {t("status") || "Status"}
+          {orders
+            ?.toSorted((a, b) => b.id - a.id)
+            ?.map((order) => (
+              <div
+                key={order.id}
+                className="bg-white rounded-xl border border-neutral-200 shadow-sm hover:shadow-md transition-shadow duration-200 overflow-hidden"
+              >
+                {/* Card Header */}
+                <div className="bg-gradient-to-r from-primary-400 to-primary-500 px-4 py-3">
+                  <h3 className="text-base font-bold text-white tracking-wide">
+                    {t("saleOrder#") + order.id}
+                  </h3>
+                  {order.public_order_id && (
+                    <p className="text-sm text-primary-100 mt-1">
+                      Public ID: {order.public_order_id}
                     </p>
-                    <p className="text-sm font-medium text-gray-900 capitalize">
-                      {order.status}
-                    </p>
-                  </div>
+                  )}
                 </div>
 
-                {/* Created Date and Total Price Row */}
-                <div className="flex flex-row justify-between items-center">
+                {/* Card Body */}
+                <div className="p-4 space-y-3">
+                  {/* Status */}
                   <div className="flex items-center space-x-3 rtl:space-x-reverse">
-                    <div className="w-2 h-2 bg-blue-500 rounded-full flex-shrink-0 mr-2 rtl:mr-0 rtl:ml-2"></div>
+                    <div
+                      className={`w-2 h-2 ${getStatusColor(
+                        order.status
+                      )} rounded-full flex-shrink-0 mr-2 rtl:mr-0 rtl:ml-2`}
+                    ></div>
                     <div className="flex-1 min-w-0">
                       <p className="text-xs text-gray-500 uppercase tracking-wide">
-                        {t("createdAt") || "Created At"}
+                        {t("status") || "Status"}
                       </p>
-                      <p className="text-sm text-gray-700">
-                        {formatDate(order.created_at)}
+                      <p className="text-sm font-medium text-gray-900 capitalize">
+                        {order.status}
                       </p>
                     </div>
                   </div>
+
+                  {/* Created Date and Total Price Row */}
+                  <div className="flex flex-row justify-between items-center">
+                    <div className="flex items-center space-x-3 rtl:space-x-reverse">
+                      <div className="w-2 h-2 bg-blue-500 rounded-full flex-shrink-0 mr-2 rtl:mr-0 rtl:ml-2"></div>
+                      <div className="flex-1 min-w-0">
+                        <p className="text-xs text-gray-500 uppercase tracking-wide">
+                          {t("createdAt") || "Created At"}
+                        </p>
+                        <p className="text-sm text-gray-700">
+                          {formatDate(order.created_at)}
+                        </p>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+
+                {/* Card Footer */}
+                <div className="px-4 pb-4">
+                  <Button
+                    onClick={() => handleUploadDocuments(order.id)}
+                    variant="outline"
+                    size="sm"
+                    className="w-full"
+                  >
+                    <Upload className="h-4 w-4 mr-2" />
+                    {t("uploadDocuments") || "Upload Documents"}
+                  </Button>
                 </div>
               </div>
-
-              {/* Card Footer */}
-              <div className="px-4 pb-4">
-                <Button
-                  onClick={() => handleUploadDocuments(order.id)}
-                  variant="outline"
-                  size="sm"
-                  className="w-full"
-                >
-                  <Upload className="h-4 w-4 mr-2" />
-                  {t("uploadDocuments") || "Upload Documents"}
-                </Button>
-              </div>
-            </div>
-          ))}
+            ))}
         </div>
       )}
 

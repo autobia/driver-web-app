@@ -127,97 +127,99 @@ export default function QualityCheckTicketsComponent() {
         </div>
       ) : (
         <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-3">
-          {qualityChecks.map((qualityCheck) => (
-            <div
-              key={qualityCheck.id}
-              className="bg-white rounded-xl border border-neutral-200 shadow-sm hover:shadow-md transition-shadow duration-200 overflow-hidden"
-            >
-              {/* Card Header */}
-              <div className="bg-gradient-to-r from-primary-400 to-primary-500 px-4 py-3">
-                <h3 className="text-base font-bold text-white tracking-wide">
-                  {t("qcPrefix")}
-                  {qualityCheck.id}
-                </h3>
-              </div>
-
-              {/* Card Body */}
-              <div className="p-4 space-y-2">
-                {/* Company Name */}
-                <div className="flex items-center space-x-3 rtl:space-x-reverse">
-                  <div className="w-2 h-2 bg-secondary-500 rounded-full flex-shrink-0 mr-2 rtl:mr-0 rtl:ml-2"></div>
-                  <p className="text-sm font-medium text-gray-900 truncate">
-                    {getCompanyName(qualityCheck)}
-                  </p>
+          {qualityChecks
+            ?.toSorted((a, b) => b.id - a.id)
+            ?.map((qualityCheck) => (
+              <div
+                key={qualityCheck.id}
+                className="bg-white rounded-xl border border-neutral-200 shadow-sm hover:shadow-md transition-shadow duration-200 overflow-hidden"
+              >
+                {/* Card Header */}
+                <div className="bg-gradient-to-r from-primary-400 to-primary-500 px-4 py-3">
+                  <h3 className="text-base font-bold text-white tracking-wide">
+                    {t("qcPrefix")}
+                    {qualityCheck.id}
+                  </h3>
                 </div>
 
-                {/* Order ID */}
-                <div className="flex items-center space-x-3 rtl:space-x-reverse">
-                  <div className="w-2 h-2 bg-secondary-400 rounded-full flex-shrink-0 mr-2 rtl:mr-0 rtl:ml-2"></div>
-                  <p className="text-sm text-gray-700">
-                    {t("orderId")}:{" "}
-                    {typeof qualityCheck.object_id === "object"
-                      ? qualityCheck.object_id.id
-                      : qualityCheck.object_id}
-                  </p>
-                </div>
-
-                {/* Quantity */}
-                <div className="flex items-center justify-between">
+                {/* Card Body */}
+                <div className="p-4 space-y-2">
+                  {/* Company Name */}
                   <div className="flex items-center space-x-3 rtl:space-x-reverse">
-                    <div className="w-2 h-2 bg-secondary-300 rounded-full flex-shrink-0 mr-2 rtl:mr-0 rtl:ml-2"></div>
-                    <span className="text-sm text-gray-700">
-                      {t("quantity")}:
+                    <div className="w-2 h-2 bg-secondary-500 rounded-full flex-shrink-0 mr-2 rtl:mr-0 rtl:ml-2"></div>
+                    <p className="text-sm font-medium text-gray-900 truncate">
+                      {getCompanyName(qualityCheck)}
+                    </p>
+                  </div>
+
+                  {/* Order ID */}
+                  <div className="flex items-center space-x-3 rtl:space-x-reverse">
+                    <div className="w-2 h-2 bg-secondary-400 rounded-full flex-shrink-0 mr-2 rtl:mr-0 rtl:ml-2"></div>
+                    <p className="text-sm text-gray-700">
+                      {t("orderId")}:{" "}
+                      {typeof qualityCheck.object_id === "object"
+                        ? qualityCheck.object_id.id
+                        : qualityCheck.object_id}
+                    </p>
+                  </div>
+
+                  {/* Quantity */}
+                  <div className="flex items-center justify-between">
+                    <div className="flex items-center space-x-3 rtl:space-x-reverse">
+                      <div className="w-2 h-2 bg-secondary-300 rounded-full flex-shrink-0 mr-2 rtl:mr-0 rtl:ml-2"></div>
+                      <span className="text-sm text-gray-700">
+                        {t("quantity")}:
+                      </span>
+                    </div>
+                    <span className="text-sm font-semibold text-gray-900 bg-gray-100 px-2 py-1 rounded-md">
+                      {getTotalQuantity(qualityCheck.items)}
                     </span>
                   </div>
-                  <span className="text-sm font-semibold text-gray-900 bg-gray-100 px-2 py-1 rounded-md">
-                    {getTotalQuantity(qualityCheck.items)}
-                  </span>
-                </div>
 
-                {/* Status */}
-                <div className="flex items-center justify-between">
-                  <div className="flex items-center space-x-3 rtl:space-x-reverse">
-                    <div className="w-2 h-2 bg-secondary-200 rounded-full flex-shrink-0 mr-2 rtl:mr-0 rtl:ml-2"></div>
-                    <span className="text-sm text-gray-700">
-                      {t("status")}:
+                  {/* Status */}
+                  <div className="flex items-center justify-between">
+                    <div className="flex items-center space-x-3 rtl:space-x-reverse">
+                      <div className="w-2 h-2 bg-secondary-200 rounded-full flex-shrink-0 mr-2 rtl:mr-0 rtl:ml-2"></div>
+                      <span className="text-sm text-gray-700">
+                        {t("status")}:
+                      </span>
+                    </div>
+                    <span
+                      className={`text-xs font-medium px-2 py-1 rounded-full border ${getStatusColor(
+                        qualityCheck.status
+                      )}`}
+                    >
+                      {getStatusTranslation(qualityCheck.status)}
                     </span>
                   </div>
-                  <span
-                    className={`text-xs font-medium px-2 py-1 rounded-full border ${getStatusColor(
-                      qualityCheck.status
-                    )}`}
+                </div>
+
+                {/* Card Footer */}
+                <div className="px-4 pb-4">
+                  <Button
+                    onClick={() => handleStartPreparing(qualityCheck.id)}
+                    className="w-full"
+                    variant="default"
+                    size="sm"
                   >
-                    {getStatusTranslation(qualityCheck.status)}
-                  </span>
+                    <svg
+                      className="w-4 h-4"
+                      fill="none"
+                      stroke="currentColor"
+                      viewBox="0 0 24 24"
+                    >
+                      <path
+                        strokeLinecap="round"
+                        strokeLinejoin="round"
+                        strokeWidth={2}
+                        d="M14.828 14.828a4 4 0 01-5.656 0M9 10h1m4 0h1m-6 4h1m4 0h1m-6-8h8a2 2 0 012 2v8a2 2 0 01-2 2H8a2 2 0 01-2-2v-8a2 2 0 012-2z"
+                      />
+                    </svg>
+                    {t("startPreparing")}
+                  </Button>
                 </div>
               </div>
-
-              {/* Card Footer */}
-              <div className="px-4 pb-4">
-                <Button
-                  onClick={() => handleStartPreparing(qualityCheck.id)}
-                  className="w-full"
-                  variant="default"
-                  size="sm"
-                >
-                  <svg
-                    className="w-4 h-4"
-                    fill="none"
-                    stroke="currentColor"
-                    viewBox="0 0 24 24"
-                  >
-                    <path
-                      strokeLinecap="round"
-                      strokeLinejoin="round"
-                      strokeWidth={2}
-                      d="M14.828 14.828a4 4 0 01-5.656 0M9 10h1m4 0h1m-6 4h1m4 0h1m-6-8h8a2 2 0 012 2v8a2 2 0 01-2 2H8a2 2 0 01-2-2v-8a2 2 0 012-2z"
-                    />
-                  </svg>
-                  {t("startPreparing")}
-                </Button>
-              </div>
-            </div>
-          ))}
+            ))}
         </div>
       )}
     </div>

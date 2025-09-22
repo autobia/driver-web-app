@@ -268,7 +268,7 @@ export default function TripsComponent() {
           console.log("Getting the quality check");
 
           // Create quality check for non-QC content types
-          const qualityCheckResult = await createQualityCheck({
+          await createQualityCheck({
             content_type: trip.content_type,
             object_id: trip.object_id,
             quality_checker: user.user_id,
@@ -537,207 +537,209 @@ export default function TripsComponent() {
         </div>
       ) : (
         <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-3">
-          {trips.map((trip) => (
-            <div
-              key={trip.id}
-              className={`bg-white rounded-xl border border-neutral-200 shadow-sm hover:shadow-md transition-all duration-200 overflow-hidden relative ${
-                locationLoadingTripId === trip.id ||
-                isRefetchingSpecificTrip(trip.id)
-                  ? "opacity-75 scale-[0.98] shadow-lg border-primary-200"
-                  : isAnyRefetchInProgress && refetchingTripId !== trip.id
-                  ? "opacity-70"
-                  : ""
-              }`}
-            >
-              {/* Loading Overlay */}
-              {(locationLoadingTripId === trip.id ||
-                isRefetchingSpecificTrip(trip.id)) && (
-                <div className="absolute inset-0 bg-white bg-opacity-60 backdrop-blur-[1px] flex items-center justify-center z-10 rounded-xl animate-in fade-in duration-200">
-                  <div className="flex flex-col items-center space-y-2 animate-pulse">
-                    <div className="animate-spin rounded-full h-6 w-6 border-2 border-primary-200 border-t-primary-600"></div>
-                    <span className="text-sm text-gray-700 font-medium">
-                      {isRefetchingSpecificTrip(trip.id)
-                        ? t("refreshingTripData")
-                        : operationType === "going"
-                        ? t("updatingTrip")
-                        : operationType === "arriving"
-                        ? t("processingArrival")
-                        : operationType === "assigning"
-                        ? t("assigningPreparer")
-                        : t("getting_location")}
-                    </span>
-                  </div>
-                </div>
-              )}
-
-              {/* Card Header */}
-              <div className="bg-gradient-to-r from-primary-400 to-primary-500 px-4 py-3">
-                <h3 className="text-base font-bold text-white tracking-wide">
-                  {t("trip")}#{trip.id}
-                </h3>
-              </div>
-
-              {/* Card Body */}
-              <div className="p-4 space-y-2">
-                {/* Purchase Invoice ID */}
-                <div className="flex items-center space-x-3 rtl:space-x-reverse">
-                  <div className="w-2 h-2 bg-secondary-500 rounded-full flex-shrink-0 mr-2 rtl:mr-0 rtl:ml-2"></div>
-                  <p className="text-sm font-medium text-gray-900 truncate">
-                    {t("purchaseInvoice")} #{trip.main_source_id}
-                  </p>
-                </div>
-
-                {/* Trip Status */}
-                <div className="flex items-center justify-between">
-                  <div className="flex items-center space-x-3 rtl:space-x-reverse">
-                    <div className="w-2 h-2 bg-secondary-200 rounded-full flex-shrink-0 mr-2 rtl:mr-0 rtl:ml-2"></div>
-                    <span className="text-sm text-gray-700">
-                      {t("status")}:
-                    </span>
-                  </div>
-                  <span
-                    className={`text-xs font-medium px-2 py-1 rounded-full border ${getStatusColor(
-                      trip.status
-                    )}`}
-                  >
-                    {getStatusTranslation(trip.status)}
-                  </span>
-                </div>
-
-                {/* Destination Information */}
-                {trip.destination_point_type && trip.destination_point && (
-                  <div className="flex items-center space-x-3 rtl:space-x-reverse">
-                    <div className="w-2 h-2 bg-blue-500 rounded-full flex-shrink-0 mr-2 rtl:mr-0 rtl:ml-2"></div>
-                    <div className="flex-1 min-w-0">
-                      <p className="text-xs text-gray-500 uppercase tracking-wide">
-                        {getDestinationTypeTranslation(
-                          trip.destination_point_type
-                        )}
-                      </p>
-                      <p className="text-sm font-medium text-gray-900 truncate">
-                        {getDestinationName(trip)}
-                      </p>
+          {trips
+            ?.toSorted((a, b) => b.id - a.id)
+            ?.map((trip) => (
+              <div
+                key={trip.id}
+                className={`bg-white rounded-xl border border-neutral-200 shadow-sm hover:shadow-md transition-all duration-200 overflow-hidden relative ${
+                  locationLoadingTripId === trip.id ||
+                  isRefetchingSpecificTrip(trip.id)
+                    ? "opacity-75 scale-[0.98] shadow-lg border-primary-200"
+                    : isAnyRefetchInProgress && refetchingTripId !== trip.id
+                    ? "opacity-70"
+                    : ""
+                }`}
+              >
+                {/* Loading Overlay */}
+                {(locationLoadingTripId === trip.id ||
+                  isRefetchingSpecificTrip(trip.id)) && (
+                  <div className="absolute inset-0 bg-white bg-opacity-60 backdrop-blur-[1px] flex items-center justify-center z-10 rounded-xl animate-in fade-in duration-200">
+                    <div className="flex flex-col items-center space-y-2 animate-pulse">
+                      <div className="animate-spin rounded-full h-6 w-6 border-2 border-primary-200 border-t-primary-600"></div>
+                      <span className="text-sm text-gray-700 font-medium">
+                        {isRefetchingSpecificTrip(trip.id)
+                          ? t("refreshingTripData")
+                          : operationType === "going"
+                          ? t("updatingTrip")
+                          : operationType === "arriving"
+                          ? t("processingArrival")
+                          : operationType === "assigning"
+                          ? t("assigningPreparer")
+                          : t("getting_location")}
+                      </span>
                     </div>
                   </div>
                 )}
 
-                {/* Trip Direction */}
-                {trip.trip_direction && (
+                {/* Card Header */}
+                <div className="bg-gradient-to-r from-primary-400 to-primary-500 px-4 py-3">
+                  <h3 className="text-base font-bold text-white tracking-wide">
+                    {t("trip")}#{trip.id}
+                  </h3>
+                </div>
+
+                {/* Card Body */}
+                <div className="p-4 space-y-2">
+                  {/* Purchase Invoice ID */}
                   <div className="flex items-center space-x-3 rtl:space-x-reverse">
-                    <div className="w-2 h-2 bg-green-500 rounded-full flex-shrink-0 mr-2 rtl:mr-0 rtl:ml-2"></div>
-                    <p className="text-sm text-gray-700">
-                      <span className="text-xs text-gray-500 uppercase tracking-wide mr-2">
-                        {t("direction")}:
-                      </span>
-                      {trip.trip_direction === "bring"
-                        ? t("bring")
-                        : t("deliver")}
+                    <div className="w-2 h-2 bg-secondary-500 rounded-full flex-shrink-0 mr-2 rtl:mr-0 rtl:ml-2"></div>
+                    <p className="text-sm font-medium text-gray-900 truncate">
+                      {t("purchaseInvoice")} #{trip.main_source_id}
                     </p>
                   </div>
-                )}
-              </div>
 
-              {/* Card Footer */}
-              <div className="px-4 pb-4">
-                {trip.status === "pending" && (
-                  <div className="flex gap-2">
-                    <Button
-                      onClick={() => handleGoingClick(trip.id)}
-                      disabled={
-                        locationLoadingTripId === trip.id ||
-                        isRefetchingSpecificTrip(trip.id) ||
-                        isAnyRefetchInProgress
-                      }
-                      variant="default"
-                      size="sm"
-                      className="flex-1"
+                  {/* Trip Status */}
+                  <div className="flex items-center justify-between">
+                    <div className="flex items-center space-x-3 rtl:space-x-reverse">
+                      <div className="w-2 h-2 bg-secondary-200 rounded-full flex-shrink-0 mr-2 rtl:mr-0 rtl:ml-2"></div>
+                      <span className="text-sm text-gray-700">
+                        {t("status")}:
+                      </span>
+                    </div>
+                    <span
+                      className={`text-xs font-medium px-2 py-1 rounded-full border ${getStatusColor(
+                        trip.status
+                      )}`}
                     >
-                      {locationLoadingTripId === trip.id ||
-                      isRefetchingSpecificTrip(trip.id) ? (
-                        <>
-                          <div className="animate-spin rounded-full h-4 w-4 border-b-2 border-white mr-2"></div>
-                          {isRefetchingSpecificTrip(trip.id)
-                            ? t("refreshingTripData")
-                            : t("getting_location")}
-                        </>
-                      ) : refetchingTripId === trip.id ? (
-                        <>
-                          <div className="h-4 w-4 border-2 border-gray-400 border-t-transparent rounded-full animate-spin mr-2"></div>
-                          {t("refreshingTripData")}
-                        </>
-                      ) : (
-                        t("going")
-                      )}
-                    </Button>
-                    {trip.trip_direction !== "deliver" && (
+                      {getStatusTranslation(trip.status)}
+                    </span>
+                  </div>
+
+                  {/* Destination Information */}
+                  {trip.destination_point_type && trip.destination_point && (
+                    <div className="flex items-center space-x-3 rtl:space-x-reverse">
+                      <div className="w-2 h-2 bg-blue-500 rounded-full flex-shrink-0 mr-2 rtl:mr-0 rtl:ml-2"></div>
+                      <div className="flex-1 min-w-0">
+                        <p className="text-xs text-gray-500 uppercase tracking-wide">
+                          {getDestinationTypeTranslation(
+                            trip.destination_point_type
+                          )}
+                        </p>
+                        <p className="text-sm font-medium text-gray-900 truncate">
+                          {getDestinationName(trip)}
+                        </p>
+                      </div>
+                    </div>
+                  )}
+
+                  {/* Trip Direction */}
+                  {trip.trip_direction && (
+                    <div className="flex items-center space-x-3 rtl:space-x-reverse">
+                      <div className="w-2 h-2 bg-green-500 rounded-full flex-shrink-0 mr-2 rtl:mr-0 rtl:ml-2"></div>
+                      <p className="text-sm text-gray-700">
+                        <span className="text-xs text-gray-500 uppercase tracking-wide mr-2">
+                          {t("direction")}:
+                        </span>
+                        {trip.trip_direction === "bring"
+                          ? t("bring")
+                          : t("deliver")}
+                      </p>
+                    </div>
+                  )}
+                </div>
+
+                {/* Card Footer */}
+                <div className="px-4 pb-4">
+                  {trip.status === "pending" && (
+                    <div className="flex gap-2">
                       <Button
-                        onClick={() => handleAssignPreparerClick(trip.id)}
+                        onClick={() => handleGoingClick(trip.id)}
                         disabled={
                           locationLoadingTripId === trip.id ||
                           isRefetchingSpecificTrip(trip.id) ||
                           isAnyRefetchInProgress
                         }
-                        variant="secondary"
+                        variant="default"
                         size="sm"
                         className="flex-1"
                       >
-                        {t("assignPreparer")}
+                        {locationLoadingTripId === trip.id ||
+                        isRefetchingSpecificTrip(trip.id) ? (
+                          <>
+                            <div className="animate-spin rounded-full h-4 w-4 border-b-2 border-white mr-2"></div>
+                            {isRefetchingSpecificTrip(trip.id)
+                              ? t("refreshingTripData")
+                              : t("getting_location")}
+                          </>
+                        ) : refetchingTripId === trip.id ? (
+                          <>
+                            <div className="h-4 w-4 border-2 border-gray-400 border-t-transparent rounded-full animate-spin mr-2"></div>
+                            {t("refreshingTripData")}
+                          </>
+                        ) : (
+                          t("going")
+                        )}
                       </Button>
-                    )}
-                  </div>
-                )}
-
-                {trip.status === "on_the_way" && (
-                  <div className="flex gap-2">
-                    <Button
-                      onClick={() => handleArrivedClick(trip.id)}
-                      disabled={
-                        locationLoadingTripId === trip.id ||
-                        isRefetchingSpecificTrip(trip.id) ||
-                        isAnyRefetchInProgress
-                      }
-                      variant="default"
-                      size="sm"
-                      className="w-full bg-green-600 hover:bg-green-700 disabled:bg-green-400"
-                    >
-                      {locationLoadingTripId === trip.id ||
-                      isRefetchingSpecificTrip(trip.id) ? (
-                        <>
-                          <div className="animate-spin rounded-full h-4 w-4 border-b-2 border-white mr-2"></div>
-                          {isRefetchingSpecificTrip(trip.id)
-                            ? t("refreshingTripData")
-                            : t("getting_location")}
-                        </>
-                      ) : refetchingTripId === trip.id ? (
-                        <>
-                          <div className="h-4 w-4 border-2 border-gray-400 border-t-transparent rounded-full animate-spin mr-2"></div>
-                          {t("refreshingTripData")}
-                        </>
-                      ) : (
-                        t("arrived")
+                      {trip.trip_direction !== "deliver" && (
+                        <Button
+                          onClick={() => handleAssignPreparerClick(trip.id)}
+                          disabled={
+                            locationLoadingTripId === trip.id ||
+                            isRefetchingSpecificTrip(trip.id) ||
+                            isAnyRefetchInProgress
+                          }
+                          variant="secondary"
+                          size="sm"
+                          className="flex-1"
+                        >
+                          {t("assignPreparer")}
+                        </Button>
                       )}
-                    </Button>
-                  </div>
-                )}
+                    </div>
+                  )}
 
-                {trip.status === "arrived" && (
-                  <div className="text-center py-2">
-                    <span className="text-sm font-medium text-green-600">
-                      {t("tripCompleted")}
-                    </span>
-                  </div>
-                )}
+                  {trip.status === "on_the_way" && (
+                    <div className="flex gap-2">
+                      <Button
+                        onClick={() => handleArrivedClick(trip.id)}
+                        disabled={
+                          locationLoadingTripId === trip.id ||
+                          isRefetchingSpecificTrip(trip.id) ||
+                          isAnyRefetchInProgress
+                        }
+                        variant="default"
+                        size="sm"
+                        className="w-full bg-green-600 hover:bg-green-700 disabled:bg-green-400"
+                      >
+                        {locationLoadingTripId === trip.id ||
+                        isRefetchingSpecificTrip(trip.id) ? (
+                          <>
+                            <div className="animate-spin rounded-full h-4 w-4 border-b-2 border-white mr-2"></div>
+                            {isRefetchingSpecificTrip(trip.id)
+                              ? t("refreshingTripData")
+                              : t("getting_location")}
+                          </>
+                        ) : refetchingTripId === trip.id ? (
+                          <>
+                            <div className="h-4 w-4 border-2 border-gray-400 border-t-transparent rounded-full animate-spin mr-2"></div>
+                            {t("refreshingTripData")}
+                          </>
+                        ) : (
+                          t("arrived")
+                        )}
+                      </Button>
+                    </div>
+                  )}
 
-                {trip.status === "cancelled" && (
-                  <div className="text-center py-2">
-                    <span className="text-sm font-medium text-red-600">
-                      {t("tripCancelled")}
-                    </span>
-                  </div>
-                )}
+                  {trip.status === "arrived" && (
+                    <div className="text-center py-2">
+                      <span className="text-sm font-medium text-green-600">
+                        {t("tripCompleted")}
+                      </span>
+                    </div>
+                  )}
+
+                  {trip.status === "cancelled" && (
+                    <div className="text-center py-2">
+                      <span className="text-sm font-medium text-red-600">
+                        {t("tripCancelled")}
+                      </span>
+                    </div>
+                  )}
+                </div>
               </div>
-            </div>
-          ))}
+            ))}
         </div>
       )}
 

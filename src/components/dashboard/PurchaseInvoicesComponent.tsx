@@ -200,104 +200,106 @@ export default function PurchaseInvoicesComponent() {
       {/* Purchase Order Cards */}
       {searchResults.length > 0 && (
         <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-3">
-          {searchResults.map((order) => (
-            <div
-              key={order.id}
-              className="bg-white rounded-xl border border-neutral-200 shadow-sm hover:shadow-md transition-shadow duration-200 overflow-hidden"
-            >
-              {/* Card Header */}
-              <div className="bg-gradient-to-r from-primary-400 to-primary-500 px-4 py-3">
-                <h3 className="text-base font-bold text-white tracking-wide">
-                  PO #{order.id}
-                </h3>
-                {order.invoice_id && (
-                  <p className="text-sm text-primary-100 mt-1">
-                    Invoice: {order.invoice_id}
-                  </p>
-                )}
-              </div>
+          {searchResults
+            ?.toSorted((a, b) => b.id - a.id)
+            ?.map((order) => (
+              <div
+                key={order.id}
+                className="bg-white rounded-xl border border-neutral-200 shadow-sm hover:shadow-md transition-shadow duration-200 overflow-hidden"
+              >
+                {/* Card Header */}
+                <div className="bg-gradient-to-r from-primary-400 to-primary-500 px-4 py-3">
+                  <h3 className="text-base font-bold text-white tracking-wide">
+                    {t("purchaseInvoice#") + order.id}
+                  </h3>
+                  {order.invoice_id && (
+                    <p className="text-sm text-primary-100 mt-1">
+                      Invoice: {order.invoice_id}
+                    </p>
+                  )}
+                </div>
 
-              {/* Card Body */}
-              <div className="p-4 space-y-3">
-                {/* Company Name */}
-                <div className="flex items-start space-x-3 rtl:space-x-reverse">
-                  <div className="w-2 h-2 bg-blue-500 rounded-full flex-shrink-0 mt-2 mr-2 rtl:mr-0 rtl:ml-2"></div>
-                  <div className="flex-1 min-w-0">
-                    <p className="text-xs text-gray-500 uppercase tracking-wide">
-                      {t("company")}
-                    </p>
-                    <p className="text-sm font-medium text-gray-900 truncate">
-                      {order.company_branch.company.name_ar ||
-                        order.company_branch.company.name_en}
-                    </p>
-                    {order.company_branch.company.commercial_name && (
-                      <p className="text-xs text-gray-600 truncate">
-                        {order.company_branch.company.commercial_name}
+                {/* Card Body */}
+                <div className="p-4 space-y-3">
+                  {/* Company Name */}
+                  <div className="flex items-start space-x-3 rtl:space-x-reverse">
+                    <div className="w-2 h-2 bg-blue-500 rounded-full flex-shrink-0 mt-2 mr-2 rtl:mr-0 rtl:ml-2"></div>
+                    <div className="flex-1 min-w-0">
+                      <p className="text-xs text-gray-500 uppercase tracking-wide">
+                        {t("company")}
                       </p>
-                    )}
-                  </div>
-                </div>
-
-                {/* Address */}
-                <div className="flex items-start space-x-3 rtl:space-x-reverse">
-                  <div className="w-2 h-2 bg-green-500 rounded-full flex-shrink-0 mt-2 mr-2 rtl:mr-0 rtl:ml-2"></div>
-                  <div className="flex-1 min-w-0">
-                    <p className="text-xs text-gray-500 uppercase tracking-wide">
-                      {t("address")}
-                    </p>
-                    <p className="text-sm text-gray-700">
-                      {order.company_branch.building_number}{" "}
-                      {order.company_branch.street_name}
-                    </p>
-                    {order.company_branch.postal_code && (
-                      <p className="text-xs text-gray-600">
-                        {t("postalCode")}: {order.company_branch.postal_code}
+                      <p className="text-sm font-medium text-gray-900 truncate">
+                        {order.company_branch.company.name_ar ||
+                          order.company_branch.company.name_en}
                       </p>
-                    )}
+                      {order.company_branch.company.commercial_name && (
+                        <p className="text-xs text-gray-600 truncate">
+                          {order.company_branch.company.commercial_name}
+                        </p>
+                      )}
+                    </div>
                   </div>
-                </div>
 
-                {/* Items Count */}
-                <div className="flex items-center space-x-3 rtl:space-x-reverse">
-                  <div className="w-2 h-2 bg-orange-500 rounded-full flex-shrink-0 mr-2 rtl:mr-0 rtl:ml-2"></div>
-                  <p className="text-sm text-gray-700">
-                    <span className="text-xs text-gray-500 uppercase tracking-wide mr-2">
-                      {t("itemsCount")}:
-                    </span>
-                    {order.items.length} {t("itemsCount")}
-                  </p>
-                </div>
+                  {/* Address */}
+                  <div className="flex items-start space-x-3 rtl:space-x-reverse">
+                    <div className="w-2 h-2 bg-green-500 rounded-full flex-shrink-0 mt-2 mr-2 rtl:mr-0 rtl:ml-2"></div>
+                    <div className="flex-1 min-w-0">
+                      <p className="text-xs text-gray-500 uppercase tracking-wide">
+                        {t("address")}
+                      </p>
+                      <p className="text-sm text-gray-700">
+                        {order.company_branch.building_number}{" "}
+                        {order.company_branch.street_name}
+                      </p>
+                      {order.company_branch.postal_code && (
+                        <p className="text-xs text-gray-600">
+                          {t("postalCode")}: {order.company_branch.postal_code}
+                        </p>
+                      )}
+                    </div>
+                  </div>
 
-                {/* Order Date */}
-                {order.actual_purchase_date && (
+                  {/* Items Count */}
                   <div className="flex items-center space-x-3 rtl:space-x-reverse">
-                    <div className="w-2 h-2 bg-purple-500 rounded-full flex-shrink-0 mr-2 rtl:mr-0 rtl:ml-2"></div>
+                    <div className="w-2 h-2 bg-orange-500 rounded-full flex-shrink-0 mr-2 rtl:mr-0 rtl:ml-2"></div>
                     <p className="text-sm text-gray-700">
                       <span className="text-xs text-gray-500 uppercase tracking-wide mr-2">
-                        {t("purchaseDate")}:
+                        {t("itemsCount")}:
                       </span>
-                      {new Date(
-                        order.actual_purchase_date
-                      ).toLocaleDateString()}
+                      {order.items.length} {t("itemsCount")}
                     </p>
                   </div>
-                )}
-              </div>
 
-              {/* Card Footer */}
-              <div className="px-4 pb-4">
-                <Button
-                  onClick={() => handleShowItems(order)}
-                  variant="outline"
-                  size="sm"
-                  className="w-full"
-                >
-                  <Eye className="h-4 w-4 mr-2" />
-                  {t("showPurchaseOrderItems")}
-                </Button>
+                  {/* Order Date */}
+                  {order.actual_purchase_date && (
+                    <div className="flex items-center space-x-3 rtl:space-x-reverse">
+                      <div className="w-2 h-2 bg-purple-500 rounded-full flex-shrink-0 mr-2 rtl:mr-0 rtl:ml-2"></div>
+                      <p className="text-sm text-gray-700">
+                        <span className="text-xs text-gray-500 uppercase tracking-wide mr-2">
+                          {t("purchaseDate")}:
+                        </span>
+                        {new Date(
+                          order.actual_purchase_date
+                        ).toLocaleDateString()}
+                      </p>
+                    </div>
+                  )}
+                </div>
+
+                {/* Card Footer */}
+                <div className="px-4 pb-4">
+                  <Button
+                    onClick={() => handleShowItems(order)}
+                    variant="outline"
+                    size="sm"
+                    className="w-full"
+                  >
+                    <Eye className="h-4 w-4 mr-2" />
+                    {t("showPurchaseOrderItems")}
+                  </Button>
+                </div>
               </div>
-            </div>
-          ))}
+            ))}
         </div>
       )}
 
