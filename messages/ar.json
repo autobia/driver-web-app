@@ -278,5 +278,7 @@
   "packageSubmissionFailed": "فشل في إرسال الطرود",
   "packageSubmissionError": "حدث خطأ أثناء إرسال الطرود",
   "submitPackagesByOrderIdDescription": "أدخل رقم الطلب لإرسال الطرود للتسليم",
-  "unexpectedError": "حدث خطأ غير متوقع"
+  "unexpectedError": "حدث خطأ غير متوقع",
+  "thereIsPendingReplacements": "هناك بدائل معلقة",
+  "qualityCheckCompleted": "تم الانتهاء من فحص الجودة بنجاح!"
 }

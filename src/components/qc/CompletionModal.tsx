@@ -13,13 +13,17 @@ import type {
   QualityCheckCloseRequest,
   CreateDelayedItemsFlowRequest,
 } from "../../store/api/qualityChecksApi";
-import { useCreateAdvancedTripMutation } from "../../store/api/tripsApi";
+import {
+  useCreateAdvancedTripMutation,
+  useGetDriverTripsQuery,
+} from "../../store/api/tripsApi";
 import type { CreateAdvancedTripRequest } from "../../store/api/tripsApi";
 import { useDrivers, usePreparers } from "../../hooks/useUserData";
 import { useSelector, useDispatch } from "react-redux";
 import { useTranslations } from "next-intl";
 import { useRouter } from "next/navigation";
 import { RootState } from "../../store/store";
+import { useToast } from "../../hooks/useToast";
 import {
   calculateCounterTotals,
   resetCurrentQC,
@@ -64,6 +68,7 @@ export default function CompletionModal({
   const t = useTranslations();
   const router = useRouter();
   const dispatch = useDispatch();
+  const toast = useToast();
   const { currentQC, itemCounters } = useSelector(
     (state: RootState) => state.qc
   );
@@ -92,6 +97,9 @@ export default function CompletionModal({
   const [createDelayedItemsFlow] = useCreateDelayedItemsFlowMutation();
   const [createTrip] = useCreateAdvancedTripMutation();
   const [uploadFile] = useUploadFileMutation();
+
+  // Hook for refetching driver trips
+  const { refetch: refetchDriverTrips } = useGetDriverTripsQuery();
 
   // Fetch drivers and preparers data
   const { data: drivers, isLoading: driversLoading } = useDrivers();
@@ -392,17 +400,9 @@ export default function CompletionModal({
           throw new Error("Driver selection is required");
         }
 
-        // Step 1: Submit QC Data
-        console.log("Submitting quality check:", submissionData);
-        const submitResult = await submitQualityCheck({
-          id: currentQC.id,
-          data: submissionData,
-        }).unwrap();
-        console.log("Quality Check submitted successfully:", submitResult);
-
         // Step 2: Create Trip
         const tripData: CreateAdvancedTripRequest = {
-          content_type: 14,
+          content_type: 48,
           object_id: currentQC.id,
           destination_point:
             currentQC.main_source_id.company_branch.id.toString(),
@@ -456,6 +456,12 @@ export default function CompletionModal({
           );
         }
       }
+
+      // Show success toast before navigation
+      toast.success(t("qualityCheckCompleted"));
+
+      // Refetch driver trips to update the trips list
+      refetchDriverTrips();
 
       // Navigate to success page or dashboard
       dispatch(resetCurrentQC());
