@@ -20,7 +20,7 @@ const Toaster = ({ ...props }: ToasterProps) => {
         style: {
           borderRadius: "8px",
           fontSize: "14px",
-          fontFamily: "var(--font-beiruti), system-ui, sans-serif",
+          fontFamily: "var(--font-rubik), system-ui, sans-serif",
           fontWeight: "500",
         },
         className: "font-medium",

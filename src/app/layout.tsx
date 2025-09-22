@@ -1,4 +1,4 @@
-import { Beiruti } from "next/font/google";
+import { Rubik } from "next/font/google";
 import "./globals.css";
 import { NextIntlClientProvider } from "next-intl";
 import { getLocale } from "next-intl/server";
@@ -11,8 +11,8 @@ import TranslationInitializer from "@/components/TranslationInitializer";
 import { Toaster } from "@/components/ui/sonner";
 import type { Metadata } from "next";
 
-const beiruti = Beiruti({
-  variable: "--font-beiruti",
+const rubik = Rubik({
+  variable: "--font-rubik",
   subsets: ["arabic", "latin"],
 });
 
@@ -49,7 +49,7 @@ export default async function RootLayout({
 
   return (
     <html lang={locale} dir={isRTL ? "rtl" : "ltr"} className="h-full">
-      <body className={`${beiruti.variable} antialiased h-full`}>
+      <body className={`${rubik.variable} antialiased h-full`}>
         <StoreProvider>
           <NextIntlClientProvider>
             <TranslationInitializer>
