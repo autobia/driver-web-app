@@ -6,6 +6,7 @@ import { useRouter } from "next/navigation";
 import { RootState } from "../../store/store";
 import {
   useGetQualityChecksQuery,
+  useDriverAppResetMutation,
   QualityCheck,
   QualityCheckItem,
 } from "../../store/api/qualityChecksApi";
@@ -28,6 +29,9 @@ export default function QualityCheckTicketsComponent() {
     { userId: user?.user_id || 0 },
     { skip: !user?.user_id }
   );
+
+  const [driverAppReset, { isLoading: isRefreshing }] =
+    useDriverAppResetMutation();
 
   // Helper function to get localized company name
   const getCompanyName = (qualityCheck: QualityCheck) => {
@@ -78,6 +82,16 @@ export default function QualityCheckTicketsComponent() {
       t("loadingQualityCheckDetails")
     );
     router.push(`/quality-checks/${qualityCheckId}`);
+  };
+
+  const handleRefresh = async (qualityCheckId: number) => {
+    try {
+      await driverAppReset(qualityCheckId).unwrap();
+      toast.success(t("qualityCheckRefreshed"));
+    } catch (error) {
+      console.error("Failed to refresh quality check:", error);
+      toast.error(t("refreshFailed"));
+    }
   };
 
   if (isLoading) {
@@ -195,7 +209,7 @@ export default function QualityCheckTicketsComponent() {
                 </div>
 
                 {/* Card Footer */}
-                <div className="px-4 pb-4">
+                <div className="px-4 pb-4 space-y-2">
                   <Button
                     onClick={() => handleStartPreparing(qualityCheck.id)}
                     className="w-full"
@@ -216,6 +230,31 @@ export default function QualityCheckTicketsComponent() {
                       />
                     </svg>
                     {t("startPreparing")}
+                  </Button>
+
+                  <Button
+                    onClick={() => handleRefresh(qualityCheck.id)}
+                    className="w-full"
+                    variant="outline"
+                    size="sm"
+                    disabled={isRefreshing}
+                  >
+                    <svg
+                      className={`w-4 h-4 ${
+                        isRefreshing ? "animate-spin" : ""
+                      }`}
+                      fill="none"
+                      stroke="currentColor"
+                      viewBox="0 0 24 24"
+                    >
+                      <path
+                        strokeLinecap="round"
+                        strokeLinejoin="round"
+                        strokeWidth={2}
+                        d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15"
+                      />
+                    </svg>
+                    {isRefreshing ? t("refreshing") : t("refresh")}
                   </Button>
                 </div>
               </div>

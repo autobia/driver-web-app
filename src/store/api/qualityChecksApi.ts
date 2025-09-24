@@ -397,6 +397,13 @@ export interface CreateQualityCheckResponse {
   created_at: string;
 }
 
+// Driver App Reset Types
+export interface DriverAppResetResponse {
+  id: number;
+  status: string;
+  message: string;
+}
+
 // Create the quality checks API slice
 export const qualityChecksApi = createApi({
   reducerPath: "qualityChecksApi",
@@ -462,6 +469,14 @@ export const qualityChecksApi = createApi({
         method: "POST",
         data,
       }),
+      invalidatesTags: [{ type: "QualityChecks", id: "LIST" }],
+    }),
+
+    driverAppReset: builder.mutation<DriverAppResetResponse, number>({
+      query: (id) => ({
+        url: `/quality-checks/${id}/driver-app-reset/`,
+        method: "POST",
+      }),
       invalidatesTags: ["QualityChecks"],
     }),
   }),
@@ -475,6 +490,7 @@ export const {
   useCloseQualityCheckMutation,
   useCreateDelayedItemsFlowMutation,
   useCreateQualityCheckMutation,
+  useDriverAppResetMutation,
 } = qualityChecksApi;
 
 // Export the reducer

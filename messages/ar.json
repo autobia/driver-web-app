@@ -280,5 +280,10 @@
   "submitPackagesByOrderIdDescription": "أدخل رقم الطلب لإرسال الطرود للتسليم",
   "unexpectedError": "حدث خطأ غير متوقع",
   "thereIsPendingReplacements": "هناك بدائل معلقة",
-  "qualityCheckCompleted": "تم الانتهاء من فحص الجودة بنجاح!"
+  "qualityCheckCompleted": "تم الانتهاء من فحص الجودة بنجاح!",
+  "refresh": "تحديث (تصفير العداد)",
+  "refreshing": "جاري التحديث...",
+  "refreshQualityCheck": "تحديث فحص الجودة",
+  "qualityCheckRefreshed": "تم تحديث فحص الجودة بنجاح!",
+  "refreshFailed": "فشل في تحديث فحص الجودة"
 }

@@ -280,5 +280,10 @@
   "submitPackagesByOrderIdDescription": "Enter an order ID to submit packages for delivery",
   "unexpectedError": "An unexpected error occurred",
   "thereIsPendingReplacements": "there is pending replacements",
-  "qualityCheckCompleted": "Quality check completed successfully!"
+  "qualityCheckCompleted": "Quality check completed successfully!",
+  "refresh": "Refresh (Reset Counter)",
+  "refreshing": "Refreshing...",
+  "refreshQualityCheck": "Refresh Quality Check",
+  "qualityCheckRefreshed": "Quality check refreshed successfully!",
+  "refreshFailed": "Failed to refresh quality check"
 }
