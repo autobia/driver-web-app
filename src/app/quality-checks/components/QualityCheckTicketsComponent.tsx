@@ -3,16 +3,16 @@
 import { useTranslations } from "next-intl";
 import { useSelector } from "react-redux";
 import { useRouter } from "next/navigation";
-import { RootState } from "../../store/store";
+import { RootState } from "../../../store/store";
 import {
   useGetQualityChecksQuery,
   useDriverAppResetMutation,
   QualityCheck,
   QualityCheckItem,
-} from "../../store/api/qualityChecksApi";
+} from "../../../store/api/qualityChecksApi";
 import { useLocale } from "next-intl";
-import { Button } from "../ui/button";
-import { useToast } from "../../hooks/useToast";
+import { Button } from "../../../components/ui/button";
+import { useToast } from "../../../hooks/useToast";
 
 export default function QualityCheckTicketsComponent() {
   const t = useTranslations();

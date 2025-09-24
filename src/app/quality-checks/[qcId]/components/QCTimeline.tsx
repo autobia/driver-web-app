@@ -2,8 +2,8 @@
 
 import { useSelector } from "react-redux";
 import { useTranslations } from "next-intl";
-import { RootState } from "../../store/store";
-import { calculateCounterTotals } from "../../store/slices/qcSlice";
+import { RootState } from "../../../../store/store";
+import { calculateCounterTotals } from "../../../../store/slices/qcSlice";
 import { CheckCircle, Clock } from "lucide-react";
 
 export default function QCTimeline() {

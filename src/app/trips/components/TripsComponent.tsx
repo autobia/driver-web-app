@@ -8,31 +8,31 @@ import {
   type Trip,
   type WarehouseDestination,
   type CompanyBranchDestination,
-} from "../../store/api/tripsApi";
-import { useCreateQualityCheckMutation } from "../../store/api/qualityChecksApi";
+} from "../../../store/api/tripsApi";
+import { useCreateQualityCheckMutation } from "../../../store/api/qualityChecksApi";
 import {
   useFetchUsersQuery,
   useFetchContentTypesQuery,
-} from "../../store/api/coreApi";
+} from "../../../store/api/coreApi";
 import { useState } from "react";
 import { useSelector } from "react-redux";
-import { RootState } from "../../store/store";
-import { Button } from "../ui/button";
+import { RootState } from "../../../store/store";
+import { Button } from "../../../components/ui/button";
 import {
   Dialog,
   DialogContent,
   DialogHeader,
   DialogTitle,
   DialogFooter,
-} from "../ui/dialog";
+} from "../../../components/ui/dialog";
 import {
   Select,
   SelectContent,
   SelectItem,
   SelectTrigger,
   SelectValue,
-} from "../ui/select";
-import { useToast } from "../../hooks/useToast";
+} from "../../../components/ui/select";
+import { useToast } from "../../../hooks/useToast";
 
 export default function TripsComponent() {
   const t = useTranslations();

@@ -3,7 +3,7 @@
 import { useState } from "react";
 import { useDispatch } from "react-redux";
 import { useTranslations } from "next-intl";
-import { Button } from "../ui/button";
+import { Button } from "../../../../components/ui/button";
 import {
   Dialog,
   DialogContent,
@@ -11,10 +11,10 @@ import {
   DialogFooter,
   DialogHeader,
   DialogTitle,
-} from "../ui/dialog";
-import { Input } from "../ui/input";
-import { Label } from "../ui/label";
-import { addDelayedItem } from "../../store/slices/qcSlice";
+} from "../../../../components/ui/dialog";
+import { Input } from "../../../../components/ui/input";
+import { Label } from "../../../../components/ui/label";
+import { addDelayedItem } from "../../../../store/slices/qcSlice";
 import { Clock } from "lucide-react";
 
 interface DelayedItemModalProps {

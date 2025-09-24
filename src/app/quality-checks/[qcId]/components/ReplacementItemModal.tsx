@@ -3,7 +3,7 @@
 import { useState } from "react";
 import { useDispatch } from "react-redux";
 import { useTranslations, useLocale } from "next-intl";
-import { Button } from "../ui/button";
+import { Button } from "../../../../components/ui/button";
 import {
   Dialog,
   DialogContent,
@@ -11,21 +11,21 @@ import {
   DialogFooter,
   DialogHeader,
   DialogTitle,
-} from "../ui/dialog";
+} from "../../../../components/ui/dialog";
 import {
   Select,
   SelectContent,
   SelectItem,
   SelectTrigger,
   SelectValue,
-} from "../ui/select";
-import { Input } from "../ui/input";
-import { Label } from "../ui/label";
-import { addReplacementItem } from "../../store/slices/qcSlice";
+} from "../../../../components/ui/select";
+import { Input } from "../../../../components/ui/input";
+import { Label } from "../../../../components/ui/label";
+import { addReplacementItem } from "../../../../store/slices/qcSlice";
 import {
   useGetManufacturersQuery,
   useGetBrandsQuery,
-} from "../../store/api/inventoryApi";
+} from "../../../../store/api/inventoryApi";
 import { Loader2, Package } from "lucide-react";
 
 interface ReplacementItemModalProps {

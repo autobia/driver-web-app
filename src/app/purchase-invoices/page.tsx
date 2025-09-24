@@ -2,8 +2,9 @@
 
 import { useSelector } from "react-redux";
 import { RootState } from "../../store/store";
-import { UserInfo, NavigationTabs } from "../../components/dashboard";
-import PurchaseInvoicesComponent from "../../components/dashboard/PurchaseInvoicesComponent";
+import UserInfo from "../../components/UserInfo";
+import NavigationTabs from "../../components/NavigationTabs";
+import PurchaseInvoicesComponent from "./components/PurchaseInvoicesComponent";
 
 export default function PurchaseInvoicesPage() {
   const { user } = useSelector((state: RootState) => state.auth);

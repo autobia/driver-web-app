@@ -2,11 +2,9 @@
 
 import { useSelector } from "react-redux";
 import { RootState } from "../../store/store";
-import {
-  UserInfo,
-  NavigationTabs,
-  SalesOrdersComponent,
-} from "../../components/dashboard";
+import UserInfo from "../../components/UserInfo";
+import NavigationTabs from "../../components/NavigationTabs";
+import SalesOrdersComponent from "./components/SalesOrdersComponent";
 
 export default function OrdersDeliveryPage() {
   const { user } = useSelector((state: RootState) => state.auth);

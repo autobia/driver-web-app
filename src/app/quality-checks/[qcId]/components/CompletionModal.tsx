@@ -5,39 +5,39 @@ import {
   useSubmitQualityCheckMutation,
   useCloseQualityCheckMutation,
   useCreateDelayedItemsFlowMutation,
-} from "../../store/api/qualityChecksApi";
-import { useUploadFileMutation } from "../../store/api/filerApi";
+} from "../../../../store/api/qualityChecksApi";
+import { useUploadFileMutation } from "../../../../store/api/filerApi";
 import type {
   QualityCheckSubmissionRequest,
   SubmissionItem,
   QualityCheckCloseRequest,
   CreateDelayedItemsFlowRequest,
-} from "../../store/api/qualityChecksApi";
+} from "../../../../store/api/qualityChecksApi";
 import {
   useCreateAdvancedTripMutation,
   useGetDriverTripsQuery,
-} from "../../store/api/tripsApi";
-import type { CreateAdvancedTripRequest } from "../../store/api/tripsApi";
-import { useDrivers, usePreparers } from "../../hooks/useUserData";
+} from "../../../../store/api/tripsApi";
+import type { CreateAdvancedTripRequest } from "../../../../store/api/tripsApi";
+import { useDrivers, usePreparers } from "../../../../hooks/useUserData";
 import { useSelector, useDispatch } from "react-redux";
 import { useTranslations } from "next-intl";
 import { useRouter } from "next/navigation";
-import { RootState } from "../../store/store";
-import { useToast } from "../../hooks/useToast";
+import { RootState } from "../../../../store/store";
+import { useToast } from "../../../../hooks/useToast";
 import {
   calculateCounterTotals,
   resetCurrentQC,
-} from "../../store/slices/qcSlice";
-import { Button } from "../ui/button";
-import { Checkbox } from "../ui/checkbox";
-import { Label } from "../ui/label";
+} from "../../../../store/slices/qcSlice";
+import { Button } from "../../../../components/ui/button";
+import { Checkbox } from "../../../../components/ui/checkbox";
+import { Label } from "../../../../components/ui/label";
 import {
   Select,
   SelectContent,
   SelectItem,
   SelectTrigger,
   SelectValue,
-} from "../ui/select";
+} from "../../../../components/ui/select";
 import {
   Dialog,
   DialogContent,
@@ -45,7 +45,7 @@ import {
   DialogFooter,
   DialogHeader,
   DialogTitle,
-} from "../ui/dialog";
+} from "../../../../components/ui/dialog";
 import {
   CheckCircle,
   AlertTriangle,

@@ -4,10 +4,10 @@ import { NextIntlClientProvider } from "next-intl";
 import { getLocale } from "next-intl/server";
 import Navbar from "@/components/Navabr";
 import StoreProvider from "@/store/ReduxProvider";
-import AuthInitializer from "@/components/AuthInitializer";
-import AuthGuard from "@/components/AuthGuard";
-import UserDataProvider from "@/components/UserDataProvider";
-import TranslationInitializer from "@/components/TranslationInitializer";
+import AuthInitializer from "@/providers/AuthInitializer";
+import AuthGuard from "@/providers/AuthGuard";
+import UserDataProvider from "@/providers/UserDataProvider";
+import TranslationInitializer from "@/providers/TranslationInitializer";
 import { Toaster } from "@/components/ui/sonner";
 import type { Metadata } from "next";
 

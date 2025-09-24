@@ -2,8 +2,9 @@
 
 import { useSelector } from "react-redux";
 import { RootState } from "../../store/store";
-import { UserInfo, NavigationTabs } from "../../components/dashboard";
-import TripsComponent from "../../components/dashboard/TripsComponent";
+import UserInfo from "../../components/UserInfo";
+import NavigationTabs from "../../components/NavigationTabs";
+import TripsComponent from "./components/TripsComponent";
 
 export default function TripsPage() {
   const { user } = useSelector((state: RootState) => state.auth);

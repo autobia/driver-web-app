@@ -2,8 +2,9 @@
 
 import { useSelector } from "react-redux";
 import { RootState } from "../../store/store";
-import { UserInfo, NavigationTabs } from "../../components/dashboard";
-import QualityCheckTicketsComponent from "../../components/dashboard/QualityCheckTicketsComponent";
+import UserInfo from "../../components/UserInfo";
+import NavigationTabs from "../../components/NavigationTabs";
+import QualityCheckTicketsComponent from "./components/QualityCheckTicketsComponent";
 
 export default function QualityChecksPage() {
   const { user } = useSelector((state: RootState) => state.auth);

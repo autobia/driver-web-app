@@ -3,10 +3,10 @@
 import { useTranslations } from "next-intl";
 import { useSelector } from "react-redux";
 import { useRouter } from "next/navigation";
-import { RootState } from "../../store/store";
-import { useGetDriverTripsQuery } from "../../store/api/tripsApi";
-import { useGetQualityChecksQuery } from "../../store/api/qualityChecksApi";
-import { useGetUnShippedOrdersQuery } from "../../store/api/saleOrderApi";
+import { RootState } from "../store/store";
+import { useGetDriverTripsQuery } from "../store/api/tripsApi";
+import { useGetQualityChecksQuery } from "../store/api/qualityChecksApi";
+import { useGetUnShippedOrdersQuery } from "../store/api/saleOrderApi";
 
 export type NavigationTab =
   | "trips"
@@ -68,6 +68,7 @@ export default function NavigationTabs({
         break;
       case "purchaseInvoices":
         router.push("/purchase-invoices");
+        break;
       case "ordersDelivery":
         router.push("/orders-delivery");
         break;

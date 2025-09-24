@@ -2,16 +2,16 @@
 
 import { useSelector, useDispatch } from "react-redux";
 import { useTranslations } from "next-intl";
-import { RootState } from "../../store/store";
-import { QualityCheckItem } from "../../store/api/qualityChecksApi";
+import { RootState } from "../../../../store/store";
+import { QualityCheckItem } from "../../../../store/api/qualityChecksApi";
 import {
   incrementItemCounter,
   decrementItemCounter,
   removeReplacementItem,
   removeDelayedItem,
   selectItemCounter,
-} from "../../store/slices/qcSlice";
-import { Button } from "../ui/button";
+} from "../../../../store/slices/qcSlice";
+import { Button } from "../../../../components/ui/button";
 import { Plus, Minus, Package, Clock, Timer } from "lucide-react";
 import { useState } from "react";
 import ReplacementItemModal from "./ReplacementItemModal";

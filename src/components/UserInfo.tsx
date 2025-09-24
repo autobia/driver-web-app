@@ -3,7 +3,7 @@
 import { useTranslations, useLocale } from "next-intl";
 import { motion } from "framer-motion";
 import { Sparkles } from "lucide-react";
-import { User } from "../../store/slices/authSlice";
+import { User } from "../store/slices/authSlice";
 
 interface UserInfoProps {
   user: User;
