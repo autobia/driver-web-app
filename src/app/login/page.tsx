@@ -193,7 +193,7 @@ export default function LoginPage() {
                             .slice(0, 9);
                           setFieldValue("phone", value);
                         }}
-                        className={`w-full pl-20 pr-4 py-3 border rounded-lg focus:outline-none focus:ring-2 transition-all duration-200 text-neutral-900 placeholder-neutral-400 ${
+                        className={`w-full pl-22 pr-4 py-3 border rounded-lg focus:outline-none focus:ring-2 transition-all duration-200 text-neutral-900 placeholder-neutral-400 ${
                           errors.phone && touched.phone
                             ? "border-red-300 focus:border-red-500 focus:ring-red-200"
                             : "border-neutral-300 focus:border-primary-500 focus:ring-primary-200"
