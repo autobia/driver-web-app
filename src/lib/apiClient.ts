@@ -120,23 +120,7 @@ apiClient.interceptors.response.use(
             );
           }
           break;
-        case 403:
-          console.error(translateUtil("accessForbidden"));
-          // Just show toast, no navigation
-          break;
-        case 404:
-          // ONLY navigate on 404 errors
-          console.error(translateUtil("resourceNotFound"));
-          if (!isAuthRoute && typeof window !== "undefined") {
-            showToast.error(
-              translateUtil("notFound"),
-              translateUtil("requestedResourceNotFound")
-            );
-            // Navigate to 404 page for not found resources
-            window.location.href = "/404";
-          }
-          break;
-        case 500:
+
           console.error(translateUtil("serverError"));
           // Just show toast, no navigation
           break;
