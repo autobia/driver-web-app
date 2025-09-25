@@ -110,6 +110,8 @@
   "totalExpected": "المجموع المتوقع",
   "totalProcessed": "المجموع المعالج",
   "incompleteItemsDetails": "تفاصيل العناصر غير المكتملة",
+  "itemsToMarket": "عناصر للسوق",
+  "notCounted": "غير محسوب",
   "missing": "مفقود",
   "acknowledgeIncompleteDescription": "أتعهد أنه لم يتم استلام هذه الأصناف ويجب إرسالها إلى السوق للشراء",
   "sendToMarket": "إرسال إلى السوق",

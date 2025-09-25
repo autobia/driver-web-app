@@ -110,6 +110,8 @@
   "totalExpected": "Total Expected",
   "totalProcessed": "Total Processed",
   "incompleteItemsDetails": "Incomplete Items Details",
+  "itemsToMarket": "Items to Market",
+  "notCounted": "Not Counted",
   "missing": "Missing",
   "acknowledgeIncompleteDescription": "I acknowledge that these items were not received and should be sent to market for procurement",
   "sendToMarket": "Send to Market",

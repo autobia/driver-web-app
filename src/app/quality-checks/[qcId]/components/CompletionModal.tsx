@@ -479,7 +479,7 @@ export default function CompletionModal({
 
   return (
     <Dialog open={isOpen} onOpenChange={onClose}>
-      <DialogContent className="w-[95vw] max-w-[600px] max-h-[90vh] flex flex-col p-0">
+      <DialogContent className="w-[95vw] md:max-w-[600px] max-h-[90vh] flex flex-col p-0 md:p-4">
         <DialogHeader className="px-6 pt-6 pb-2 flex-shrink-0">
           <DialogTitle className="flex items-center space-x-2">
             {incompleteItems === 0 ? (
@@ -502,37 +502,45 @@ export default function CompletionModal({
 
         <div className="flex-1 overflow-y-auto px-6 py-4 space-y-6">
           {/* Statistics Grid */}
-          <div className="grid grid-cols-2 sm:grid-cols-4 gap-2 sm:gap-3">
-            <div className="text-center p-2 sm:p-3 bg-blue-50 rounded-lg">
-              <Package className="w-4 h-4 sm:w-6 sm:h-6 text-blue-600 mx-auto mb-1 sm:mb-2" />
-              <div className="text-lg sm:text-xl font-bold text-blue-600">
+          <div className="grid grid-cols-3 md:grid-cols-5 gap-4 lg:gap-2">
+            <div className="text-center p-3 sm:p-4 bg-blue-50 rounded-lg">
+              <Package className="w-5 h-5 sm:w-7 sm:h-7 text-blue-600 mx-auto mb-2" />
+              <div className="text-xl sm:text-2xl font-bold text-blue-600">
                 {totalRegular}
               </div>
-              <div className="text-xs text-gray-600">{t("regular")}</div>
+              <div className="text-sm text-gray-600">{t("regular")}</div>
             </div>
 
-            <div className="text-center p-2 sm:p-3 bg-yellow-50 rounded-lg">
-              <ShoppingCart className="w-4 h-4 sm:w-6 sm:h-6 text-yellow-600 mx-auto mb-1 sm:mb-2" />
-              <div className="text-lg sm:text-xl font-bold text-yellow-600">
+            <div className="text-center p-3 sm:p-4 bg-yellow-50 rounded-lg">
+              <ShoppingCart className="w-5 h-5 sm:w-7 sm:h-7 text-yellow-600 mx-auto mb-2" />
+              <div className="text-xl sm:text-2xl font-bold text-yellow-600">
                 {totalReplacements}
               </div>
-              <div className="text-xs text-gray-600">{t("replacements")}</div>
+              <div className="text-sm text-gray-600">{t("replacements")}</div>
             </div>
 
-            <div className="text-center p-2 sm:p-3 bg-orange-50 rounded-lg">
-              <Timer className="w-4 h-4 sm:w-6 sm:h-6 text-orange-600 mx-auto mb-1 sm:mb-2" />
-              <div className="text-lg sm:text-xl font-bold text-orange-600">
+            <div className="text-center p-3 sm:p-4 bg-orange-50 rounded-lg">
+              <Timer className="w-5 h-5 sm:w-7 sm:h-7 text-orange-600 mx-auto mb-2" />
+              <div className="text-xl sm:text-2xl font-bold text-orange-600">
                 {totalDelayed}
               </div>
-              <div className="text-xs text-gray-600">{t("delayed")}</div>
+              <div className="text-sm text-gray-600">{t("delayed")}</div>
             </div>
 
-            <div className="text-center p-2 sm:p-3 bg-green-50 rounded-lg">
-              <CheckCircle className="w-4 h-4 sm:w-6 sm:h-6 text-green-600 mx-auto mb-1 sm:mb-2" />
-              <div className="text-lg sm:text-xl font-bold text-green-600">
+            <div className="text-center p-3 sm:p-4 bg-red-50 rounded-lg">
+              <AlertTriangle className="w-5 h-5 sm:w-7 sm:h-7 text-red-600 mx-auto mb-2" />
+              <div className="text-xl sm:text-2xl font-bold text-red-600">
+                {totalRemainingQuantity}
+              </div>
+              <div className="text-sm text-gray-600">{t("itemsToMarket")}</div>
+            </div>
+
+            <div className="text-center p-3 sm:p-4 bg-green-50 rounded-lg">
+              <CheckCircle className="w-5 h-5 sm:w-7 sm:h-7 text-green-600 mx-auto mb-2" />
+              <div className="text-xl sm:text-2xl font-bold text-green-600">
                 {countedItems}
               </div>
-              <div className="text-xs text-gray-600">{t("totalCounted")}</div>
+              <div className="text-sm text-gray-600">{t("totalCounted")}</div>
             </div>
           </div>
 
