@@ -479,7 +479,7 @@ export default function CompletionModal({
 
   return (
     <Dialog open={isOpen} onOpenChange={onClose}>
-      <DialogContent className="w-[95vw] md:max-w-[600px] max-h-[90vh] flex flex-col p-0 md:p-4">
+      <DialogContent className="w-[95vw]  max-h-[90vh] md:max-w-[600px]  flex flex-col p-0 md:p-4">
         <DialogHeader className="px-6 pt-6 pb-2 flex-shrink-0">
           <DialogTitle className="flex items-center space-x-2">
             {incompleteItems === 0 ? (
