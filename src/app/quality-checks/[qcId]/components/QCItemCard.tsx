@@ -90,12 +90,12 @@ export default function QCItemCard({ item }: QCItemCardProps) {
         <div className="flex items-center space-x-2">
           {getStatusIcon()}
           <div>
-            <h3 className="font-semibold text-gray-900 text-sm">
+            <h3 className="font-bold text-gray-900 text-lg">
+              {item.brand_item?.item?.part_number || "N/A"}
+            </h3>
+            <p className="text-sm text-gray-600 mt-1">
               {item.brand_item?.brand?.name_en || "N/A"} -{" "}
               {item.brand_item?.item?.description || "N/A"}
-            </h3>
-            <p className="text-xs text-gray-500">
-              Part#: {item.brand_item?.item?.part_number || "N/A"}
             </p>
           </div>
         </div>

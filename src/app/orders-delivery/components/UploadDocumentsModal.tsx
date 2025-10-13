@@ -333,6 +333,7 @@ export default function UploadDocumentsModal({
                   type="file"
                   id="shipping-policy"
                   accept="image/*"
+                  capture="environment"
                   onChange={(e) =>
                     setShippingPolicyFile(e.target.files?.[0] || null)
                   }
@@ -362,6 +363,7 @@ export default function UploadDocumentsModal({
                   type="file"
                   id="receipt"
                   accept="image/*"
+                  capture="environment"
                   onChange={(e) => setReceiptFile(e.target.files?.[0] || null)}
                   className="hidden"
                 />
