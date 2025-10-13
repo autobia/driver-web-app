@@ -15,7 +15,13 @@ import {
   useGetQualityCheckByIdQuery,
 } from "../../../store/api/qualityChecksApi";
 import { Button } from "../../../components/ui/button";
-import { ArrowLeft, ArrowRight, RotateCcw, CheckCircle, Scan } from "lucide-react";
+import {
+  ArrowLeft,
+  ArrowRight,
+  RotateCcw,
+  CheckCircle,
+  Scan,
+} from "lucide-react";
 import QCTimeline from "./components/QCTimeline";
 import QCItemCard from "./components/QCItemCard";
 import ConfirmationModal from "./components/ConfirmationModal";
@@ -188,14 +194,18 @@ export default function QualityCheckDetailPage() {
         {/* Items List */}
         <div className="space-y-4">
           <div className="flex items-center justify-between mb-4">
-            <h2 className="text-lg font-semibold text-gray-900">{t("items")}</h2>
-            <Button
-              onClick={handleOpenScannerMode}
-              className="bg-primary-600 hover:bg-primary-700 text-white"
-            >
-              <Scan className="w-4 h-4 mr-2" />
-              {t("scannerMode")}
-            </Button>
+            <h2 className="text-lg font-semibold text-gray-900">
+              {t("items")}
+            </h2>
+            {user?.user_id === 27504 && (
+              <Button
+                onClick={handleOpenScannerMode}
+                className="bg-primary-600 hover:bg-primary-700 text-white"
+              >
+                <Scan className="w-4 h-4 mr-2" />
+                {t("scannerMode")}
+              </Button>
+            )}
           </div>
 
           <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-3">
