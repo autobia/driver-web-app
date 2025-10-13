@@ -297,5 +297,16 @@
   "timeMinuteSingular": "دقيقة",
   "timeMinuteDual": "دقيقتان",
   "timeMinutePlural": "دقائق",
+  "scannerMode": "وضع الماسح الضوئي",
+  "scanQRCode": "وجه الكاميرا على رمز QR",
+  "scannedItems": "العناصر الممسوحة",
+  "noItemsScannedYet": "لم يتم مسح أي عناصر بعد",
+  "detectedCode": "تم الكشف",
+  "confirmScan": "تأكيد المسح",
+  "processing": "جاري المعالجة...",
+  "itemNotInThisQC": "العنصر غير موجود في فحص الجودة هذا",
+  "maxQuantityReached": "تم الوصول للكمية المطلوبة لهذا العنصر",
+  "scanned": "تم المسح",
+  "endScanning": "إنهاء المسح",
   "ticketCreatedFrom": "مضى على التذكرة"
 }

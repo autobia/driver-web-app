@@ -297,5 +297,16 @@
   "timeMinuteSingular": "m",
   "timeMinuteDual": "m",
   "timeMinutePlural": "m",
+  "scannerMode": "Scanner Mode",
+  "scanQRCode": "Point camera at QR code",
+  "scannedItems": "Scanned Items",
+  "noItemsScannedYet": "No items scanned yet",
+  "detectedCode": "Detected",
+  "confirmScan": "Confirm Scan",
+  "processing": "Processing...",
+  "itemNotInThisQC": "Item not found in this quality check",
+  "maxQuantityReached": "Maximum quantity reached for this item",
+  "scanned": "Scanned",
+  "endScanning": "End Scanning",
   "ticketCreatedFrom": "Ticket created from"
 }
