@@ -13,6 +13,7 @@ import {
 import { useLocale } from "next-intl";
 import { Button } from "../../../components/ui/button";
 import { useToast } from "../../../hooks/useToast";
+import TimeCounter from "../../../components/TimeCounter";
 
 export default function QualityCheckTicketsComponent() {
   const t = useTranslations();
@@ -142,7 +143,12 @@ export default function QualityCheckTicketsComponent() {
       ) : (
         <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-3">
           {qualityChecks
-            ?.toSorted((a, b) => b.id - a.id)
+            ?.toSorted((a, b) => {
+              // Sort by creation time - oldest first
+              const dateA = new Date(a.created_at).getTime();
+              const dateB = new Date(b.created_at).getTime();
+              return dateA - dateB;
+            })
             ?.map((qualityCheck) => (
               <div
                 key={qualityCheck.id}
@@ -150,10 +156,17 @@ export default function QualityCheckTicketsComponent() {
               >
                 {/* Card Header */}
                 <div className="bg-gradient-to-r from-primary-400 to-primary-500 px-4 py-3">
-                  <h3 className="text-base font-bold text-white tracking-wide">
-                    {t("qcPrefix")}
-                    {qualityCheck.id}
-                  </h3>
+                  <div className="flex items-center justify-between">
+                    <h3 className="text-base font-bold text-white tracking-wide">
+                      {t("qcPrefix")}
+                      {qualityCheck.id}
+                    </h3>
+                  </div>
+                </div>
+
+                {/* Time Counter */}
+                <div className="px-4 pt-3">
+                  <TimeCounter createdAt={qualityCheck.created_at} />
                 </div>
 
                 {/* Card Body */}

@@ -287,5 +287,15 @@
   "refreshing": "Refreshing...",
   "refreshQualityCheck": "Refresh Quality Check",
   "qualityCheckRefreshed": "Quality check refreshed successfully!",
-  "refreshFailed": "Failed to refresh quality check"
+  "refreshFailed": "Failed to refresh quality check",
+  "timeDaySingular": "d",
+  "timeDayDual": "d",
+  "timeDayPlural": "d",
+  "timeHourSingular": "h",
+  "timeHourDual": "h",
+  "timeHourPlural": "h",
+  "timeMinuteSingular": "m",
+  "timeMinuteDual": "m",
+  "timeMinutePlural": "m",
+  "ticketCreatedFrom": "Ticket created from"
 }

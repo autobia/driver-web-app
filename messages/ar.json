@@ -287,5 +287,15 @@
   "refreshing": "جاري التحديث...",
   "refreshQualityCheck": "تحديث فحص الجودة",
   "qualityCheckRefreshed": "تم تحديث فحص الجودة بنجاح!",
-  "refreshFailed": "فشل في تحديث فحص الجودة"
+  "refreshFailed": "فشل في تحديث فحص الجودة",
+  "timeDaySingular": "يوم",
+  "timeDayDual": "يومان",
+  "timeDayPlural": "أيام",
+  "timeHourSingular": "ساعة",
+  "timeHourDual": "ساعتان",
+  "timeHourPlural": "ساعات",
+  "timeMinuteSingular": "دقيقة",
+  "timeMinuteDual": "دقيقتان",
+  "timeMinutePlural": "دقائق",
+  "ticketCreatedFrom": "مضى على التذكرة"
 }
