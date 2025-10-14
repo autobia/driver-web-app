@@ -3,7 +3,7 @@
 import { useEffect, useRef, useState } from "react";
 import { useSelector, useDispatch } from "react-redux";
 import { useTranslations } from "next-intl";
-import { Html5Qrcode } from "html5-qrcode";
+import { Html5Qrcode, Html5QrcodeSupportedFormats } from "html5-qrcode";
 import { RootState } from "../../../../store/store";
 import { incrementItemCounter } from "../../../../store/slices/qcSlice";
 import { Button } from "../../../../components/ui/button";
@@ -96,20 +96,30 @@ export default function QCScannerMode({ onClose }: QCScannerModeProps) {
 
   const startScanner = async () => {
     try {
-      const scanner = new Html5Qrcode("qr-reader");
+      const scanner = new Html5Qrcode("qr-reader", {
+        formatsToSupport: [
+          Html5QrcodeSupportedFormats.QR_CODE,
+          Html5QrcodeSupportedFormats.CODE_128,
+          Html5QrcodeSupportedFormats.CODE_39,
+          Html5QrcodeSupportedFormats.EAN_13,
+          Html5QrcodeSupportedFormats.EAN_8,
+          Html5QrcodeSupportedFormats.UPC_A,
+          Html5QrcodeSupportedFormats.UPC_E,
+        ],
+        verbose: false,
+      });
       scannerRef.current = scanner;
 
       await scanner.start(
         { facingMode: "environment" },
         {
           fps: 10,
-          qrbox: function (viewfinderWidth, viewfinderHeight) {
-            // Make the scanning box 90% width and 60% height for better mobile experience
+          qrbox: function (viewfinderWidth) {
+            // Static scanning box - 90% width and 200px height
             const boxWidth = Math.floor(viewfinderWidth * 0.9);
-            const boxHeight = Math.floor(viewfinderHeight * 0.6);
             return {
               width: boxWidth,
-              height: boxHeight,
+              height: 200,
             };
           },
         },
@@ -239,11 +249,11 @@ export default function QCScannerMode({ onClose }: QCScannerModeProps) {
 
       {/* Split Screen Layout */}
       <div className="flex flex-col" style={{ height: "calc(100vh - 4rem)" }}>
-        {/* Items List - Top 30% */}
+        {/* Items List - Top 40% */}
         <div
           ref={itemsListRef}
           className="bg-white overflow-y-auto"
-          style={{ height: "30%" }}
+          style={{ height: "40%" }}
         >
           <div className="p-4">
             {/* Summary Header */}
@@ -413,12 +423,22 @@ export default function QCScannerMode({ onClose }: QCScannerModeProps) {
           </div>
         </div>
 
-        {/* Camera View - Bottom 70% */}
+        {/* Camera View - Bottom 60% */}
         <div
           className="bg-black flex flex-col items-center justify-center relative overflow-hidden"
-          style={{ height: "70%" }}
+          style={{ height: "60%" }}
         >
-          <div id="qr-reader" style={{ width: "100%", height: "100%" }} />
+          <div
+            id="qr-reader"
+            style={{
+              width: "100%",
+              height: "100%",
+              display: "flex",
+              flexDirection: "column",
+              alignItems: "center",
+              justifyContent: "center",
+            }}
+          />
 
           {/* Detected Code & Scan Button Overlay */}
           <div className="absolute bottom-0 left-0 right-0 bg-gradient-to-t from-black/80 to-transparent p-4">
