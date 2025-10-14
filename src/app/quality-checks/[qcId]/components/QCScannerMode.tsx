@@ -208,17 +208,13 @@ export default function QCScannerMode({ onClose }: QCScannerModeProps) {
     // Clean the scanned code before comparison
     const cleanedScannedCode = partNumberScannerRegex(detectedCode);
 
-    // Find item by part number in the scanned QR code
+    // Find item by part number - compare cleaned scanned code with original part number
     const item = currentQC?.items.find((item) => {
       const itemPartNumber = item.brand_item?.item?.part_number;
       if (!itemPartNumber) return false;
 
-      // Clean the item's part number for comparison
-      const cleanedItemPartNumber = partNumberScannerRegex(itemPartNumber);
-
       return (
-        cleanedItemPartNumber?.toLowerCase() ===
-        cleanedScannedCode?.toLowerCase()
+        itemPartNumber?.toLowerCase() === cleanedScannedCode?.toLowerCase()
       );
     });
 
