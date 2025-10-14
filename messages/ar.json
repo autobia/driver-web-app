@@ -297,7 +297,6 @@
   "timeMinuteSingular": "دقيقة",
   "timeMinuteDual": "دقيقتان",
   "timeMinutePlural": "دقائق",
-  "ticketCreatedFrom": "مضى على التذكرة",
   "scannerMode": "وضع الماسح الضوئي",
   "scanQRCode": "وجه الكاميرا على رمز QR",
   "scannedItems": "العناصر الممسوحة",
@@ -308,5 +307,6 @@
   "itemNotInThisQC": "العنصر غير موجود في فحص الجودة هذا",
   "maxQuantityReached": "تم الوصول للكمية المطلوبة لهذا العنصر",
   "scanned": "تم المسح",
-  "endScanning": "إنهاء المسح"
+  "endScanning": "إنهاء المسح",
+  "ticketCreatedFrom": "مضى على التذكرة"
 }
