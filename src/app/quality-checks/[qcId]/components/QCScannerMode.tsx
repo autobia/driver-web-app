@@ -47,7 +47,20 @@ export default function QCScannerMode({ onClose }: QCScannerModeProps) {
     startScanner();
 
     return () => {
+      // Cleanup on unmount
       stopScanner();
+
+      // Close audio context
+      if (audioContextRef.current) {
+        audioContextRef.current.close();
+        audioContextRef.current = null;
+      }
+
+      // Clear state
+      setDetectedCode("");
+      setIsProcessing(false);
+      setErrorMessage("");
+      setLastScannedItemId(null);
     };
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
@@ -137,12 +150,20 @@ export default function QCScannerMode({ onClose }: QCScannerModeProps) {
   };
 
   const stopScanner = async () => {
-    if (scannerRef.current && isScanning) {
+    if (scannerRef.current) {
       try {
-        await scannerRef.current.stop();
+        // Stop scanning if active
+        if (isScanning) {
+          await scannerRef.current.stop();
+        }
+        // Clear scanner instance
         await scannerRef.current.clear();
       } catch (err) {
         console.error("Error stopping scanner:", err);
+      } finally {
+        // Ensure scanner ref is cleared
+        scannerRef.current = null;
+        setIsScanning(false);
       }
     }
   };
@@ -216,13 +237,35 @@ export default function QCScannerMode({ onClose }: QCScannerModeProps) {
       }
     }, 100);
 
-    // Reset for next scan
+    // Reset scanner state completely for next scan
     setDetectedCode("");
-    setTimeout(() => setIsProcessing(false), 500);
+    setIsProcessing(false);
+    setErrorMessage("");
+
+    // Restart scanner to clear any cached detection data
+    setTimeout(async () => {
+      await stopScanner();
+      await startScanner();
+    }, 300);
   };
 
   const handleClose = async () => {
+    // Stop and cleanup scanner
     await stopScanner();
+
+    // Close audio context
+    if (audioContextRef.current) {
+      audioContextRef.current.close();
+      audioContextRef.current = null;
+    }
+
+    // Reset all state
+    setDetectedCode("");
+    setIsProcessing(false);
+    setErrorMessage("");
+    setLastScannedItemId(null);
+
+    // Call parent close handler
     onClose();
   };
 
