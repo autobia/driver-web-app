@@ -47,7 +47,20 @@ export default function QCScannerMode({ onClose }: QCScannerModeProps) {
     startScanner();
 
     return () => {
+      // Cleanup on unmount
       stopScanner();
+
+      // Close audio context
+      if (audioContextRef.current) {
+        audioContextRef.current.close();
+        audioContextRef.current = null;
+      }
+
+      // Clear state
+      setDetectedCode("");
+      setIsProcessing(false);
+      setErrorMessage("");
+      setLastScannedItemId(null);
     };
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
@@ -137,14 +150,53 @@ export default function QCScannerMode({ onClose }: QCScannerModeProps) {
   };
 
   const stopScanner = async () => {
-    if (scannerRef.current && isScanning) {
+    if (scannerRef.current) {
       try {
-        await scannerRef.current.stop();
+        // Stop scanning if active
+        if (isScanning) {
+          await scannerRef.current.stop();
+        }
+        // Clear scanner instance
         await scannerRef.current.clear();
       } catch (err) {
         console.error("Error stopping scanner:", err);
+      } finally {
+        // Ensure scanner ref is cleared
+        scannerRef.current = null;
+        setIsScanning(false);
       }
     }
+  };
+
+  // Clean scanned part number using regex
+  const partNumberScannerRegex = (partNumber: string) => {
+    if (!partNumber) {
+      return partNumber;
+    }
+    partNumber = partNumber
+      .replace(/^\s+/, "") // Remove leading whitespace
+      .replace(/[-]/g, ""); // Remove hyphens
+
+    // Check if the character count before the period is greater than 4
+    const periodIndex = partNumber.indexOf(".");
+    if (periodIndex > 4) {
+      partNumber = partNumber.replace(
+        /\..*[a-zA-Z0-9&\/\\#,+()@\^$_~%'":*?<>{}]*$/,
+        ""
+      ); // Remove everything after the period
+    }
+
+    // Remove everything after a space
+    partNumber = partNumber.replace(
+      /\s.*[a-zA-Z0-9&\/\\#,+()@\^$_~%'":*?<>{}]*$/,
+      ""
+    );
+
+    if (partNumber && partNumber.length > 20) {
+      partNumber = partNumber.substring(0, 20);
+    }
+
+    return partNumber;
   };
 
   const handleConfirmScan = () => {
@@ -153,12 +205,22 @@ export default function QCScannerMode({ onClose }: QCScannerModeProps) {
     setIsProcessing(true);
     setErrorMessage(""); // Clear previous error
 
+    // Clean the scanned code before comparison
+    const cleanedScannedCode = partNumberScannerRegex(detectedCode);
+
     // Find item by part number in the scanned QR code
-    const item = currentQC?.items.find(
-      (item) =>
-        item.brand_item?.item?.part_number?.toLowerCase() ===
-        detectedCode.toLowerCase()
-    );
+    const item = currentQC?.items.find((item) => {
+      const itemPartNumber = item.brand_item?.item?.part_number;
+      if (!itemPartNumber) return false;
+
+      // Clean the item's part number for comparison
+      const cleanedItemPartNumber = partNumberScannerRegex(itemPartNumber);
+
+      return (
+        cleanedItemPartNumber?.toLowerCase() ===
+        cleanedScannedCode?.toLowerCase()
+      );
+    });
 
     if (!item) {
       // Item not found in this QC
@@ -216,13 +278,35 @@ export default function QCScannerMode({ onClose }: QCScannerModeProps) {
       }
     }, 100);
 
-    // Reset for next scan
+    // Reset scanner state completely for next scan
     setDetectedCode("");
-    setTimeout(() => setIsProcessing(false), 500);
+    setIsProcessing(false);
+    setErrorMessage("");
+
+    // Restart scanner to clear any cached detection data
+    setTimeout(async () => {
+      await stopScanner();
+      await startScanner();
+    }, 300);
   };
 
   const handleClose = async () => {
+    // Stop and cleanup scanner
     await stopScanner();
+
+    // Close audio context
+    if (audioContextRef.current) {
+      audioContextRef.current.close();
+      audioContextRef.current = null;
+    }
+
+    // Reset all state
+    setDetectedCode("");
+    setIsProcessing(false);
+    setErrorMessage("");
+    setLastScannedItemId(null);
+
+    // Call parent close handler
     onClose();
   };
 
