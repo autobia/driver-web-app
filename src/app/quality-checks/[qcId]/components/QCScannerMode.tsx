@@ -168,18 +168,55 @@ export default function QCScannerMode({ onClose }: QCScannerModeProps) {
     }
   };
 
+  // Clean scanned part number using regex
+  const partNumberScannerRegex = (partNumber: string) => {
+    if (!partNumber) {
+      return partNumber;
+    }
+    partNumber = partNumber
+      .replace(/^\s+/, "") // Remove leading whitespace
+      .replace(/[-]/g, ""); // Remove hyphens
+
+    // Check if the character count before the period is greater than 4
+    const periodIndex = partNumber.indexOf(".");
+    if (periodIndex > 4) {
+      partNumber = partNumber.replace(
+        /\..*[a-zA-Z0-9&\/\\#,+()@\^$_~%'":*?<>{}]*$/,
+        ""
+      ); // Remove everything after the period
+    }
+
+    // Remove everything after a space
+    partNumber = partNumber.replace(
+      /\s.*[a-zA-Z0-9&\/\\#,+()@\^$_~%'":*?<>{}]*$/,
+      ""
+    );
+
+    if (partNumber && partNumber.length > 20) {
+      partNumber = partNumber.substring(0, 20);
+    }
+
+    return partNumber;
+  };
+
   const handleConfirmScan = () => {
     if (!detectedCode || isProcessing) return;
 
     setIsProcessing(true);
     setErrorMessage(""); // Clear previous error
 
-    // Find item by part number in the scanned QR code
-    const item = currentQC?.items.find(
-      (item) =>
-        item.brand_item?.item?.part_number?.toLowerCase() ===
-        detectedCode.toLowerCase()
-    );
+    // Clean the scanned code before comparison
+    const cleanedScannedCode = partNumberScannerRegex(detectedCode);
+
+    // Find item by part number - compare cleaned scanned code with original part number
+    const item = currentQC?.items.find((item) => {
+      const itemPartNumber = item.brand_item?.item?.part_number;
+      if (!itemPartNumber) return false;
+
+      return (
+        itemPartNumber?.toLowerCase() === cleanedScannedCode?.toLowerCase()
+      );
+    });
 
     if (!item) {
       // Item not found in this QC
