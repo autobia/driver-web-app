@@ -197,15 +197,13 @@ export default function QualityCheckDetailPage() {
             <h2 className="text-lg font-semibold text-gray-900">
               {t("items")}
             </h2>
-            {(user?.user_id === 27504 || user?.user_id === 27505) && (
-              <Button
-                onClick={handleOpenScannerMode}
-                className="bg-primary-600 hover:bg-primary-700 text-white"
-              >
-                <Scan className="w-4 h-4 mr-2" />
-                {t("scannerMode")}
-              </Button>
-            )}
+            <Button
+              onClick={handleOpenScannerMode}
+              className="bg-primary-600 hover:bg-primary-700 text-white"
+            >
+              <Scan className="w-4 h-4 mr-2" />
+              {t("scannerMode")}
+            </Button>
           </div>
 
           <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-3">
