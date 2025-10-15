@@ -66,6 +66,7 @@
   "sku": "رقم المنتج",
   "enterSku": "أدخل رقم المنتج",
   "maxQuantity": "الحد الأقصى للكمية",
+  "quantityExceedsAvailable": "الكمية تتجاوز الكمية المتاحة",
   "addItem": "إضافة عنصر",
   "loading": "جارٍ التحميل...",
   "readyToComplete": "جاهز للإكمال",
@@ -305,8 +306,12 @@
   "confirmScan": "تأكيد المسح",
   "processing": "جاري المعالجة...",
   "itemNotInThisQC": "العنصر غير موجود في فحص الجودة هذا",
-  "maxQuantityReached": "تم الوصول للكمية المطلوبة لهذا العنصر",
+  "maxQuantityReached": "تم مسح العنصر بالكامل - تم الوصول للحد الأقصى",
   "scanned": "تم المسح",
   "endScanning": "إنهاء المسح",
-  "ticketCreatedFrom": "مضى على التذكرة"
+  "resumingScannerSoon": "سيتم استئناف المسح قريباً...",
+  "ticketCreatedFrom": "مضى على التذكرة",
+  "ready": "جاهز",
+  "initializingScanner": "جاري تهيئة الماسح...",
+  "scannerInitError": "فشل في تهيئة الماسح"
 }
