@@ -197,7 +197,7 @@ export default function QualityCheckDetailPage() {
             <h2 className="text-lg font-semibold text-gray-900">
               {t("items")}
             </h2>
-            {user?.user_id === 27504 && (
+            {(user?.user_id === 27504 || user?.user_id === 27505) && (
               <Button
                 onClick={handleOpenScannerMode}
                 className="bg-primary-600 hover:bg-primary-700 text-white"

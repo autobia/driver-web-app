@@ -88,7 +88,7 @@ export default function TripsComponent() {
 
   // Constants from Flutter code
   const QUALITY_CHECK_CONTENT_TYPE = 48;
-  const WAREHOUSE_CONTENT_TYPE = 32;
+  const WAREHOUSE_CONTENT_TYPE = 42;
 
   // Fallback coordinates
   const FALLBACK_LATITUDE = 17;

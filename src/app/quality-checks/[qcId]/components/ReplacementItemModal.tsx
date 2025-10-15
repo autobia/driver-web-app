@@ -225,6 +225,11 @@ export default function ReplacementItemModal({
               }
               className="w-full"
             />
+            {parseInt(quantity) > maxQuantity && (
+              <p className="text-xs text-red-500">
+                {t("quantityExceedsAvailable")}
+              </p>
+            )}
             <p className="text-xs text-gray-500">
               {t("maxQuantity")}: {maxQuantity}
             </p>
