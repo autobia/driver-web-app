@@ -66,6 +66,7 @@
   "sku": "SKU",
   "enterSku": "Enter SKU",
   "maxQuantity": "Max quantity",
+  "quantityExceedsAvailable": "Quantity exceeds available quantity",
   "addItem": "Add Item",
   "loading": "Loading...",
   "readyToComplete": "Ready to Complete",
@@ -305,8 +306,12 @@
   "confirmScan": "Confirm Scan",
   "processing": "Processing...",
   "itemNotInThisQC": "Item not found in this quality check",
-  "maxQuantityReached": "Maximum quantity reached for this item",
+  "maxQuantityReached": "Item Already Fully Scanned - Maximum Quantity Reached",
   "scanned": "Scanned",
   "endScanning": "End Scanning",
-  "ticketCreatedFrom": "Ticket created from"
+  "resumingScannerSoon": "Resuming scanner soon...",
+  "ticketCreatedFrom": "Ticket created from",
+  "ready": "Ready",
+  "initializingScanner": "Initializing scanner...",
+  "scannerInitError": "Failed to initialize scanner"
 }

@@ -23,8 +23,16 @@ export default function QCScannerMode({ onClose }: QCScannerModeProps) {
   const [detectedCode, setDetectedCode] = useState<string>("");
   const [isProcessing, setIsProcessing] = useState(false);
   const [errorMessage, setErrorMessage] = useState<string>("");
+  const [isPaused, setIsPaused] = useState(false);
   const scannerRef = useRef<Html5Qrcode | null>(null);
   const audioContextRef = useRef<AudioContext | null>(null);
+  const isProcessingRef = useRef(false);
+
+  // Keep a ref to the latest itemCounters to avoid stale closure issues
+  const itemCountersRef = useRef(itemCounters);
+  useEffect(() => {
+    itemCountersRef.current = itemCounters;
+  }, [itemCounters]);
 
   // Track last scanned item ID for highlighting
   const [lastScannedItemId, setLastScannedItemId] = useState<number | null>(
@@ -111,13 +119,8 @@ export default function QCScannerMode({ onClose }: QCScannerModeProps) {
     try {
       const scanner = new Html5Qrcode("qr-reader", {
         formatsToSupport: [
-          Html5QrcodeSupportedFormats.QR_CODE,
           Html5QrcodeSupportedFormats.CODE_128,
           Html5QrcodeSupportedFormats.CODE_39,
-          Html5QrcodeSupportedFormats.EAN_13,
-          Html5QrcodeSupportedFormats.EAN_8,
-          Html5QrcodeSupportedFormats.UPC_A,
-          Html5QrcodeSupportedFormats.UPC_E,
         ],
         verbose: false,
       });
@@ -126,7 +129,7 @@ export default function QCScannerMode({ onClose }: QCScannerModeProps) {
       await scanner.start(
         { facingMode: "environment" },
         {
-          fps: 10,
+          fps: 60,
           qrbox: function (viewfinderWidth) {
             // Static scanning box - 90% width and 200px height
             const boxWidth = Math.floor(viewfinderWidth * 0.9);
@@ -137,8 +140,11 @@ export default function QCScannerMode({ onClose }: QCScannerModeProps) {
           },
         },
         (decodedText) => {
-          // Just update the detected code, don't process it yet
-          setDetectedCode(decodedText);
+          // When code is detected, pause scanner and process immediately
+          if (!isProcessingRef.current) {
+            isProcessingRef.current = true;
+            pauseScannerAndProcess(decodedText);
+          }
         },
         undefined
       );
@@ -168,122 +174,192 @@ export default function QCScannerMode({ onClose }: QCScannerModeProps) {
     }
   };
 
-  // Clean scanned part number using regex
+  const pauseScannerAndProcess = async (code: string) => {
+    try {
+      // Pause the scanner (stop camera)
+      if (scannerRef.current && isScanning) {
+        await scannerRef.current.pause(true);
+        setIsPaused(true);
+      }
+
+      // Set detected code for UI display
+      setDetectedCode(code);
+      setIsProcessing(true);
+      setErrorMessage("");
+
+      // Clean the scanned code using regex
+      const cleanedScannedCode = partNumberScannerRegex(code);
+
+      // Find item by part_number_scan
+      const item = currentQC?.items.find((item) => {
+        const itemPartNumberScan = item.brand_item?.item?.part_number_scan;
+        if (!itemPartNumberScan) return false;
+        return (
+          itemPartNumberScan?.toLowerCase() ===
+          cleanedScannedCode?.toLowerCase()
+        );
+      });
+
+      if (!item) {
+        // Item not found - play error beep and show message
+        playErrorBeep();
+        setIsProcessing(false);
+        setErrorMessage(t("itemNotInThisQC"));
+
+        // Wait 2 seconds then resume scanner
+        setTimeout(async () => {
+          await resumeScanner();
+        }, 2000);
+        return;
+      }
+
+      // Get the latest counter from ref to avoid stale state issues with async Redux updates
+      const latestCounters = itemCountersRef.current;
+      const counter = latestCounters[item.id] || {
+        itemId: item.id,
+        regularQuantity: 0,
+        originalQuantity: item.quantity,
+        status: "not-started" as const,
+        replacementItems: [],
+        delayedItems: [],
+        totalReplacementQuantity: 0,
+        totalDelayedQuantity: 0,
+        totalRequestedQuantity: 0,
+      };
+
+      // Recalculate totals from individual quantities to ensure accuracy
+      const currentTotalRequestedQuantity =
+        counter.regularQuantity +
+        counter.totalReplacementQuantity +
+        counter.totalDelayedQuantity;
+
+      // Check if already reached max quantity
+      if (currentTotalRequestedQuantity >= item.quantity) {
+        playErrorBeep();
+        setIsProcessing(false);
+        setErrorMessage(t("maxQuantityReached"));
+
+        // Wait 2 seconds then resume scanner
+        setTimeout(async () => {
+          await resumeScanner();
+        }, 2000);
+        return;
+      }
+
+      // Double-check if incrementing would exceed max quantity
+      const potentialTotal = currentTotalRequestedQuantity + 1;
+      if (potentialTotal > item.quantity) {
+        playErrorBeep();
+        setIsProcessing(false);
+        setErrorMessage(t("maxQuantityReached"));
+
+        // Wait 2 seconds then resume scanner
+        setTimeout(async () => {
+          await resumeScanner();
+        }, 2000);
+        return;
+      }
+
+      // Item found and can increment - play success sound
+      playSuccessBeep();
+      dispatch(incrementItemCounter(item.id));
+
+      // Highlight the scanned item
+      setLastScannedItemId(item.id);
+      setTimeout(() => setLastScannedItemId(null), 2000);
+
+      // Scroll to the scanned item
+      setTimeout(() => {
+        const itemElement = scannedItemRefs.current[item.id];
+        if (itemElement && itemsListRef.current) {
+          itemElement.scrollIntoView({
+            behavior: "smooth",
+            block: "nearest",
+          });
+        }
+      }, 100);
+
+      // Wait 1 second to show success, then resume scanner
+      setTimeout(async () => {
+        await resumeScanner();
+      }, 1000);
+    } catch (err) {
+      console.error("Error processing scan:", err);
+      await resumeScanner();
+    }
+  };
+
+  const resumeScanner = async () => {
+    try {
+      // Clear state
+      setDetectedCode("");
+      setIsProcessing(false);
+      setErrorMessage("");
+      isProcessingRef.current = false;
+
+      // Resume the scanner (reopen camera)
+      if (scannerRef.current && isPaused) {
+        await scannerRef.current.resume();
+        setIsPaused(false);
+      }
+    } catch (err) {
+      console.error("Error resuming scanner:", err);
+      // If resume fails, try to restart the scanner
+      await startScanner();
+    }
+  };
+
+  // Clean scanned part number using regex (from Dart implementation)
   const partNumberScannerRegex = (partNumber: string) => {
     if (!partNumber) {
       return partNumber;
     }
-    partNumber = partNumber
-      .replace(/^\s+/, "") // Remove leading whitespace
-      .replace(/[-]/g, ""); // Remove hyphens
 
-    // Check if the character count before the period is greater than 4
-    const periodIndex = partNumber.indexOf(".");
-    if (periodIndex > 4) {
-      partNumber = partNumber.replace(
-        /\..*[a-zA-Z0-9&\/\\#,+()@\^$_~%'":*?<>{}]*$/,
-        ""
-      ); // Remove everything after the period
-    }
+    let correct = false;
+    let sku = partNumber.toString().toUpperCase();
 
-    // Remove everything after a space
-    partNumber = partNumber.replace(
-      /\s.*[a-zA-Z0-9&\/\\#,+()@\^$_~%'":*?<>{}]*$/,
-      ""
-    );
+    // Remove hyphens and newlines
+    sku = sku.replace(/[-]+/g, "");
+    sku = sku.replace(/[\n]+/g, "");
 
-    if (partNumber && partNumber.length > 20) {
-      partNumber = partNumber.substring(0, 20);
-    }
+    let counter = 0;
+    while (!correct && counter < 30) {
+      counter += 1;
 
-    return partNumber;
-  };
+      if (sku.length > 6) {
+        // Split by length of 6
+        const firstPart = sku.substring(0, 6);
+        const restPart = sku.substring(6);
 
-  const handleConfirmScan = () => {
-    if (!detectedCode || isProcessing) return;
+        // Clean first part
+        let cleanedFirstPart = firstPart.replace(/\s/g, "");
+        cleanedFirstPart = cleanedFirstPart.replace(
+          /[.&#,+()@\^$_~%":*?<>=!]+/g,
+          ""
+        );
 
-    setIsProcessing(true);
-    setErrorMessage(""); // Clear previous error
+        sku = cleanedFirstPart + restPart;
 
-    // Clean the scanned code before comparison
-    const cleanedScannedCode = partNumberScannerRegex(detectedCode);
+        // Check if first 6 characters don't have special characters
+        const first6 = sku.substring(0, 6);
+        if (!/[&\/\\#,+()@\s\^$\-_~%"\.:*?<>{}\s]+/.test(first6)) {
+          sku = sku
+            .replace(/[.&#,+()@\^$_~%":*?<>=!]+/g, "")
+            .replace(/\s.*[a-zA-Z0-9&\/\\#,+()@\^$_~%'":*?<>{}]*$/g, "")
+            .replace(/\..*[a-zA-Z0-9&\/\\#,+()@\^$_~%'":*?<>{}]*$/g, "");
+          break;
+        }
 
-    // Find item by part_number_scan - compare cleaned scanned code with part_number_scan
-    const item = currentQC?.items.find((item) => {
-      const itemPartNumberScan = item.brand_item?.item?.part_number_scan;
-      if (!itemPartNumberScan) return false;
-
-      return (
-        itemPartNumberScan?.toLowerCase() === cleanedScannedCode?.toLowerCase()
-      );
-    });
-
-    if (!item) {
-      // Item not found in this QC
-      playErrorBeep();
-      setErrorMessage(t("itemNotInThisQC"));
-      setDetectedCode("");
-      setTimeout(() => {
-        setErrorMessage("");
-        setIsProcessing(false);
-      }, 3000);
-      return;
-    }
-
-    // Get current counter for this item
-    const counter = itemCounters[item.id] || {
-      itemId: item.id,
-      regularQuantity: 0,
-      originalQuantity: item.quantity,
-      status: "not-started" as const,
-      replacementItems: [],
-      delayedItems: [],
-      totalReplacementQuantity: 0,
-      totalDelayedQuantity: 0,
-      totalRequestedQuantity: 0,
-    };
-
-    // Check if already reached max quantity
-    if (counter.totalRequestedQuantity >= item.quantity) {
-      playErrorBeep();
-      setErrorMessage(t("maxQuantityReached"));
-      setDetectedCode("");
-      setTimeout(() => {
-        setErrorMessage("");
-        setIsProcessing(false);
-      }, 3000);
-      return;
-    }
-
-    // Item found and can increment - play success sound and increment counter
-    playSuccessBeep();
-    dispatch(incrementItemCounter(item.id));
-
-    // Highlight the scanned item
-    setLastScannedItemId(item.id);
-    setTimeout(() => setLastScannedItemId(null), 2000);
-
-    // Scroll to the scanned item for better UX
-    setTimeout(() => {
-      const itemElement = scannedItemRefs.current[item.id];
-      if (itemElement && itemsListRef.current) {
-        itemElement.scrollIntoView({
-          behavior: "smooth",
-          block: "nearest",
-        });
+        if (!/[.&#,+()@\^$_~%":*?<>=!\s]+/.test(sku)) {
+          correct = true;
+        }
+      } else {
+        sku = sku.replace(/^[&#,+()@\^$_~%":*?<>=!\s]+/g, "");
+        break;
       }
-    }, 100);
+    }
 
-    // Reset scanner state completely for next scan
-    setDetectedCode("");
-    setIsProcessing(false);
-    setErrorMessage("");
-
-    // Restart scanner to clear any cached detection data
-    setTimeout(async () => {
-      await stopScanner();
-      await startScanner();
-    }, 300);
+    return sku.toString();
   };
 
   const handleClose = async () => {
@@ -353,8 +429,8 @@ export default function QCScannerMode({ onClose }: QCScannerModeProps) {
                 </div>
                 <div className="text-right">
                   <div className="text-3xl font-bold text-primary-600">
-                    {Object.values(itemCounters).reduce(
-                      (sum, counter) => sum + counter.totalRequestedQuantity,
+                    {Object.values(itemCountersRef.current).reduce(
+                      (sum, counter) => sum + (counter.regularQuantity + counter.totalReplacementQuantity + counter.totalDelayedQuantity),
                       0
                     )}
                   </div>
@@ -369,9 +445,9 @@ export default function QCScannerMode({ onClose }: QCScannerModeProps) {
                     style={{
                       width: `${Math.min(
                         100,
-                        (Object.values(itemCounters).reduce(
+                        (Object.values(itemCountersRef.current).reduce(
                           (sum, counter) =>
-                            sum + counter.totalRequestedQuantity,
+                            sum + (counter.regularQuantity + counter.totalReplacementQuantity + counter.totalDelayedQuantity),
                           0
                         ) /
                           (currentQC?.items.reduce(
@@ -393,7 +469,7 @@ export default function QCScannerMode({ onClose }: QCScannerModeProps) {
             ) : (
               <div className="space-y-3">
                 {currentQC.items.map((item) => {
-                  const counter = itemCounters[item.id] || {
+                  const counter = itemCountersRef.current[item.id] || {
                     itemId: item.id,
                     regularQuantity: 0,
                     originalQuantity: item.quantity,
@@ -520,31 +596,31 @@ export default function QCScannerMode({ onClose }: QCScannerModeProps) {
             }}
           />
 
-          {/* Detected Code & Scan Button Overlay */}
+          {/* Status Overlay */}
           <div className="absolute bottom-0 left-0 right-0 bg-gradient-to-t from-black/80 to-transparent p-4">
             {errorMessage ? (
-              <div className="text-center mb-4 bg-red-500 text-white p-3 rounded-lg">
-                <p className="text-sm font-bold">{errorMessage}</p>
+              <div className="text-center bg-red-500 text-white p-4 rounded-lg shadow-lg animate-pulse">
+                <div className="text-5xl mb-3">⚠️</div>
+                <p className="text-lg font-bold">{errorMessage}</p>
+                {detectedCode && (
+                  <div className="mt-3 bg-red-600 rounded px-3 py-2">
+                    <p className="text-xs mb-1">{t("detectedCode")}:</p>
+                    <p className="text-base font-mono font-semibold break-all">{detectedCode}</p>
+                  </div>
+                )}
+                <p className="text-sm mt-3">{t("resumingScannerSoon")}</p>
               </div>
-            ) : detectedCode ? (
-              <div className="text-center mb-4">
-                <p className="text-white text-xs mb-1">{t("detectedCode")}:</p>
-                <p className="text-white text-lg font-bold">{detectedCode}</p>
+            ) : isProcessing ? (
+              <div className="text-center bg-blue-500 text-white p-4 rounded-lg">
+                <p className="text-xs mb-2">{t("detectedCode")}:</p>
+                <p className="text-xl font-bold mb-2 font-mono break-all">{detectedCode}</p>
+                <p className="text-sm">{t("processing")}...</p>
               </div>
             ) : (
-              <div className="text-center mb-4">
-                <p className="text-white text-sm">{t("scanQRCode")}</p>
+              <div className="text-center bg-primary-600/80 text-white p-4 rounded-lg">
+                <p className="text-lg font-semibold">{t("scanQRCode")}</p>
               </div>
             )}
-
-            <Button
-              onClick={handleConfirmScan}
-              disabled={!detectedCode || isProcessing || !!errorMessage}
-              className="w-full bg-primary-600 hover:bg-primary-700 text-white disabled:opacity-50 disabled:cursor-not-allowed"
-              size="lg"
-            >
-              {isProcessing ? t("processing") : t("confirmScan")}
-            </Button>
           </div>
         </div>
       </div>
