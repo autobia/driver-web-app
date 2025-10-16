@@ -105,6 +105,19 @@ export default function CompletionModal({
   const { data: drivers, isLoading: driversLoading } = useDrivers();
   const { data: preparers, isLoading: preparersLoading } = usePreparers();
 
+  // Create union of drivers and preparers
+  const allUsers = [
+    ...(drivers || []),
+    ...(preparers || []),
+  ];
+
+  // Remove duplicates based on user ID
+  const uniqueUsers = allUsers.filter(
+    (user, index, self) => index === self.findIndex((u) => u.id === user.id)
+  );
+
+  const isLoadingUsers = driversLoading || preparersLoading;
+
   if (!currentQC) return null;
 
   // Helper to convert file to base64
@@ -757,7 +770,7 @@ export default function CompletionModal({
           )}
 
           {/* Driver and Preparer Selectors for Non-Driver Roles */}
-          {!user?.role?.name_en?.toLowerCase().includes("driver") && (
+          {
             <div className="space-y-4">
               <div className="border-t pt-4">
                 <h3 className="text-sm font-medium text-gray-900 mb-3 flex items-center">
@@ -769,7 +782,7 @@ export default function CompletionModal({
                 <div className="space-y-2 mb-4">
                   <Label
                     htmlFor="driver-select"
-                    className="text-sm font-medium text-gray-700"
+                    className="text-sm font-mexdium text-gray-700"
                   >
                     {t("selectDriver")} <span className="text-red-500">*</span>
                   </Label>
@@ -780,7 +793,7 @@ export default function CompletionModal({
                     <SelectTrigger id="driver-select" className="w-full">
                       <SelectValue
                         placeholder={
-                          driversLoading
+                          isLoadingUsers
                             ? t("loading")
                             : t("selectDriverPlaceholder")
                         }
@@ -790,13 +803,13 @@ export default function CompletionModal({
                       <SelectItem value="0" disabled>
                         {t("selectDriverPlaceholder")}
                       </SelectItem>
-                      {drivers?.map((driver) => (
+                      {uniqueUsers?.map((user) => (
                         <SelectItem
-                          key={driver.id}
-                          value={driver.id.toString()}
+                          key={user.id}
+                          value={user.id.toString()}
                         >
-                          {driver.first_name} {driver.last_name} (
-                          {driver.username})
+                          {user.first_name} {user.last_name} (
+                          {user.username})
                         </SelectItem>
                       ))}
                     </SelectContent>
@@ -828,7 +841,7 @@ export default function CompletionModal({
                       <SelectTrigger id="preparer-select" className="w-full">
                         <SelectValue
                           placeholder={
-                            preparersLoading
+                            isLoadingUsers
                               ? t("loading")
                               : t("selectPreparerPlaceholder")
                           }
@@ -838,13 +851,13 @@ export default function CompletionModal({
                         <SelectItem value="0">
                           {t("noPreparerSelected")}
                         </SelectItem>
-                        {preparers?.map((preparer) => (
+                        {uniqueUsers?.map((user) => (
                           <SelectItem
-                            key={preparer.id}
-                            value={preparer.id.toString()}
+                            key={user.id}
+                            value={user.id.toString()}
                           >
-                            {preparer.first_name} {preparer.last_name} (
-                            {preparer.username})
+                            {user.first_name} {user.last_name} (
+                            {user.username})
                           </SelectItem>
                         ))}
                       </SelectContent>
@@ -856,7 +869,7 @@ export default function CompletionModal({
                 )}
               </div>
             </div>
-          )}
+          }
         </div>
 
         <DialogFooter className="flex-shrink-0 px-6 pb-6 pt-2 flex flex-col space-y-2 sm:flex-row sm:space-y-0 sm:space-x-2">
