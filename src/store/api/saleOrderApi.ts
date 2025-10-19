@@ -145,10 +145,13 @@ export interface SubmitShippingDocumentResponse {
   message?: string;
 }
 
-// Package submission with sale order IDs interfaces
+// Package submission with sale order IDs or QR codes interfaces
 export interface SubmitPackageRequest {
-  sale_order_ids: number[];
+  sale_order_ids?: number[];
 }
+
+// QR code submission - array of strings
+export type SubmitQRCodesRequest = string[];
 
 export interface SubmitPackageResponse {
   status: boolean;
@@ -201,6 +204,18 @@ const saleOrderApi = createApi({
       }),
       invalidatesTags: ["SaleOrders"],
     }),
+
+    submitQRCodes: builder.mutation<
+      SubmitPackageResponse,
+      SubmitQRCodesRequest
+    >({
+      query: (qrCodes) => ({
+        url: "/package-qr-submit/",
+        method: "POST",
+        data: qrCodes,
+      }),
+      invalidatesTags: ["SaleOrders"],
+    }),
   }),
 });
 
@@ -209,6 +224,7 @@ export const {
   useUploadFileMutation,
   useSubmitShippingDocumentMutation,
   useSubmitPackageMutation,
+  useSubmitQRCodesMutation,
 } = saleOrderApi;
 
 export default saleOrderApi;
