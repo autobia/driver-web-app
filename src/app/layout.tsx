@@ -35,8 +35,12 @@ export const metadata: Metadata = {
     description:
       "Professional driver management and delivery tracking application",
   },
-  viewport: "width=device-width, initial-scale=1",
   robots: "index, follow",
+};
+
+export const viewport = {
+  width: "device-width",
+  initialScale: 1,
 };
 
 export default async function RootLayout({
