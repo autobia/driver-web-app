@@ -29,6 +29,7 @@ export default function PackageScannerMode({
   const [isScanning, setIsScanning] = useState(false);
   const [isProcessing, setIsProcessing] = useState(false);
   const [scannedPackages, setScannedPackages] = useState<ScannedPackage[]>(initialPackages);
+  const [showCancelModal, setShowCancelModal] = useState(false);
 
   const scannerRef = useRef<Html5Qrcode | null>(null);
   const audioContextRef = useRef<AudioContext | null>(null);
@@ -206,7 +207,11 @@ export default function PackageScannerMode({
     onComplete(scannedPackages);
   };
 
-  const handleClose = async () => {
+  const handleCancelClick = () => {
+    setShowCancelModal(true);
+  };
+
+  const handleCancelConfirm = async () => {
     // Stop and cleanup scanner
     await stopScanner();
 
@@ -225,6 +230,10 @@ export default function PackageScannerMode({
 
     // Navigate back to orders delivery page
     router.push("/orders-delivery");
+  };
+
+  const handleCancelClose = () => {
+    setShowCancelModal(false);
   };
 
   return (
@@ -253,7 +262,7 @@ export default function PackageScannerMode({
               </h1>
             </div>
             <Button
-              onClick={handleClose}
+              onClick={handleCancelClick}
               variant="outline"
               size="lg"
               className="bg-white/20 text-white border-white/30 hover:bg-white/30 px-8 py-3 text-lg font-bold"
@@ -313,6 +322,35 @@ export default function PackageScannerMode({
           </Button>
         </div>
       </div>
+
+      {/* Cancel Confirmation Modal */}
+      {showCancelModal && (
+        <div className="fixed inset-0 z-[60] bg-black/50 flex items-center justify-center p-4">
+          <div className="bg-white rounded-xl shadow-2xl max-w-md w-full p-6">
+            <h3 className="text-xl font-bold text-gray-900 mb-3">
+              {t("confirmCancelOperation")}
+            </h3>
+            <p className="text-gray-600 mb-6">
+              {t("confirmCancelOperationMessage")}
+            </p>
+            <div className="flex gap-3">
+              <Button
+                onClick={handleCancelClose}
+                variant="outline"
+                className="flex-1"
+              >
+                {t("goBack")}
+              </Button>
+              <Button
+                onClick={handleCancelConfirm}
+                className="flex-1 bg-red-600 hover:bg-red-700 text-white"
+              >
+                {t("confirmCancel")}
+              </Button>
+            </div>
+          </div>
+        </div>
+      )}
     </div>
   );
 }
