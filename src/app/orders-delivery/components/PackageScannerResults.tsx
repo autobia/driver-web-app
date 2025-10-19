@@ -6,27 +6,25 @@ import { Button } from "../../../components/ui/button";
 import { Package, CheckCircle } from "lucide-react";
 import { useSubmitQRCodesMutation } from "../../../store/api/saleOrderApi";
 import { useToast } from "../../../hooks/useToast";
-import { useRouter } from "next/navigation";
 
 interface ScannedPackage {
-  fullCode: string;
-  displayCode: string;
-  orderId: string;
-  boxId: string;
+  fullCode: string; // Full QR code sent to backend
+  boxId: string;    // Box ID for display
 }
 
 interface PackageScannerResultsProps {
   scannedPackages: ScannedPackage[];
   onBack: () => void;
+  onCancel: () => void;
 }
 
 export default function PackageScannerResults({
   scannedPackages,
   onBack,
+  onCancel,
 }: PackageScannerResultsProps) {
   const t = useTranslations();
   const toast = useToast();
-  const router = useRouter();
   const [submitQRCodes, { isLoading: isSubmitting }] = useSubmitQRCodesMutation();
   const [isSuccess, setIsSuccess] = useState(false);
   const [showCancelModal, setShowCancelModal] = useState(false);
@@ -47,10 +45,9 @@ export default function PackageScannerResults({
           t("packagesSubmittedSuccessfully")
         );
 
-        // Wait 2 seconds then navigate back to orders delivery
+        // Wait 2 seconds then call onCancel to reset state
         setTimeout(() => {
-          router.push("/orders-delivery");
-          router.refresh();
+          onCancel();
         }, 2000);
       } else {
         toast.error(
@@ -78,7 +75,7 @@ export default function PackageScannerResults({
   };
 
   const handleCancelConfirm = () => {
-    router.push("/orders-delivery");
+    onCancel();
   };
 
   const handleCancelClose = () => {

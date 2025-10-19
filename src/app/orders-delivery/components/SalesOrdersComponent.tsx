@@ -33,7 +33,7 @@ export default function SalesOrdersComponent() {
   const [showScanner, setShowScanner] = useState(false);
   const [showResults, setShowResults] = useState(false);
   const [scannedPackages, setScannedPackages] = useState<
-    { fullCode: string; displayCode: string; orderId: string; boxId: string }[]
+    { fullCode: string; boxId: string }[]
   >([]);
 
   const handleUploadDocuments = (orderId: number) => {
@@ -103,13 +103,13 @@ export default function SalesOrdersComponent() {
 
   const handleCloseScanner = () => {
     setShowScanner(false);
+    setShowResults(false); // Reset results view
+    setScannedPackages([]); // Reset scanned packages on cancel
   };
 
   const handleScannerComplete = (
     packages: {
       fullCode: string;
-      displayCode: string;
-      orderId: string;
       boxId: string;
     }[]
   ) => {
@@ -187,6 +187,7 @@ export default function SalesOrdersComponent() {
       <PackageScannerResults
         scannedPackages={scannedPackages}
         onBack={handleBackToScanner}
+        onCancel={handleCloseScanner}
       />
     );
   }

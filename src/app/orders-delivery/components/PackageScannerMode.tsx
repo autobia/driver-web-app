@@ -2,15 +2,14 @@
 
 import { useEffect, useRef, useState } from "react";
 import { useTranslations } from "next-intl";
+import { useRouter } from "next/navigation";
 import { Html5Qrcode, Html5QrcodeSupportedFormats } from "html5-qrcode";
 import { Button } from "../../../components/ui/button";
 import { Camera, Package } from "lucide-react";
 
 interface ScannedPackage {
-  fullCode: string;
-  displayCode: string;
-  orderId: string;
-  boxId: string;
+  fullCode: string; // Full QR code sent to backend
+  boxId: string;    // Box ID for display
 }
 
 interface PackageScannerModeProps {
@@ -25,17 +24,16 @@ export default function PackageScannerMode({
   initialPackages = [],
 }: PackageScannerModeProps) {
   const t = useTranslations();
+  const router = useRouter();
 
   const [isScanning, setIsScanning] = useState(false);
-  const [detectedCode, setDetectedCode] = useState<string>("");
-  const [displayCode, setDisplayCode] = useState<string>("");
   const [isProcessing, setIsProcessing] = useState(false);
-  const [scannedPackages, setScannedPackages] =
-    useState<ScannedPackage[]>(initialPackages);
+  const [scannedPackages, setScannedPackages] = useState<ScannedPackage[]>(initialPackages);
 
   const scannerRef = useRef<Html5Qrcode | null>(null);
   const audioContextRef = useRef<AudioContext | null>(null);
   const isProcessingRef = useRef(false);
+  const scannedCodesRef = useRef<Set<string>>(new Set(initialPackages.map(pkg => pkg.boxId)));
 
   useEffect(() => {
     // Initialize audio context
@@ -61,8 +59,6 @@ export default function PackageScannerMode({
       }
 
       // Clear state
-      setDetectedCode("");
-      setDisplayCode("");
       setIsProcessing(false);
     };
     // eslint-disable-next-line react-hooks/exhaustive-deps
@@ -146,43 +142,33 @@ export default function PackageScannerMode({
     }
   };
 
-  // Extract order ID and box ID from QR code format: package-box-90936-a917a423-4fc3-4c46-943e-253979392ee8
+  // Extract box ID from QR code format: package-box-90936-a917a423-4fc3-4c46-943e-253979392ee8
   // Box ID is the part after "box-", which is "90936"
-  const extractPackageInfo = (
-    qrCode: string
-  ): { orderId: string; boxId: string; displayCode: string } => {
+  const extractBoxId = (qrCode: string): string => {
     const parts = qrCode.split("-");
     if (parts.length >= 3 && parts[0] === "package" && parts[1] === "box") {
-      const boxId = parts[2]; // e.g., "90936" (the part after "box-")
-      const orderId = parts[2]; // Same as boxId for now
-      return { orderId, boxId, displayCode: boxId };
+      return parts[2]; // e.g., "90936"
     }
-    return { orderId: qrCode, boxId: qrCode, displayCode: qrCode }; // Return full code if format doesn't match
+    return qrCode; // Return full code if format doesn't match
   };
 
   const pauseScannerAndProcess = async (code: string) => {
     try {
-      // Extract package info (order ID and box ID)
-      const {
-        orderId,
-        boxId,
-        displayCode: orderIdDisplay,
-      } = extractPackageInfo(code);
+      // Extract box ID from QR code
+      const boxId = extractBoxId(code);
 
-      // Set codes for UI display
-      setDetectedCode(code);
-      setDisplayCode(orderIdDisplay);
-      setIsProcessing(true);
-
-      // Check if package already scanned (ignore duplicate scans by full code)
-      if (scannedPackages.some((pkg) => pkg.fullCode === code)) {
+      // Check if package already scanned using ref (prevents race conditions)
+      if (scannedCodesRef.current.has(boxId)) {
         // Silently ignore duplicate - no sound, no error
-        setIsProcessing(false);
-        setDetectedCode("");
-        setDisplayCode("");
         isProcessingRef.current = false;
         return;
       }
+
+      // Add to ref immediately to prevent duplicates during rapid scans
+      scannedCodesRef.current.add(boxId);
+
+      // Set processing state
+      setIsProcessing(true);
 
       // New package - play success sound and add to list
       playSuccessBeep();
@@ -190,8 +176,6 @@ export default function PackageScannerMode({
         ...prev,
         {
           fullCode: code,
-          displayCode: orderIdDisplay,
-          orderId,
           boxId,
         },
       ]);
@@ -199,15 +183,11 @@ export default function PackageScannerMode({
       // Wait 1.5 seconds to show success message, then clear and continue scanning
       setTimeout(() => {
         setIsProcessing(false);
-        setDetectedCode("");
-        setDisplayCode("");
         isProcessingRef.current = false;
       }, 1500);
     } catch (err) {
       console.error("Error processing scan:", err);
       setIsProcessing(false);
-      setDetectedCode("");
-      setDisplayCode("");
       isProcessingRef.current = false;
     }
   };
@@ -237,12 +217,14 @@ export default function PackageScannerMode({
     }
 
     // Reset all state
-    setDetectedCode("");
-    setDisplayCode("");
     setIsProcessing(false);
+    scannedCodesRef.current.clear();
 
     // Call parent close handler
     onClose();
+
+    // Navigate back to orders delivery page
+    router.push("/orders-delivery");
   };
 
   return (
@@ -282,7 +264,7 @@ export default function PackageScannerMode({
         </div>
 
         {/* Success Message Overlay - Center */}
-        {isProcessing && detectedCode && (
+        {isProcessing && (
           <div className="absolute top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2 z-10 max-w-[90%]">
             <div className="text-center bg-green-500 text-white p-8 rounded-2xl shadow-2xl animate-scale-in">
               <div className="text-7xl mb-4">✓</div>
