@@ -347,5 +347,6 @@
   "cancelOperation": "Cancel Operation",
   "confirmCancelOperation": "Confirm Cancel Operation",
   "confirmCancelOperationMessage": "Are you sure you want to cancel the operation? All scanned packages will be lost.",
-  "confirmCancel": "Confirm Cancel"
+  "confirmCancel": "Confirm Cancel",
+  "profile": "Profile"
 }

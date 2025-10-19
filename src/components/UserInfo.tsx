@@ -15,14 +15,14 @@ export default function UserInfo({ user }: UserInfoProps) {
 
   return (
     <motion.div
-      className="p-3"
+      className="hidden lg:block p-3"
       initial={{ opacity: 0, y: -20 }}
       animate={{ opacity: 1, y: 0 }}
       transition={{ duration: 0.6, ease: "easeOut" }}
     >
       <div className="max-w-7xl mx-auto">
         <motion.div
-          className="bg-gradient-to-br  rounded-lg border border-primary-50 p-3 shadow-sm backdrop-blur-sm"
+          className="bg-gradient-to-br rounded-lg border border-primary-50 p-3 shadow-sm backdrop-blur-sm"
           whileHover={{
             boxShadow:
               "0 6px 20px -5px rgba(0, 0, 0, 0.1), 0 3px 8px -6px rgba(0, 0, 0, 0.1)",
