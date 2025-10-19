@@ -9,6 +9,7 @@ import { useGetQualityChecksQuery } from "../../store/api/qualityChecksApi";
 import LogoutButton from "./LogoutButton";
 import LanguageSwitcher from "./LanguageSwitcher";
 import { useGetUnShippedOrdersQuery } from "@/store/api/saleOrderApi";
+import { UserCircle } from "lucide-react";
 
 export default function Navbar() {
   const t = useTranslations();
@@ -207,7 +208,21 @@ export default function Navbar() {
             }`}
           >
             <LanguageSwitcher />
-            {isAuthenticated && <LogoutButton />}
+            {isAuthenticated && (
+              <>
+                {/* Desktop: Show Logout Button */}
+                <div className="hidden lg:block">
+                  <LogoutButton />
+                </div>
+                {/* Mobile: Show Profile Icon */}
+                <button
+                  onClick={() => router.push("/profile")}
+                  className="lg:hidden flex items-center justify-center w-10 h-10 rounded-full bg-gradient-to-br from-primary-500 to-primary-600 shadow-md hover:scale-110 transition-transform"
+                >
+                  <UserCircle className="w-6 h-6 text-white" />
+                </button>
+              </>
+            )}
           </div>
         </div>
       </div>

@@ -4,12 +4,14 @@ import { useTranslations } from "next-intl";
 import { useState } from "react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
-import { Upload, FileText, Search, Package } from "lucide-react";
+import { Upload, FileText, Search, Package, Camera } from "lucide-react";
 import {
   useGetUnShippedOrdersQuery,
   useSubmitPackageMutation,
 } from "@/store/api/saleOrderApi";
 import UploadDocumentsModal from "./UploadDocumentsModal";
+import PackageScannerMode from "./PackageScannerMode";
+import PackageScannerResults from "./PackageScannerResults";
 import { useToast } from "@/hooks/useToast";
 
 export default function SalesOrdersComponent() {
@@ -26,6 +28,13 @@ export default function SalesOrdersComponent() {
 
   // Package submission state
   const [packageOrderId, setPackageOrderId] = useState("");
+
+  // Scanner state
+  const [showScanner, setShowScanner] = useState(false);
+  const [showResults, setShowResults] = useState(false);
+  const [scannedPackages, setScannedPackages] = useState<
+    { fullCode: string; boxId: string }[]
+  >([]);
 
   const handleUploadDocuments = (orderId: number) => {
     setSelectedOrderId(orderId);
@@ -88,6 +97,32 @@ export default function SalesOrdersComponent() {
     }
   };
 
+  const handleOpenScanner = () => {
+    setShowScanner(true);
+  };
+
+  const handleCloseScanner = () => {
+    setShowScanner(false);
+    setShowResults(false); // Reset results view
+    setScannedPackages([]); // Reset scanned packages on cancel
+  };
+
+  const handleScannerComplete = (
+    packages: {
+      fullCode: string;
+      boxId: string;
+    }[]
+  ) => {
+    setScannedPackages(packages);
+    setShowScanner(false);
+    setShowResults(true);
+  };
+
+  const handleBackToScanner = () => {
+    setShowResults(false);
+    setShowScanner(true);
+  };
+
   const formatDate = (dateString: string) => {
     return new Date(dateString).toLocaleDateString();
   };
@@ -113,7 +148,7 @@ export default function SalesOrdersComponent() {
     return (
       <div className="space-y-4">
         <h2 className="text-xl font-semibold text-gray-900">
-          {t("ordersDelivery") || "Orders Delivery"}
+          {t("ordersDelivery")}
         </h2>
         <div className="flex justify-center items-center h-64">
           <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-primary-500" />
@@ -126,12 +161,34 @@ export default function SalesOrdersComponent() {
     return (
       <div className="space-y-4">
         <h2 className="text-xl font-semibold text-gray-900">
-          {t("ordersDelivery") || "Orders Delivery"}
+          {t("ordersDelivery")}
         </h2>
         <div className="text-sm text-red-600 bg-red-50 p-4 rounded-lg">
-          {t("failedToLoadSalesOrders") || "Failed to load sales orders"}
+          {t("failedToLoadSalesOrders")}
         </div>
       </div>
+    );
+  }
+
+  // Show scanner mode
+  if (showScanner) {
+    return (
+      <PackageScannerMode
+        onComplete={handleScannerComplete}
+        onClose={handleCloseScanner}
+        initialPackages={scannedPackages}
+      />
+    );
+  }
+
+  // Show results page
+  if (showResults) {
+    return (
+      <PackageScannerResults
+        scannedPackages={scannedPackages}
+        onBack={handleBackToScanner}
+        onCancel={handleCloseScanner}
+      />
     );
   }
 
@@ -139,8 +196,28 @@ export default function SalesOrdersComponent() {
     <div className="space-y-4">
       <div className="flex flex-row items-center justify-between">
         <h2 className="text-xl font-semibold text-gray-900">
-          {t("ordersDelivery") || "Orders Delivery"}
+          {t("ordersDelivery")}
         </h2>
+      </div>
+
+      {/* Scanner Mode Button */}
+      <div className="bg-green-50 border border-green-200 rounded-lg p-4">
+        <div className="flex items-center space-x-2 mb-2">
+          <Camera className="h-5 w-5 text-green-600" />
+          <h3 className="text-sm font-medium text-green-800">
+            {t("scanPackages")}
+          </h3>
+        </div>
+        <Button
+          onClick={handleOpenScanner}
+          className="w-full bg-green-600 hover:bg-green-700 text-white"
+        >
+          <Camera className="h-4 w-4 mr-2" />
+          {t("openScanner")}
+        </Button>
+        <p className="text-xs text-green-600 mt-2">
+          {t("scanPackagesDescription")}
+        </p>
       </div>
 
       {/* Package Submission Search */}
@@ -148,13 +225,13 @@ export default function SalesOrdersComponent() {
         <div className="flex items-center space-x-2 mb-2">
           <Package className="h-5 w-5 text-blue-600" />
           <h3 className="text-sm font-medium text-blue-800">
-            {t("submitPackagesByOrderId") || "Submit Packages by Order ID"}
+            {t("submitPackagesByOrderId")}
           </h3>
         </div>
         <div className="flex space-x-2">
           <Input
             type="number"
-            placeholder={t("enterOrderId") || "Enter Order ID"}
+            placeholder={t("enterOrderId")}
             value={packageOrderId}
             onChange={(e) => setPackageOrderId(e.target.value)}
             onKeyDown={handleKeyDown}
@@ -169,19 +246,18 @@ export default function SalesOrdersComponent() {
             {isSubmittingPackage ? (
               <div className="flex items-center space-x-2">
                 <div className="animate-spin rounded-full h-4 w-4 border-b-2 border-white" />
-                <span>{t("submitting") || "Submitting..."}</span>
+                <span>{t("submitting")}</span>
               </div>
             ) : (
               <>
                 <Search className="h-4 w-4 mr-2" />
-                {t("submit") || "Submit"}
+                {t("submit")}
               </>
             )}
           </Button>
         </div>
         <p className="text-xs text-blue-600 mt-2">
-          {t("submitPackagesByOrderIdDescription") ||
-            "Enter an order ID to submit packages for delivery"}
+          {t("submitPackagesByOrderIdDescription")}
         </p>
       </div>
 
@@ -192,10 +268,10 @@ export default function SalesOrdersComponent() {
             <FileText className="h-12 w-12 mx-auto" />
           </div>
           <p className="text-gray-600 text-lg font-medium mb-1">
-            {t("noSalesOrders") || "No Sales Orders"}
+            {t("noSalesOrders")}
           </p>
           <p className="text-gray-500 text-sm">
-            {t("noSalesOrdersDescription") || "No unshipped sales orders found"}
+            {t("noSalesOrdersDescription")}
           </p>
         </div>
       ) : (
@@ -215,7 +291,7 @@ export default function SalesOrdersComponent() {
                   </h3>
                   {order.public_order_id && (
                     <p className="text-sm text-primary-100 mt-1">
-                      Public ID: {order.public_order_id}
+                      {t("publicId")}: {order.public_order_id}
                     </p>
                   )}
                 </div>
@@ -231,7 +307,7 @@ export default function SalesOrdersComponent() {
                     ></div>
                     <div className="flex-1 min-w-0">
                       <p className="text-xs text-gray-500 uppercase tracking-wide">
-                        {t("status") || "Status"}
+                        {t("status")}
                       </p>
                       <p className="text-sm font-medium text-gray-900 capitalize">
                         {order.status}
@@ -245,7 +321,7 @@ export default function SalesOrdersComponent() {
                       <div className="w-2 h-2 bg-blue-500 rounded-full flex-shrink-0 mr-2 rtl:mr-0 rtl:ml-2"></div>
                       <div className="flex-1 min-w-0">
                         <p className="text-xs text-gray-500 uppercase tracking-wide">
-                          {t("createdAt") || "Created At"}
+                          {t("createdAt")}
                         </p>
                         <p className="text-sm text-gray-700">
                           {formatDate(order.created_at)}
@@ -264,7 +340,7 @@ export default function SalesOrdersComponent() {
                     className="w-full"
                   >
                     <Upload className="h-4 w-4 mr-2" />
-                    {t("uploadDocuments") || "Upload Documents"}
+                    {t("uploadDocuments")}
                   </Button>
                 </div>
               </div>
