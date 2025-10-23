@@ -83,17 +83,17 @@ export default function QCItemCard({ item }: QCItemCardProps) {
 
   return (
     <div
-      className={`rounded-lg border-2 p-4 transition-all duration-200 ${getStatusColor()}`}
+      className={`w-full max-w-full overflow-hidden rounded-lg border-2 p-4 transition-all duration-200 ${getStatusColor()}`}
     >
       {/* Header */}
       <div className="flex items-start justify-between mb-3">
-        <div className="flex items-center space-x-2">
+        <div className="flex items-center space-x-2 flex-1 min-w-0">
           {getStatusIcon()}
-          <div>
+          <div className="w-full max-w-full">
             <h3 className="font-bold text-gray-900 text-lg">
               {item.brand_item?.item?.part_number || "N/A"}
             </h3>
-            <p className="text-sm text-gray-600 mt-1">
+            <p className="text-sm text-gray-600 mt-1 break-words">
               {item.brand_item?.brand?.name_en || "N/A"} -{" "}
               {item.brand_item?.item?.description || "N/A"}
             </p>
