@@ -90,7 +90,7 @@ export default function UploadDocumentsModal({
   };
 
   const handleConfirmUpload = async () => {
-    if (!orderId || !shippingPolicyFile || !receiptFile) {
+    if (!orderId || !shippingPolicyFile) {
       toast.error(t("error"), t("pleaseCompleteAllFields"));
       return;
     }
@@ -101,10 +101,7 @@ export default function UploadDocumentsModal({
       // Show initial upload message
       toast.info(t("uploadDocuments"), t("uploadingDocuments"));
 
-      console.log("Starting 4 API calls for order:", orderId);
-
       // === SHIPPING POLICY FILE (2 API CALLS) ===
-      console.log("1/4: Uploading shipping policy file to storage...");
       const base64PolicyFile = await fileToBase64(shippingPolicyFile);
 
       const policyFileUploadResponse = await uploadFile({
@@ -114,7 +111,6 @@ export default function UploadDocumentsModal({
         base64_file: base64PolicyFile,
       }).unwrap();
 
-      console.log("2/4: Submitting shipping policy document...");
       await submitShippingDocument({
         content_type: 75,
         object_id: orderId!,
@@ -126,35 +122,32 @@ export default function UploadDocumentsModal({
         loading_fee: parseFloat(loadingFee),
       }).unwrap();
 
-      // === RECEIPT FILE (2 API CALLS) ===
-      console.log("3/4: Uploading receipt file to storage...");
-      const base64ReceiptFile = await fileToBase64(receiptFile);
+      // === RECEIPT FILE (2 API CALLS) - OPTIONAL ===
+      if (receiptFile) {
+        const base64ReceiptFile = await fileToBase64(receiptFile);
 
-      const receiptFileUploadResponse = await uploadFile({
-        content_type: 75, // Sale order content type
-        object_id: orderId!,
-        type: 1, // Image type
-        base64_file: base64ReceiptFile,
-      }).unwrap();
+        const receiptFileUploadResponse = await uploadFile({
+          content_type: 75, // Sale order content type
+          object_id: orderId!,
+          type: 1, // Image type
+          base64_file: base64ReceiptFile,
+        }).unwrap();
 
-      console.log("4/4: Submitting receipt document...");
-      await submitShippingDocument({
-        content_type: 75,
-        object_id: orderId!,
-        url: receiptFileUploadResponse.file,
-        type: "ShippingReceipt",
-        shipping_company_id: parseInt(selectedShippingCompany),
-        shipping_price: parseFloat(shippingPrice),
-        is_vat_included: includeVat,
-        loading_fee: parseFloat(loadingFee),
-      }).unwrap();
+        await submitShippingDocument({
+          content_type: 75,
+          object_id: orderId!,
+          url: receiptFileUploadResponse.file,
+          type: "ShippingReceipt",
+          shipping_company_id: parseInt(selectedShippingCompany),
+          shipping_price: parseFloat(shippingPrice),
+          is_vat_included: includeVat,
+          loading_fee: parseFloat(loadingFee),
+        }).unwrap();
+      }
 
-      // All 4 API calls completed successfully
-      console.log("All 4 API calls completed successfully");
       toast.success(t("uploadDocuments"), t("documentsUploadedSuccessfully"));
       handleClose();
     } catch (error) {
-      console.error("Upload error:", error);
       const errorMessage =
         error &&
         typeof error === "object" &&
@@ -175,7 +168,6 @@ export default function UploadDocumentsModal({
     selectedShippingCompany &&
     shippingPrice &&
     shippingPolicyFile &&
-    receiptFile &&
     ordersScanned &&
     !isSubmitting;
   return (
@@ -356,7 +348,7 @@ export default function UploadDocumentsModal({
             {/* Receipt Upload */}
             <div className="space-y-2">
               <Label className="text-xs sm:text-sm font-medium">
-                {t("receipt")} *
+                {t("receipt")}
               </Label>
               <div className="border-2 border-dashed border-gray-300 rounded-lg p-3 sm:p-4 text-center hover:border-gray-400 transition-colors">
                 <input
