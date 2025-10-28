@@ -348,5 +348,6 @@
   "confirmCancelOperation": "تأكيد إلغاء العملية",
   "confirmCancelOperationMessage": "هل أنت متأكد من أنك تريد إلغاء العملية؟ سيتم فقدان جميع الطرود الممسوحة.",
   "confirmCancel": "تأكيد الإلغاء",
-  "profile": "الملف الشخصي"
+  "profile": "الملف الشخصي",
+  "searchByPartNumber": "البحث برقم القطعة"
 }
