@@ -135,7 +135,7 @@ export default function QCScannerMode({ onClose }: QCScannerModeProps) {
             const boxWidth = Math.floor(viewfinderWidth * 0.9);
             return {
               width: boxWidth,
-              height: 200,
+              height: 300,
             };
           },
         },
@@ -430,7 +430,11 @@ export default function QCScannerMode({ onClose }: QCScannerModeProps) {
                 <div className="text-right">
                   <div className="text-3xl font-bold text-primary-600">
                     {Object.values(itemCountersRef.current).reduce(
-                      (sum, counter) => sum + (counter.regularQuantity + counter.totalReplacementQuantity + counter.totalDelayedQuantity),
+                      (sum, counter) =>
+                        sum +
+                        (counter.regularQuantity +
+                          counter.totalReplacementQuantity +
+                          counter.totalDelayedQuantity),
                       0
                     )}
                   </div>
@@ -447,7 +451,10 @@ export default function QCScannerMode({ onClose }: QCScannerModeProps) {
                         100,
                         (Object.values(itemCountersRef.current).reduce(
                           (sum, counter) =>
-                            sum + (counter.regularQuantity + counter.totalReplacementQuantity + counter.totalDelayedQuantity),
+                            sum +
+                            (counter.regularQuantity +
+                              counter.totalReplacementQuantity +
+                              counter.totalDelayedQuantity),
                           0
                         ) /
                           (currentQC?.items.reduce(
@@ -605,7 +612,9 @@ export default function QCScannerMode({ onClose }: QCScannerModeProps) {
                 {detectedCode && (
                   <div className="mt-3 bg-red-600 rounded px-3 py-2">
                     <p className="text-xs mb-1">{t("detectedCode")}:</p>
-                    <p className="text-base font-mono font-semibold break-all">{detectedCode}</p>
+                    <p className="text-base font-mono font-semibold break-all">
+                      {detectedCode}
+                    </p>
                   </div>
                 )}
                 <p className="text-sm mt-3">{t("resumingScannerSoon")}</p>
@@ -613,7 +622,9 @@ export default function QCScannerMode({ onClose }: QCScannerModeProps) {
             ) : isProcessing ? (
               <div className="text-center bg-blue-500 text-white p-4 rounded-lg">
                 <p className="text-xs mb-2">{t("detectedCode")}:</p>
-                <p className="text-xl font-bold mb-2 font-mono break-all">{detectedCode}</p>
+                <p className="text-xl font-bold mb-2 font-mono break-all">
+                  {detectedCode}
+                </p>
                 <p className="text-sm">{t("processing")}...</p>
               </div>
             ) : (
