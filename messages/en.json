@@ -349,5 +349,9 @@
   "confirmCancelOperationMessage": "Are you sure you want to cancel the operation? All scanned packages will be lost.",
   "confirmCancel": "Confirm Cancel",
   "profile": "Profile",
-  "searchByPartNumber": "Search by Part Number"
+  "searchByPartNumber": "Search by Part Number",
+  "bulkScanAll": "Bulk Scan All",
+  "scanOne": "Scan One",
+  "autoScanOneIn3Sec": "Auto-scan 1 item in 3 seconds...",
+  "scanAll": "Scan All"
 }
