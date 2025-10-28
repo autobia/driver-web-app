@@ -19,9 +19,28 @@ import DelayedItemModal from "./DelayedItemModal";
 
 interface QCItemCardProps {
   item: QualityCheckItem;
+  searchQuery?: string;
 }
 
-export default function QCItemCard({ item }: QCItemCardProps) {
+// Utility function to highlight matching text
+function highlightText(text: string, query: string) {
+  if (!query.trim()) {
+    return text;
+  }
+
+  const parts = text.split(new RegExp(`(${query})`, "gi"));
+  return parts.map((part, index) =>
+    part.toLowerCase() === query.toLowerCase() ? (
+      <mark key={index} className="bg-yellow-300 text-gray-900 px-0.5">
+        {part}
+      </mark>
+    ) : (
+      part
+    )
+  );
+}
+
+export default function QCItemCard({ item, searchQuery = "" }: QCItemCardProps) {
   const t = useTranslations();
   const dispatch = useDispatch();
 
@@ -91,7 +110,12 @@ export default function QCItemCard({ item }: QCItemCardProps) {
           {getStatusIcon()}
           <div className="w-full max-w-full">
             <h3 className="font-bold text-gray-900 text-lg">
-              {item.brand_item?.item?.part_number || "N/A"}
+              {searchQuery
+                ? highlightText(
+                    item.brand_item?.item?.part_number || "N/A",
+                    searchQuery
+                  )
+                : item.brand_item?.item?.part_number || "N/A"}
             </h3>
             <p className="text-sm text-gray-600 mt-1 break-words">
               {item.brand_item?.brand?.name_en || "N/A"} -{" "}
