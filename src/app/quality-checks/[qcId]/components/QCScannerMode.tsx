@@ -2,12 +2,13 @@
 
 import { useEffect, useRef, useState } from "react";
 import { useSelector, useDispatch } from "react-redux";
-import { useTranslations } from "next-intl";
+import { useTranslations, useLocale } from "next-intl";
 import { Html5Qrcode, Html5QrcodeSupportedFormats } from "html5-qrcode";
 import { RootState } from "../../../../store/store";
-import { incrementItemCounter } from "../../../../store/slices/qcSlice";
+import { incrementItemCounter, bulkScanItem } from "../../../../store/slices/qcSlice";
 import { Button } from "../../../../components/ui/button";
-import { Camera, Package } from "lucide-react";
+import { Camera, Package, ScanLine } from "lucide-react";
+import { QualityCheckItem } from "../../../../store/api/qualityChecksApi";
 
 interface QCScannerModeProps {
   onClose: () => void;
@@ -15,6 +16,7 @@ interface QCScannerModeProps {
 
 export default function QCScannerMode({ onClose }: QCScannerModeProps) {
   const t = useTranslations();
+  const locale = useLocale();
   const dispatch = useDispatch();
   const { currentQC } = useSelector((state: RootState) => state.qc);
   const itemCounters = useSelector((state: RootState) => state.qc.itemCounters);
@@ -24,9 +26,12 @@ export default function QCScannerMode({ onClose }: QCScannerModeProps) {
   const [isProcessing, setIsProcessing] = useState(false);
   const [errorMessage, setErrorMessage] = useState<string>("");
   const [isPaused, setIsPaused] = useState(false);
+  const [showScanOptions, setShowScanOptions] = useState(false);
+  const [scannedItem, setScannedItem] = useState<QualityCheckItem | null>(null);
   const scannerRef = useRef<Html5Qrcode | null>(null);
   const audioContextRef = useRef<AudioContext | null>(null);
   const isProcessingRef = useRef(false);
+  const autoResumeTimerRef = useRef<NodeJS.Timeout | null>(null);
 
   // Keep a ref to the latest itemCounters to avoid stale closure issues
   const itemCountersRef = useRef(itemCounters);
@@ -260,29 +265,63 @@ export default function QCScannerMode({ onClose }: QCScannerModeProps) {
         return;
       }
 
+      // Calculate remaining quantity
+      const remainingQuantity = item.quantity - currentTotalRequestedQuantity;
+
       // Item found and can increment - play success sound
       playSuccessBeep();
-      dispatch(incrementItemCounter(item.id));
+      setScannedItem(item);
 
-      // Highlight the scanned item
-      setLastScannedItemId(item.id);
-      setTimeout(() => setLastScannedItemId(null), 2000);
+      // Show scan options if remaining quantity is more than 1
+      if (remainingQuantity > 1) {
+        setShowScanOptions(true);
+        setIsProcessing(false);
 
-      // Scroll to the scanned item
-      setTimeout(() => {
-        const itemElement = scannedItemRefs.current[item.id];
-        if (itemElement && itemsListRef.current) {
-          itemElement.scrollIntoView({
-            behavior: "smooth",
-            block: "nearest",
-          });
-        }
-      }, 100);
+        // Auto-resume after 3 seconds if no action taken
+        autoResumeTimerRef.current = setTimeout(async () => {
+          // Default action: scan one
+          dispatch(incrementItemCounter(item.id));
 
-      // Wait 1 second to show success, then resume scanner
-      setTimeout(async () => {
-        await resumeScanner();
-      }, 1000);
+          // Highlight and scroll
+          setLastScannedItemId(item.id);
+          setTimeout(() => setLastScannedItemId(null), 2000);
+
+          setTimeout(() => {
+            const itemElement = scannedItemRefs.current[item.id];
+            if (itemElement && itemsListRef.current) {
+              itemElement.scrollIntoView({
+                behavior: "smooth",
+                block: "nearest",
+              });
+            }
+          }, 100);
+
+          await resumeScanner();
+        }, 3000);
+      } else {
+        // Only 1 item remaining, scan it directly
+        dispatch(incrementItemCounter(item.id));
+
+        // Highlight the scanned item
+        setLastScannedItemId(item.id);
+        setTimeout(() => setLastScannedItemId(null), 2000);
+
+        // Scroll to the scanned item
+        setTimeout(() => {
+          const itemElement = scannedItemRefs.current[item.id];
+          if (itemElement && itemsListRef.current) {
+            itemElement.scrollIntoView({
+              behavior: "smooth",
+              block: "nearest",
+            });
+          }
+        }, 100);
+
+        // Wait 1 second to show success, then resume scanner
+        setTimeout(async () => {
+          await resumeScanner();
+        }, 1000);
+      }
     } catch (err) {
       console.error("Error processing scan:", err);
       await resumeScanner();
@@ -295,7 +334,15 @@ export default function QCScannerMode({ onClose }: QCScannerModeProps) {
       setDetectedCode("");
       setIsProcessing(false);
       setErrorMessage("");
+      setShowScanOptions(false);
+      setScannedItem(null);
       isProcessingRef.current = false;
+
+      // Clear any timers
+      if (autoResumeTimerRef.current) {
+        clearTimeout(autoResumeTimerRef.current);
+        autoResumeTimerRef.current = null;
+      }
 
       // Resume the scanner (reopen camera)
       if (scannerRef.current && isPaused) {
@@ -307,6 +354,70 @@ export default function QCScannerMode({ onClose }: QCScannerModeProps) {
       // If resume fails, try to restart the scanner
       await startScanner();
     }
+  };
+
+  const handleScanOne = async () => {
+    if (!scannedItem) return;
+
+    // Clear auto-resume timer
+    if (autoResumeTimerRef.current) {
+      clearTimeout(autoResumeTimerRef.current);
+      autoResumeTimerRef.current = null;
+    }
+
+    dispatch(incrementItemCounter(scannedItem.id));
+
+    // Highlight the scanned item
+    setLastScannedItemId(scannedItem.id);
+    setTimeout(() => setLastScannedItemId(null), 2000);
+
+    // Scroll to the scanned item
+    setTimeout(() => {
+      const itemElement = scannedItemRefs.current[scannedItem.id];
+      if (itemElement && itemsListRef.current) {
+        itemElement.scrollIntoView({
+          behavior: "smooth",
+          block: "nearest",
+        });
+      }
+    }, 100);
+
+    // Wait a moment then resume scanner
+    setTimeout(async () => {
+      await resumeScanner();
+    }, 500);
+  };
+
+  const handleScanAll = async () => {
+    if (!scannedItem) return;
+
+    // Clear auto-resume timer
+    if (autoResumeTimerRef.current) {
+      clearTimeout(autoResumeTimerRef.current);
+      autoResumeTimerRef.current = null;
+    }
+
+    dispatch(bulkScanItem(scannedItem.id));
+
+    // Highlight the scanned item
+    setLastScannedItemId(scannedItem.id);
+    setTimeout(() => setLastScannedItemId(null), 2000);
+
+    // Scroll to the scanned item
+    setTimeout(() => {
+      const itemElement = scannedItemRefs.current[scannedItem.id];
+      if (itemElement && itemsListRef.current) {
+        itemElement.scrollIntoView({
+          behavior: "smooth",
+          block: "nearest",
+        });
+      }
+    }, 100);
+
+    // Wait a moment then resume scanner
+    setTimeout(async () => {
+      await resumeScanner();
+    }, 500);
   };
 
   // Clean scanned part number using regex (from Dart implementation)
@@ -525,8 +636,13 @@ export default function QCScannerMode({ onClose }: QCScannerModeProps) {
                               {item.brand_item?.item?.part_number || "N/A"}
                             </h3>
                             <p className="text-sm text-gray-600 mt-1 line-clamp-2">
-                              {item.brand_item?.brand?.name_en || "N/A"} -{" "}
-                              {item.brand_item?.item?.description || "N/A"}
+                              {locale === "ar"
+                                ? item.brand_item?.brand?.name_ar || item.brand_item?.brand?.name_en || "N/A"
+                                : item.brand_item?.brand?.name_en || "N/A"}{" "}
+                              -{" "}
+                              {locale === "ar"
+                                ? item.brand_item?.item?.description_ar || item.brand_item?.item?.description_en || item.brand_item?.item?.description || "N/A"
+                                : item.brand_item?.item?.description_en || item.brand_item?.item?.description || "N/A"}
                             </p>
                           </div>
                         </div>
@@ -605,7 +721,42 @@ export default function QCScannerMode({ onClose }: QCScannerModeProps) {
 
           {/* Status Overlay */}
           <div className="absolute bottom-0 left-0 right-0 bg-gradient-to-t from-black/80 to-transparent p-4">
-            {errorMessage ? (
+            {showScanOptions && scannedItem ? (
+              <div className="bg-green-500 text-white p-4 rounded-lg shadow-lg">
+                <div className="text-center mb-3">
+                  <p className="text-xs mb-1">{t("detectedCode")}:</p>
+                  <h3 className="text-2xl font-bold mb-2 font-mono">
+                    {scannedItem.brand_item?.item?.part_number || "N/A"}
+                  </h3>
+                  <p className="text-sm opacity-90">
+                    {(() => {
+                      const counter = itemCountersRef.current[scannedItem.id];
+                      const remaining = scannedItem.quantity - (counter?.totalRequestedQuantity || 0);
+                      return `${remaining} ${t("remaining")}`;
+                    })()}
+                  </p>
+                </div>
+                <div className="flex gap-3">
+                  <Button
+                    onClick={handleScanOne}
+                    variant="outline"
+                    className="flex-1 h-12 text-base bg-white text-gray-900 hover:bg-gray-100 border-2 border-white"
+                  >
+                    +1
+                  </Button>
+                  <Button
+                    onClick={handleScanAll}
+                    className="flex-1 h-12 text-base bg-primary-600 hover:bg-primary-700 text-white border-2 border-white"
+                  >
+                    <ScanLine className="w-4 h-4 mr-2" />
+                    {t("scanAll")}
+                  </Button>
+                </div>
+                <p className="text-xs text-center opacity-75 mt-2">
+                  {t("autoScanOneIn3Sec")}
+                </p>
+              </div>
+            ) : errorMessage ? (
               <div className="text-center bg-red-500 text-white p-4 rounded-lg shadow-lg animate-pulse">
                 <div className="text-5xl mb-3">⚠️</div>
                 <p className="text-lg font-bold">{errorMessage}</p>
