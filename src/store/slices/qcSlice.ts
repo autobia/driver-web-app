@@ -166,6 +166,28 @@ const qcSlice = createSlice({
       }
     },
 
+    // Bulk scan - set item counter to full quantity
+    bulkScanItem: (state, action: PayloadAction<number>) => {
+      const itemId = action.payload;
+      const counter = state.itemCounters[itemId];
+
+      if (counter) {
+        // Set regular quantity to the remaining amount needed to reach original quantity
+        const remainingQuantity =
+          counter.originalQuantity -
+          counter.totalReplacementQuantity -
+          counter.totalDelayedQuantity;
+
+        if (remainingQuantity > 0) {
+          counter.regularQuantity = remainingQuantity;
+          updateCounterCalculations(counter);
+
+          // Recalculate totals
+          qcSlice.caseReducers.recalculateTotals(state);
+        }
+      }
+    },
+
     // Reset all counters
     resetAllCounters: (state) => {
       Object.values(state.itemCounters).forEach((counter) => {
@@ -314,6 +336,7 @@ export const {
   resetCurrentQC,
   incrementItemCounter,
   decrementItemCounter,
+  bulkScanItem,
   resetAllCounters,
   resetItemCounter,
   addReplacementItem,

@@ -1,18 +1,19 @@
 "use client";
 
 import { useSelector, useDispatch } from "react-redux";
-import { useTranslations } from "next-intl";
+import { useTranslations, useLocale } from "next-intl";
 import { RootState } from "../../../../store/store";
 import { QualityCheckItem } from "../../../../store/api/qualityChecksApi";
 import {
   incrementItemCounter,
   decrementItemCounter,
+  bulkScanItem,
   removeReplacementItem,
   removeDelayedItem,
   selectItemCounter,
 } from "../../../../store/slices/qcSlice";
 import { Button } from "../../../../components/ui/button";
-import { Plus, Minus, Package, Clock, Timer } from "lucide-react";
+import { Plus, Minus, Package, Clock, Timer, ScanLine } from "lucide-react";
 import { useState } from "react";
 import ReplacementItemModal from "./ReplacementItemModal";
 import DelayedItemModal from "./DelayedItemModal";
@@ -42,6 +43,7 @@ function highlightText(text: string, query: string) {
 
 export default function QCItemCard({ item, searchQuery = "" }: QCItemCardProps) {
   const t = useTranslations();
+  const locale = useLocale();
   const dispatch = useDispatch();
 
   const [showReplacementModal, setShowReplacementModal] = useState(false);
@@ -76,6 +78,10 @@ export default function QCItemCard({ item, searchQuery = "" }: QCItemCardProps) 
     if (counter.regularQuantity > 0) {
       dispatch(decrementItemCounter(item.id));
     }
+  };
+
+  const handleBulkScan = () => {
+    dispatch(bulkScanItem(item.id));
   };
 
   const getStatusColor = () => {
@@ -118,8 +124,13 @@ export default function QCItemCard({ item, searchQuery = "" }: QCItemCardProps) 
                 : item.brand_item?.item?.part_number || "N/A"}
             </h3>
             <p className="text-sm text-gray-600 mt-1 break-words">
-              {item.brand_item?.brand?.name_en || "N/A"} -{" "}
-              {item.brand_item?.item?.description || "N/A"}
+              {locale === "ar"
+                ? item.brand_item?.brand?.name_ar || item.brand_item?.brand?.name_en || "N/A"
+                : item.brand_item?.brand?.name_en || "N/A"}{" "}
+              -{" "}
+              {locale === "ar"
+                ? item.brand_item?.item?.description_ar || item.brand_item?.item?.description_en || item.brand_item?.item?.description || "N/A"
+                : item.brand_item?.item?.description_en || item.brand_item?.item?.description || "N/A"}
             </p>
           </div>
         </div>
@@ -167,8 +178,8 @@ export default function QCItemCard({ item, searchQuery = "" }: QCItemCardProps) 
       </div>
 
       {/* Regular Quantity Counter */}
-      <div className="flex items-center justify-between mb-4">
-        <div className="flex items-center space-x-3">
+      <div className="flex items-center justify-center mb-4">
+        <div className="flex items-center space-x-2">
           <Button
             onClick={handleDecrement}
             disabled={counter.regularQuantity === 0}
@@ -195,17 +206,23 @@ export default function QCItemCard({ item, searchQuery = "" }: QCItemCardProps) 
           >
             <Plus className="w-4 h-4" />
           </Button>
-        </div>
 
-        <div className="text-right">
-          <div className="text-sm font-medium text-gray-900">
-            {counter.status === "completed" ? t("complete") : t("inProgress")}
-          </div>
-          <div className="text-xs text-gray-500">
-            {hasShortage ? t("hasShortage") : t("allCounted")}
-          </div>
+          {/* Bulk Scan Button */}
+          {counter.status !== "completed" && (
+            <Button
+              onClick={handleBulkScan}
+              disabled={counter.totalRequestedQuantity >= item.quantity}
+              size="sm"
+              variant="default"
+              className="h-8 px-3 bg-primary-600 hover:bg-primary-700 text-white"
+            >
+              <ScanLine className="w-4 h-4 mr-1" />
+              {t("bulkScanAll")}
+            </Button>
+          )}
         </div>
       </div>
+
       {/* Progress Bar */}
       <div className="mb-4">
         <div className="w-full bg-gray-200 rounded-full h-3 relative overflow-hidden">
@@ -398,12 +415,16 @@ export default function QCItemCard({ item, searchQuery = "" }: QCItemCardProps) 
           <div>
             <span className="font-medium">{t("manufacturer")}:</span>
             <br />
-            {item.brand_item?.item?.manufacturer?.name_en || "N/A"}
+            {locale === "ar"
+              ? item.brand_item?.item?.manufacturer?.name_ar || item.brand_item?.item?.manufacturer?.name_en || "N/A"
+              : item.brand_item?.item?.manufacturer?.name_en || "N/A"}
           </div>
           <div>
             <span className="font-medium">{t("brand")}:</span>
             <br />
-            {item.brand_item?.brand?.name_en || "N/A"}
+            {locale === "ar"
+              ? item.brand_item?.brand?.name_ar || item.brand_item?.brand?.name_en || "N/A"
+              : item.brand_item?.brand?.name_en || "N/A"}
           </div>
         </div>
       </div>

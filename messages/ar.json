@@ -349,5 +349,9 @@
   "confirmCancelOperationMessage": "هل أنت متأكد من أنك تريد إلغاء العملية؟ سيتم فقدان جميع الطرود الممسوحة.",
   "confirmCancel": "تأكيد الإلغاء",
   "profile": "الملف الشخصي",
-  "searchByPartNumber": "البحث برقم القطعة"
+  "searchByPartNumber": "البحث برقم القطعة",
+  "bulkScanAll": "مسح الكل مرة واحدة",
+  "scanOne": "مسح واحد",
+  "autoScanOneIn3Sec": "مسح تلقائي لعنصر واحد بعد 3 ثوان...",
+  "scanAll": "مسح الكل"
 }
