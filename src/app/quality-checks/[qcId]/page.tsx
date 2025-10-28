@@ -21,6 +21,8 @@ import {
   RotateCcw,
   CheckCircle,
   Scan,
+  Search,
+  X,
 } from "lucide-react";
 import QCTimeline from "./components/QCTimeline";
 import QCItemCard from "./components/QCItemCard";
@@ -43,6 +45,7 @@ export default function QualityCheckDetailPage() {
   const [showResetModal, setShowResetModal] = useState(false);
   const [showCompletionModal, setShowCompletionModal] = useState(false);
   const [showScannerMode, setShowScannerMode] = useState(false);
+  const [searchQuery, setSearchQuery] = useState("");
 
   // Fetch specific QC data - either from list or directly by ID
   const { data: qualityChecksData, isLoading: isQCListLoading } =
@@ -106,6 +109,35 @@ export default function QualityCheckDetailPage() {
   const handleOpenScannerMode = () => {
     setShowScannerMode(true);
   };
+
+  // Sort items based on search query
+  const sortedItems = currentQC
+    ? currentQC.items.slice().sort((a, b) => {
+        if (!searchQuery.trim()) {
+          return 0; // Keep original order if no search
+        }
+
+        const searchLower = searchQuery.toLowerCase();
+        const partNumberA = (a.brand_item?.item?.part_number || "").toLowerCase();
+        const partNumberB = (b.brand_item?.item?.part_number || "").toLowerCase();
+
+        const matchA = partNumberA.includes(searchLower);
+        const matchB = partNumberB.includes(searchLower);
+
+        // Items with matches come first
+        if (matchA && !matchB) return -1;
+        if (!matchA && matchB) return 1;
+
+        // Among matching items, sort by the position of the match
+        if (matchA && matchB) {
+          const indexA = partNumberA.indexOf(searchLower);
+          const indexB = partNumberB.indexOf(searchLower);
+          if (indexA !== indexB) return indexA - indexB;
+        }
+
+        return 0;
+      })
+    : [];
 
   if (isQCLoading || isLoading) {
     return (
@@ -193,22 +225,46 @@ export default function QualityCheckDetailPage() {
 
         {/* Items List */}
         <div className="space-y-4">
-          <div className="flex items-center justify-between mb-4">
-            <h2 className="text-lg font-semibold text-gray-900">
-              {t("items")}
-            </h2>
-            <Button
-              onClick={handleOpenScannerMode}
-              className="bg-primary-600 hover:bg-primary-700 text-white"
-            >
-              <Scan className="w-4 h-4 mr-2" />
-              {t("scannerMode")}
-            </Button>
+          <div className="flex flex-col gap-4 mb-4">
+            <div className="flex items-center justify-between">
+              <h2 className="text-lg font-semibold text-gray-900">
+                {t("items")}
+              </h2>
+              <Button
+                onClick={handleOpenScannerMode}
+                className="bg-primary-600 hover:bg-primary-700 text-white"
+              >
+                <Scan className="w-4 h-4 mr-2" />
+                {t("scannerMode")}
+              </Button>
+            </div>
+
+            {/* Search Input */}
+            <div className="relative">
+              <div className="absolute inset-y-0 left-0 flex items-center pl-3 pointer-events-none">
+                <Search className="w-4 h-4 text-gray-400" />
+              </div>
+              <input
+                type="text"
+                value={searchQuery}
+                onChange={(e) => setSearchQuery(e.target.value)}
+                placeholder={t("searchByPartNumber")}
+                className="w-full pl-10 pr-10 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-primary-500 focus:border-transparent"
+              />
+              {searchQuery && (
+                <button
+                  onClick={() => setSearchQuery("")}
+                  className="absolute inset-y-0 right-0 flex items-center pr-3"
+                >
+                  <X className="w-4 h-4 text-gray-400 hover:text-gray-600" />
+                </button>
+              )}
+            </div>
           </div>
 
           <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-3">
-            {currentQC.items.map((item) => (
-              <QCItemCard key={item.id} item={item} />
+            {sortedItems.map((item) => (
+              <QCItemCard key={item.id} item={item} searchQuery={searchQuery} />
             ))}
           </div>
         </div>
